@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="SML.jpg" width="500" height="500">
+</p>
+
 # Statistics and Machine Learning
 
 A clean academic repository for the **Statistics and Machine Learning** course.
