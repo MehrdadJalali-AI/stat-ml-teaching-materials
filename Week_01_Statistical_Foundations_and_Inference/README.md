@@ -2,15 +2,23 @@
 
 This week builds core statistical thinking for later machine learning topics.
 
-## Folder Purpose
+## Lecture_Support notebooks (run in order)
 
-- `Lecture_Support/`
-  - Supports lecture sessions with theory reminders, guided examples, and fully worked exercises.
-  - Includes interpretation-focused discussion to connect formulas with real meaning.
+1. `01_Data_Types_and_Descriptive_Statistics.ipynb`
+2. `02_Central_Tendency_Dispersion_and_Visualization.ipynb`
+3. `03_Distributions_Skewness_Sampling_and_CLT.ipynb`
+4. `04_Inferential_Statistics_ttest_ANOVA_Correlation.ipynb`
+5. `05_One_Question_One_Test_One_Interpretation.ipynb`
 
-- `Practical_Lab/`
-  - Supports in-class activities with a **task -> hint -> solution** format.
-  - Emphasizes practical execution, interpretation, and common pitfalls.
+All notebooks use **synthetic datasets created inside the notebook** (no external files required).
 
-- `data/`
-  - Dataset notes and data usage guidance for Week 1 activities.
+## Folder purpose
+
+- `Lecture_Support/` — guided lecture examples with interpretation
+- `Practical_Lab/` — in-class tasks with hints and solutions
+
+## Regenerate notebooks
+
+```bash
+python3 scripts/build_week1_notebooks.py
+```

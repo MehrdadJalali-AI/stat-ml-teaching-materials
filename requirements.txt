@@ -6,3 +6,9 @@ scipy
 scikit-learn
 statsmodels
 jupyter
+joblib
+
+# Optional (Week 4 Day 2)
+# prophet
+# xgboost
+# torch
