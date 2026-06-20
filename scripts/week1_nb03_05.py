@@ -122,24 +122,16 @@ def build_nb03():
         md("**Interpretation:** The mean of sample means stays near the population mean, while spread shrinks as sample size grows."),
     ]
     cells += footer(
-        "What does the Central Limit Theorem tell us about sample means?",
-        "It says that sample means tend toward a normal distribution as sample size increases, even when the original population is not normal.",
-        "Change `sample_size` from 5 to 100 in the sampling function and replot the histogram of sample means.",
+        "What does the CLT say about sample means?",
+        "Change sample size to 100 and replot sample means.",
         "- Distributions describe how data are generated.\n"
         "- Skewness helps describe asymmetry.\n"
         "- Sampling introduces random variation.\n"
         "- Larger samples give more stable mean estimates.",
-        "Generate a binomial distribution with `rng.binomial(n=20, p=0.3, size=1000)` and add it to the comparison table.",
+        "Add a binomial sample with `rng.binomial(n=20, p=0.3, size=1000)`.",
         summary="We generated different distributions, measured skewness, and showed that sample means become more normal as sample size grows.",
-        refinement1=(
-            "In **Step 4.6**, change `sample_size=5` to `sample_size=100` when calling `sample_means(...)`. "
-            "Plot the new histogram of sample means and compare it with the small-sample plot. "
-            "Does it look more bell-shaped?"
-        ),
-        refinement2=(
-            "In **Step 4.2**, change the Poisson parameter from `lam=8` to `lam=20`. "
-            "Recompute mean, variance, and skewness for Poisson data and explain whether the mean increased as you expected."
-        ),
+        refinement1="In CLT demo, use `sample_size=100`.",
+        refinement2="Change Poisson `lam` from 8 to 20 and recompute mean.",
     )
     cells.append(code("print('Notebook 03 completed successfully.')"))
     return cells
@@ -264,24 +256,16 @@ def build_nb04():
         ),
     ]
     cells += footer(
-        "What does a p-value tell us, and what does it not prove?",
-        "A p-value measures evidence against H0 under the test assumptions. It does not prove causation, practical importance, or that H1 is true.",
-        "Increase the noise level in the t-test demo (for example, scale = 20) and observe how the p-value changes.",
+        "What does a p-value tell us?",
+        "Set noise level to 20 and check how the p-value changes.",
         "- State H0 and H1 before testing.\n"
         "- Choose the test that matches your question and number of groups.\n"
         "- Report effect size and context, not only p-values.\n"
         "- Correlation is not causation.",
-        "Run `stats.pearsonr` on the correlation dataset and compare with pandas `.corr()`.",
+        "Run `stats.pearsonr` and compare with `.corr()`.",
         summary="We practiced t-tests, ANOVA, and correlation on synthetic data and interpreted p-values carefully.",
-        refinement1=(
-            "In **Step 4.6**, change `noise_level` from `8` to `20` in the t-test demo and rerun the table of p-values. "
-            "Do the p-values become larger or smaller? Why?"
-        ),
-        refinement2=(
-            "In **Step 4.3**, reduce the mean difference between Method A and Method B "
-            "(for example, use `loc=72` and `loc=73` instead of `72` and `78`). "
-            "Rerun the t-test and check whether the p-value increases."
-        ),
+        refinement1="Set `noise_level=20` in the t-test demo.",
+        refinement2="Use group means 72 vs 73 and rerun the t-test.",
     )
     cells.append(code("print('Notebook 04 completed successfully.')"))
     return cells
@@ -414,24 +398,16 @@ def build_nb05():
         md("**Interpretation:** With larger samples, we usually get stronger evidence (smaller p-values) for the same underlying difference."),
     ]
     cells += footer(
-        "Why should we avoid running many tests without a clear question?",
-        "Each test has a chance of a false positive. Many unplanned tests increase the risk of finding 'significant' results by luck.",
-        "Change `sample_size_each_group` from 30 to 10 and rerun the t-test. Observe how the p-value and confidence interval change.",
+        "Why avoid many tests without one clear question?",
+        "Change `sample_size_each_group` to 10 and rerun the t-test.",
         "- Start with one focused question.\n"
         "- Explore data briefly before testing.\n"
         "- Report estimate + uncertainty, not only p-values.\n"
         "- Write conclusions in plain language.",
-        "Rewrite the final conclusion in non-technical language for a classmate who has not taken statistics.",
+        "Rewrite the final conclusion in plain language.",
         summary="We followed one clear question from EDA to a single t-test, confidence interval, and plain-language conclusion.",
-        refinement1=(
-            "Change `sample_size_each_group` from `30` to `10`, rebuild the dataset, and rerun the t-test. "
-            "How do the p-value and confidence interval change?"
-        ),
-        refinement2=(
-            "Keep sample size at 30, but make the methods more similar "
-            "(for example, `method_a_scores = rng.normal(loc=75, ...)` and `method_b_scores = rng.normal(loc=76, ...)`). "
-            "Rerun the test and explain whether you still reject H0."
-        ),
+        refinement1="Set `sample_size_each_group = 10` and rerun the t-test.",
+        refinement2="Use similar means (75 vs 76) and rerun the t-test.",
     )
     cells.append(code("print('Notebook 05 completed successfully.')"))
     return cells

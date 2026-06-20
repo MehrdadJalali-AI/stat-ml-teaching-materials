@@ -38,49 +38,26 @@ def header(title, objectives):
     ]
 
 
-def footer(concept_q, concept_a, code_q, takeaways, practice, summary=None, refinement1="", refinement2=""):
+def footer(concept_q, code_q, takeaways, practice, summary=None, refinement1="", refinement2=""):
     summary_text = summary or "Review the tables and plots above and connect each numeric result to a plain-language sentence."
     return [
         md(f"## 7) Summary Interpretation\n\n{summary_text}"),
         md(
             "## 8) Student Check Questions\n\n"
-            "### Question 1 (Conceptual)\n"
-            f"{concept_q}\n\n"
-            "**Suggested answer:**\n"
-            f"{concept_a}\n\n"
-            "### Question 2 (Small code change)\n"
-            f"{code_q}\n\n"
-            "Try the change in a new code cell below and write one sentence about what you observed."
+            f"1. (Conceptual) {concept_q}\n\n"
+            f"2. (Code) {code_q}"
         ),
-        code("# Your code change for Question 2 goes here.\n"),
+        code("# Question 2 — your code here\n"),
         md("## 9) Key Takeaways\n\n" + takeaways),
         md("## 10) Optional Short Practice / Challenge\n\n" + practice),
         md(
-            "## 11) Code Refinement Tasks — Check Your Understanding\n\n"
-            "Complete **both** refinements below. This checks whether you understood the notebook, not only whether you can run it.\n\n"
-            "**Instructions:**\n"
-            "1. Read each task carefully.\n"
-            "2. Write or change Python code in the cells below.\n"
-            "3. **Run each cell** (and rerun earlier cells if needed).\n"
-            "4. Compare the new output with the original notebook results.\n"
-            "5. Write a short note: *What changed? Did it match your expectation?*\n\n"
-            f"### Refinement 1\n{refinement1}\n\n"
-            f"### Refinement 2\n{refinement2}"
+            "## 11) Code Refinement Tasks\n\n"
+            "Edit the code, rerun each cell, and write one short sentence per task.\n\n"
+            f"1. {refinement1}\n"
+            f"2. {refinement2}"
         ),
-        code(
-            "# Refinement 1 — your code here\n"
-            "# After editing, run this cell and describe the result in one sentence.\n"
-        ),
-        code(
-            "# Refinement 2 — your code here\n"
-            "# After editing, run this cell and describe the result in one sentence.\n"
-        ),
-        md(
-            "**Reflection (write in your own words):**\n"
-            "- Refinement 1: What did you change, and what happened after rerun?\n"
-            "- Refinement 2: What did you change, and what happened after rerun?\n"
-            "- Do you understand *why* the output changed?"
-        ),
+        code("# Refinement 1\n"),
+        code("# Refinement 2\n"),
     ]
 
 
@@ -228,25 +205,16 @@ def build_nb01():
         md("**Interpretation:** Both methods match. Mean = sum of values divided by count."),
     ]
     cells += footer(
-        "Why do we separate qualitative and quantitative variables before analysis?",
-        "They need different summaries and plots. Means are meaningful for numbers, while counts or bar charts are better for categories.",
-        "Change the grouping column from `study_group` to `city` and compare the mean `exam_score` for each city.",
+        "Why separate qualitative and quantitative variables?",
+        "Group by `city` instead of `study_group` and compare mean `exam_score`.",
         "- Inspect before interpreting.\n"
         "- Variable types are foundational.\n"
         "- Grouped descriptive statistics are more informative than one global number.\n"
         "- Manual checks improve statistical intuition.",
-        "Convert `gender` and `city` to pandas `category` dtype using `.astype('category')`, then run `info()` again.",
+        "Convert `gender` and `city` to category dtype, then run `info()`.",
         summary="We created and inspected a student table, separated variable types, and compared groups with tables and a bar chart.",
-        refinement1=(
-            "In **Step 4.5**, change the grouping column from `'study_group'` to `'city'`. "
-            "Recompute the mean `exam_score` for each city and display the table. "
-            "Which city has the highest average score in your synthetic data?"
-        ),
-        refinement2=(
-            "Create a filtered table with only students where `age >= 20`, then run `.describe()` on `exam_score`. "
-            "Compare the mean with the mean from the full dataset. "
-            "Did filtering change the average much?"
-        ),
+        refinement1="Group by `city` and show mean `exam_score`.",
+        refinement2="Keep only students with `age >= 20` and run `describe()` on `exam_score`.",
     )
     cells.append(code("print('Notebook 01 completed successfully.')"))
     write_notebook(NB_DIR / "01_Data_Types_and_Descriptive_Statistics.ipynb", cells)
@@ -375,24 +343,16 @@ def build_nb02():
         md("**Interpretation:** Removing the outlier brings the mean closer to the median."),
     ]
     cells += footer(
-        "Why can the median be better than the mean when outliers exist?",
-        "Outliers pull the mean toward extreme values. The median depends on the middle order of values, so it is more stable.",
-        "Add a new outlier (for example, score = 200) to `score_with_outlier` and observe how mean and median change.",
+        "When is median better than mean?",
+        "Add outlier score 200 and compare mean vs median.",
         "- Report center and spread together.\n"
         "- Use plots to support tables.\n"
         "- Prefer median when extreme values are present.\n"
         "- Always interpret numbers in context.",
-        "Create a third column with a strongly skewed distribution using `rng.exponential(scale=10, size=number_of_rows)` and compare mean vs median.",
+        "Add a skewed column with `rng.exponential(scale=10, size=number_of_rows)`.",
         summary="We compared mean, median, and spread measures and saw how one outlier can distort the mean but not the median.",
-        refinement1=(
-            "In **Step 4.3**, add a second extreme outlier: set two rows in `score_with_outlier` to `180` and `200`. "
-            "Recompute mean and median and print both. "
-            "Which measure changed more?"
-        ),
-        refinement2=(
-            "In **Step 4.6**, change the histogram bins from `15` to `5`, rerun the plot, and describe how the shape looks different. "
-            "Does the data change, or only the visual detail?"
-        ),
+        refinement1="Add outliers 180 and 200 to `score_with_outlier`; print mean and median.",
+        refinement2="Change histogram bins from 15 to 5 and replot.",
     )
     cells.append(code("print('Notebook 02 completed successfully.')"))
     write_notebook(NB_DIR / "02_Central_Tendency_Dispersion_and_Visualization.ipynb", cells)
