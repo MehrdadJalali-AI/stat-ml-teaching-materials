@@ -1,8 +1,11 @@
 """Generate Week 4 lecture-support notebooks (clustering, forecasting, reporting)."""
 from pathlib import Path
+import sys
 import nbformat as nbf
 
 BASE = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from student_challenges import student_challenge_cells
 WEEK4_DIR = BASE / "Week_04_Unsupervised_Learning_Time_Series_and_Reporting"
 LECTURE_DIR = WEEK4_DIR / "Lecture_Support"
 DATA_DIR = BASE / "data" / "week4"
@@ -411,6 +414,35 @@ def build_day1():
         ),
         code("print('Week 4 Day 1 Clustering + PCA completed successfully.')"),
     ]
+    cells.extend(student_challenge_cells([
+        (
+            "Change number of clusters",
+            "What happens if you set K-Means to 4 clusters?",
+            [
+                "Fit KMeans(n_clusters=4) on the scaled customer features.",
+                "Print silhouette score.",
+                "Compare with the K chosen in the notebook.",
+            ],
+        ),
+        (
+            "Change DBSCAN eps",
+            "How do cluster count and noise change when eps=0.45?",
+            [
+                "Run DBSCAN(eps=0.45, min_samples=5) on scaled data.",
+                "Print number of clusters and noise points.",
+                "Compare with eps=0.55 from the notebook.",
+            ],
+        ),
+        (
+            "Change PCA components",
+            "How much variance is explained by 3 PCA components?",
+            [
+                "Fit PCA(n_components=3) on scaled features.",
+                "Print explained_variance_ratio_ and their sum.",
+                "Compare with the 2-component PCA plot.",
+            ],
+        ),
+    ]))
     write_notebook(LECTURE_DIR / "01_Week4_Day1_Clustering_PCA.ipynb", cells)
 
 
@@ -751,6 +783,35 @@ def build_day3():
         ),
         code("print('Week 4 Day 3 Reporting and Final Project Preparation completed successfully.')"),
     ]
+    cells.extend(student_challenge_cells([
+        (
+            "Change random seed",
+            "Do results stay the same when you change the seed?",
+            [
+                "Set np.random.seed(99) and random.seed(99).",
+                "Rerun the seeded vs unseeded demo from the notebook.",
+                "Write one sentence about reproducibility.",
+            ],
+        ),
+        (
+            "Save another model file",
+            "Can you save and reload a model with a new filename?",
+            [
+                "Train a simple LinearRegression on demo data.",
+                "Save it as reports_demo_model.joblib in DATA_DIR.",
+                "Load it and print one prediction.",
+            ],
+        ),
+        (
+            "Change drift strength",
+            "What happens if the shifted test distribution is weaker?",
+            [
+                "In the drift demo, use test_x = rng.normal(0.3, 1.0, 400) instead of 1.2.",
+                "Retrain and print accuracy on shifted data.",
+                "Compare with the original drift example.",
+            ],
+        ),
+    ]))
     # Day 3 needs matplotlib import in early code cell - add imports cell
     cells.insert(
         2,

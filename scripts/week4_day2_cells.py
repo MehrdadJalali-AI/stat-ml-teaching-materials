@@ -448,3 +448,35 @@ def get_day2_cells(md, code, common_helper):
         ),
         code("print('Week 4 Day 2 Time Series Forecasting completed successfully.')"),
     ]
+
+    from student_challenges import student_challenge_cells
+    cells.extend(student_challenge_cells([
+        (
+            "Change train/test split",
+            "How does a 70/30 split change train and test length?",
+            [
+                "Set TEST_RATIO = 0.3 and rebuild train/test split.",
+                "Print len(train) and len(test).",
+                "Plot train and test periods again.",
+            ],
+        ),
+        (
+            "Change moving-average window",
+            "Does a window of 6 change the moving-average RMSE?",
+            [
+                "Compute moving average forecast with window=6 instead of 12.",
+                "Print MAE and RMSE on the test set.",
+                "Compare with the notebook baseline table.",
+            ],
+        ),
+        (
+            "Change ARIMA order",
+            "What happens with ARIMA(2, 1, 1) instead of (1, 1, 1)?",
+            [
+                "Fit ARIMA(2, 1, 1) on the training series.",
+                "Forecast the test period and print RMSE.",
+                "Compare with the ARIMA result in the notebook.",
+            ],
+        ),
+    ]))
+    return cells

@@ -1,8 +1,10 @@
 from pathlib import Path
+import sys
 import nbformat as nbf
 
-
-BASE = Path("/Users/mehrdadjalali/Documents/SRH-Courses/Modules/Statistics and Machine Learning/Hands-on/Statistics-and-Machine-Learning")
+BASE = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from student_challenges import student_challenge_cells
 WEEK3_DIR = BASE / "Week_03_Classification_Evaluation_and_Regularization"
 LECTURE_DIR = WEEK3_DIR / "Lecture_Support"
 DATA_DIR = BASE / "data" / "week3"
@@ -67,8 +69,36 @@ def build_day1():
     cells.append(nbf.v4.new_code_cell("small_tree = DecisionTreeClassifier(max_depth=3, random_state=42)\nsmall_tree.fit(X_train, y_train)\n\nplt.figure(figsize=(16, 8))\nplot_tree(small_tree, feature_names=feature_names, class_names=target_names, filled=True, max_depth=2, fontsize=8)\nplt.title('Decision Tree Visualization (truncated depth for readability)')\nplt.show()"))
     cells.append(nbf.v4.new_markdown_cell("## Summary table for compared tree models"))
     cells.append(nbf.v4.new_code_cell("summary = pd.DataFrame([\n    {'Model': m1['Model'], 'Criterion': 'default', 'max_depth': 'default', 'Train Accuracy': m1['Train Accuracy'], 'Test Accuracy': m1['Test Accuracy'], 'Precision': m1['Precision'], 'Recall': m1['Recall'], 'F1-score': m1['F1-score']},\n    {'Model': m2['Model'], 'Criterion': 'gini', 'max_depth': 4, 'Train Accuracy': m2['Train Accuracy'], 'Test Accuracy': m2['Test Accuracy'], 'Precision': m2['Precision'], 'Recall': m2['Recall'], 'F1-score': m2['F1-score']},\n    {'Model': m3['Model'], 'Criterion': 'entropy', 'max_depth': 4, 'Train Accuracy': m3['Train Accuracy'], 'Test Accuracy': m3['Test Accuracy'], 'Precision': m3['Precision'], 'Recall': m3['Recall'], 'F1-score': m3['F1-score']},\n]).sort_values('Test Accuracy', ascending=False)\ndisplay(summary.round(3))"))
-    cells.append(nbf.v4.new_markdown_cell("## Student reflection\n- Which tree performed best?\n- Did the deepest tree generalize best?\n- Why might a simpler tree be better?\n- Which metric matters most for this task?"))
     cells.append(nbf.v4.new_code_cell("print('Week 3 Day 1 Decision Trees and Evaluation completed successfully.')"))
+    cells.extend(student_challenge_cells([
+        (
+            "Change tree depth",
+            "What happens to test accuracy if max_depth is 2 instead of 4?",
+            [
+                "Train DecisionTreeClassifier(max_depth=2, random_state=42).",
+                "Print test accuracy and F1-score.",
+                "Compare with the max_depth=4 result from the notebook.",
+            ],
+        ),
+        (
+            "Change split criterion",
+            "Does entropy give a different F1-score than gini at the same depth?",
+            [
+                "Train one tree with criterion='entropy' and max_depth=4.",
+                "Print test F1-score.",
+                "Compare with the gini tree from the notebook.",
+            ],
+        ),
+        (
+            "Compare train vs test accuracy",
+            "Does a deeper tree overfit on this dataset?",
+            [
+                "Train DecisionTreeClassifier(max_depth=8, random_state=42).",
+                "Print train accuracy and test accuracy.",
+                "Write one sentence about overfitting.",
+            ],
+        ),
+    ]))
     write_notebook(LECTURE_DIR / "01_Week3_Day1_Decision_Trees_and_Evaluation.ipynb", cells)
 
 
@@ -99,8 +129,36 @@ def build_day2():
     cells.append(nbf.v4.new_code_cell("tree = DecisionTreeClassifier(max_depth=4, random_state=42)\ntree.fit(X_train, y_train)\ny_pred_tree = tree.predict(X_test)\n\ncmp = pd.DataFrame([\n    {'Model': f'KNN (k={best_k})', 'Accuracy': accuracy_score(y_test, y_pred_best_knn), 'Precision': precision_score(y_test, y_pred_best_knn), 'Recall': recall_score(y_test, y_pred_best_knn), 'F1': f1_score(y_test, y_pred_best_knn)},\n    {'Model': 'Decision Tree (max_depth=4)', 'Accuracy': accuracy_score(y_test, y_pred_tree), 'Precision': precision_score(y_test, y_pred_tree), 'Recall': recall_score(y_test, y_pred_tree), 'F1': f1_score(y_test, y_pred_tree)},\n])\ndisplay(cmp.round(3))"))
     cells.append(nbf.v4.new_code_cell("metrics = ['Accuracy', 'Precision', 'Recall', 'F1']\nx = np.arange(len(metrics))\nwidth = 0.35\n\nplt.figure(figsize=(8,4))\nplt.bar(x - width/2, cmp.loc[0, metrics], width, label=cmp.loc[0, 'Model'])\nplt.bar(x + width/2, cmp.loc[1, metrics], width, label=cmp.loc[1, 'Model'])\nplt.xticks(x, metrics)\nplt.ylim(0, 1.05)\nplt.title('Model Comparison by Metric')\nplt.legend()\nplt.tight_layout()\nplt.show()"))
     cells.append(nbf.v4.new_markdown_cell("## Interpretation\n- Which model has higher recall?\n- Which has higher precision?\n- Which errors are more important in this task?"))
-    cells.append(nbf.v4.new_markdown_cell("## Student tasks\n1. Try `metric='manhattan'` in KNN.\n2. Compare with Euclidean metric.\n3. Test another `k`.\n4. Explain whether KNN or Decision Tree is easier to interpret."))
     cells.append(nbf.v4.new_code_cell("print('Week 3 Day 2 KNN and Model Comparison completed successfully.')"))
+    cells.extend(student_challenge_cells([
+        (
+            "Change k",
+            "How do accuracy and F1 change when k=15?",
+            [
+                "Train KNeighborsClassifier(n_neighbors=15) on scaled training data.",
+                "Print test accuracy and F1-score.",
+                "Compare with k=5 from the notebook.",
+            ],
+        ),
+        (
+            "Change distance metric",
+            "Does Manhattan distance perform differently from Euclidean?",
+            [
+                "Train KNN with metric='manhattan' and n_neighbors=5 on scaled data.",
+                "Print test accuracy.",
+                "Compare with the default Euclidean KNN.",
+            ],
+        ),
+        (
+            "Change train/test split",
+            "What changes if test_size=0.3 instead of 0.2?",
+            [
+                "Create a new train/test split with test_size=0.3 and random_state=42.",
+                "Train KNN (k=5, scaled) again.",
+                "Print the new test accuracy.",
+            ],
+        ),
+    ]))
     write_notebook(LECTURE_DIR / "02_Week3_Day2_KNN_Best_k_and_Model_Comparison.ipynb", cells)
 
 
@@ -130,8 +188,36 @@ def build_day3():
     cells.append(nbf.v4.new_markdown_cell("## Final model comparison table"))
     cells.append(nbf.v4.new_code_cell("best_models = {\n    'Logistic Regression': LogisticRegression(max_iter=1000),\n    'Decision Tree': dt_grid.best_estimator_,\n    'KNN': knn_grid.best_estimator_,\n}\n\nrows = []\nfor name, model in best_models.items():\n    model.fit(X_train, y_train)\n    pred = model.predict(X_test)\n    auc = roc_auc_score(y_test, model.predict_proba(X_test)[:, 1])\n    rows.append({\n        'Model': name,\n        'Best hyperparameters': str(model.get_params()),\n        'Accuracy': accuracy_score(y_test, pred),\n        'Precision': precision_score(y_test, pred),\n        'Recall': recall_score(y_test, pred),\n        'F1': f1_score(y_test, pred),\n        'ROC-AUC': auc,\n    })\n\nfinal_table = pd.DataFrame(rows)\ndisplay(final_table[['Model','Accuracy','Precision','Recall','F1','ROC-AUC']].round(3))"))
     cells.append(nbf.v4.new_markdown_cell("## Final interpretation\nChoose model based on metric priorities, error costs, and interpretability.\n\nQuestions:\n- Which model would you choose and why?\n- Which metric supports your choice?\n- Is there any overfitting signal?\n- Would it still work if data drifts?"))
-    cells.append(nbf.v4.new_markdown_cell("## Student tasks\n1. Change threshold and compare precision/recall.\n2. Try another hyperparameter value.\n3. Explain ROC-AUC in your own words.\n4. Give one real-world concept drift example.\n5. Write a non-technical summary of your chosen model."))
     cells.append(nbf.v4.new_code_cell("print('Week 3 Day 3 Concept Drift, Model Selection, ROC-AUC completed successfully.')"))
+    cells.extend(student_challenge_cells([
+        (
+            "Change classification threshold",
+            "What happens to precision and recall at threshold 0.7?",
+            [
+                "Use logistic regression probabilities on the test set.",
+                "Predict class 1 when probability >= 0.7.",
+                "Print precision and recall and compare with threshold 0.5.",
+            ],
+        ),
+        (
+            "Change KNN grid search",
+            "Does a different k grid change the best KNN model?",
+            [
+                "Run GridSearchCV for KNN with n_neighbors=[1, 3, 5, 7].",
+                "Print best_params_ and best CV F1-score.",
+                "Compare with the notebook grid result.",
+            ],
+        ),
+        (
+            "Change tree depth grid",
+            "Does limiting tree depth change the best tree?",
+            [
+                "Run GridSearchCV for DecisionTree with max_depth=[2, 4, 6].",
+                "Print best_params_ and test F1 on X_test.",
+                "Write one sentence comparing with the notebook tree.",
+            ],
+        ),
+    ]))
     write_notebook(LECTURE_DIR / "03_Week3_Day3_Concept_Drift_Model_Selection_ROC_AUC.ipynb", cells)
 
 
