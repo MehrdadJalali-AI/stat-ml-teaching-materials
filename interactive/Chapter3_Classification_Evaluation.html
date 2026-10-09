@@ -1,0 +1,971 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ch3 · Classification, Evaluation & Regularization</title>
+<meta name="description" content="Interactive study guide — Statistics and Machine Learning, Chapter 3: Classification, Evaluation & Regularization">
+<style>:root{
+  --bg:#f7f5f2; --surface:#ffffff; --surface2:#f1eee9; --ink:#1f1d1a; --muted:#5f5a53; --line:#e3ded6;
+  --accent:#c9471a; --accent-soft:#fbe9e1; --blue:#1f5fa8; --blue-soft:#e6eef8; --green:#21794f; --green-soft:#e2f2ea;
+  --amber:#9a5a0f; --amber-soft:#fbf0de; --purple:#5a43a6; --purple-soft:#ece8f8; --red:#b42318; --red-soft:#fde8e6;
+  --code-bg:#1e1f24; --code-ink:#e8e6e3; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --radius:14px; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);padding:.1em .35em;border-radius:5px}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .5em}
+h2{font-size:1.65rem;letter-spacing:-.01em}
+h3{font-size:1.15rem}
+p{margin:0 0 1em}
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:10px 20px}
+.brand{font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+.chapnav{display:flex;gap:6px;overflow-x:auto;flex:1}
+.chapnav a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:.9rem;white-space:nowrap;border:1px solid transparent}
+.chapnav a.on{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent);font-weight:600}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.progress{height:3px;background:var(--accent);width:0;transition:width .1s}
+.hero{max-width:1240px;margin:0 auto;padding:48px 20px 24px}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}
+.hero h1{font-size:clamp(1.9rem,4vw,2.8rem);letter-spacing:-.02em;margin:.2em 0 .35em}
+.hero p.lead{font-size:1.12rem;color:var(--muted);max-width:760px}
+.objectives{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px}
+.objectives div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.93rem}
+.objectives b{display:block;color:var(--accent);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;padding:0 20px 80px}
+.toc{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 96px);overflow:auto;font-size:.9rem}
+.toc h4{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:8px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
+.toc a.active{color:var(--ink);background:var(--surface);border-left-color:var(--accent)}
+.toc a .dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--line);flex:none}
+.toc a.done .dot{background:var(--green);border-color:var(--green)}
+section.chap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow)}
+section.chap > .sec-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
+.secnum{color:var(--accent);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.donebtn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 10px;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.donebtn.on{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h4{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.green{border-color:var(--green);background:var(--green-soft)}
+.callout.blue{border-color:var(--blue);background:var(--blue-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b:first-child{display:block;margin-bottom:2px}
+.analogy{display:flex;gap:12px;background:var(--purple-soft);border-radius:12px;padding:14px 16px;margin:16px 0}
+.analogy .ico{font-size:1.5rem;line-height:1}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.tag.blue{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.tag.green{background:var(--green-soft);color:var(--green);border-color:transparent}
+.tag.amber{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.tag.red{background:var(--red-soft);color:var(--red);border-color:transparent}
+.tag.purple{background:var(--purple-soft);color:var(--purple);border-color:transparent}
+.widget{border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:12px;padding:18px;margin:18px 0;background:var(--bg)}
+.widget > .wtitle{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:10px}
+.widget > .wtitle::before{content:"▶ TRY IT";font-size:.7rem;letter-spacing:.08em;background:var(--accent);color:#fff;padding:2px 8px;border-radius:999px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:9px;cursor:pointer;font:inherit;font-size:.92rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+input[type=text],input[type=number],select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{font-family:var(--mono);font-size:.85rem;width:100%}
+label{font-size:.9rem}
+input[type=range]{accent-color:var(--accent);width:100%}
+.tablewrap{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:600;white-space:nowrap}
+td.bad,span.bad{background:var(--red-soft);color:var(--red)}
+td.good{background:var(--green-soft);color:var(--green)}
+td.warn{background:var(--amber-soft);color:var(--amber)}
+tr.hl td{background:var(--accent-soft)}
+td[contenteditable]{outline:none;cursor:text}
+td[contenteditable]:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;overflow:auto;font:13px/1.55 var(--mono);position:relative;margin:10px 0}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre .copy{position:absolute;top:8px;right:8px;font-size:.72rem;background:#ffffff1a;color:#ddd;border:1px solid #ffffff30;border-radius:6px;padding:2px 8px;cursor:pointer}
+.c-k{color:#f4a261}.c-s{color:#9ad59a}.c-c{color:#8b8f98;font-style:italic}.c-n{color:#82b8ff}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+.tabs button{border:0;background:none;color:var(--muted);padding:9px 14px;cursor:pointer;font:inherit;font-size:.93rem;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tabpanel{display:none}.tabpanel.on{display:block}
+details.reveal{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+details.reveal summary{cursor:pointer;font-weight:600}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.links a{display:block;text-decoration:none;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;transition:border-color .15s,transform .15s}
+.links a:hover{border-color:var(--accent);transform:translateY(-1px)}
+.links a b{display:block;color:var(--accent);font-size:.95rem}
+.links a span{font-size:.84rem;color:var(--muted)}
+.quiz .q{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.quiz .q p{font-weight:600;margin-bottom:8px}
+.quiz .opts{display:grid;gap:6px}
+.quiz .opts button{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;font-size:.93rem}
+.quiz .opts button.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.quiz .opts button.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.quiz .why{display:none;margin-top:8px;font-size:.9rem;color:var(--muted)}
+.quiz .q.answered .why{display:block}
+.score{font-weight:700;color:var(--accent)}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0}
+.flow .step{flex:1 1 130px;background:var(--surface2);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;position:relative}
+.flow .step small{display:block;color:var(--muted);font-size:.8rem}
+.flow .step.on{border-color:var(--accent);background:var(--accent-soft)}
+.flow .arrow{align-self:center;color:var(--muted)}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:.92rem;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-soft);color:var(--green)}
+.feedback.no{background:var(--red-soft);color:var(--red)}
+.feedback.info{background:var(--blue-soft);color:var(--blue)}
+.meter{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.meter > div{height:100%;background:var(--green);transition:width .3s}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:10px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi .v{font-size:1.5rem;font-weight:700}
+.kpi .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.sorter{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.bucket{min-height:110px;border:2px dashed var(--line);border-radius:10px;padding:8px}
+.bucket h5{margin:0 0 6px;font-size:.85rem}
+.bucket.over{border-color:var(--accent);background:var(--accent-soft)}
+.chip{display:inline-block;margin:3px;padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:.85rem;cursor:grab;user-select:none}
+.chip.sel{outline:2px solid var(--accent)}
+.chip.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.chip.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.pool{min-height:50px;padding:8px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
+.small{font-size:.86rem;color:var(--muted)}
+.foot{max-width:1240px;margin:0 auto;padding:20px;color:var(--muted);font-size:.85rem;text-align:center}
+svg text{font-family:inherit}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .toc{display:none}
+  section.chap{padding:18px}
+  .hero{padding:28px 16px 16px}
+  .layout{padding:0 16px 60px}
+  .topbar-inner{padding:8px 16px}
+}
+@media print{.topbar,.toc,.widget,.donebtn{display:none}.layout{display:block}}
+@media (max-width:700px){#doneCount{display:none}.brand{display:none}}
+
+/* ---- additions for the Statistics & ML pages ---- */
+.plot svg{width:100%;height:auto;display:block;overflow:visible}
+.plot .ax text{fill:var(--muted);font-size:11px}
+.plot .ax text.lab{font-size:12px;fill:var(--muted);font-weight:600}
+.plot .gl{stroke:var(--line);stroke-width:1}
+.plot .axl{stroke:var(--muted);stroke-width:1}
+
+.grid2>*,.grid3>*{min-width:0}
+.plot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;margin:10px 0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--muted);margin:4px 0 6px}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.lg i{display:inline-block;width:14px;height:10px;border-radius:3px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;margin:8px 0}
+.ctrls label{display:flex;flex-direction:column;gap:3px}
+.ctrls label b{font-weight:600;font-size:.86rem;display:flex;justify-content:space-between;gap:8px}
+.ctrls label b span{font-family:var(--mono);color:var(--accent)}
+.formula{font-family:"Cambria Math","STIX Two Math","Latin Modern Math",Georgia,serif;font-size:1.12rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0;overflow-x:auto;text-align:center}
+.formula .lbl{display:block;font-family:inherit;font-size:.78rem;color:var(--muted);text-align:left;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.frac>span:last-child{padding:0 3px}
+.out{font-family:var(--mono);font-size:.88rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
+.die{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:1.1rem;margin:3px;cursor:pointer;user-select:none}
+.die.a{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.die.b{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.die.a.b{background:linear-gradient(135deg,var(--blue-soft) 50%,var(--amber-soft) 50%);border-color:var(--purple);color:var(--purple)}
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;max-width:420px;font-size:.9rem;text-align:center}
+.cm div{padding:10px 6px;border-radius:8px}
+.cm .h{color:var(--muted);font-weight:600;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.cm .tp,.cm .tn{background:var(--green-soft);color:var(--green);font-weight:700}
+.cm .fp,.cm .fn{background:var(--red-soft);color:var(--red);font-weight:700}
+.cm input{width:70px;text-align:center}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;align-items:start}
+.twocol>*{min-width:0}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
+.nb{display:flex;gap:10px;align-items:flex-start;background:var(--blue-soft);border-radius:12px;padding:12px 14px;margin:14px 0;font-size:.93rem}
+.nb .ico{font-size:1.3rem;line-height:1}
+.nb a{font-weight:600}
+.tree{font-family:var(--mono);font-size:.86rem;line-height:1.5}
+.check{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--green)}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+.hlcell{outline:2px solid var(--accent);outline-offset:-2px}
+
+.kpi .v{font-size:1.3rem;line-height:1.25}
+
+section.chap > .sec-head{flex-wrap:wrap}
+section.chap > .sec-head > div{min-width:0}
+h2{overflow-wrap:break-word}
+</style></head>
+<body data-chapter="3">
+<div class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">Statistics &amp; ML</a><nav class="chapnav"><a href="Chapter1_Statistical_Foundations_Inference.html" class="">Ch 1 · Statistics & Inference</a><a href="Chapter2_ML_Foundations_Regression.html" class="">Ch 2 · ML & Regression</a><a href="Chapter3_Classification_Evaluation.html" class="on">Ch 3 · Classification</a><a href="Chapter4_Unsupervised_TimeSeries_Reporting.html" class="">Ch 4 · Clustering & Time Series</a></nav><span class="small" id="doneCount"></span><button class="iconbtn" id="themeBtn">☾ Dark</button></div><div class="progress" id="progress"></div></div>
+<header class="hero" id="top">
+  <div class="kicker">Chapter 3 · Interactive study guide</div>
+  <h1>Classification, Evaluation &amp; Regularization</h1>
+  <p class="lead">Classification predicts a <b>category</b>: spam or not, approve or reject, disease or healthy. This chapter builds three classic classifiers, shows why accuracy alone can mislead, and covers keeping models honest over time: generalisation, bias–variance, concept drift, ROC–AUC and tuning.</p>
+  <div class="objectives">
+    <div><b>Day 1 · Models</b>Logistic regression &amp; thresholds, sigmoid / softmax, decision trees, entropy, information gain, ID3</div>
+    <div><b>Day 2 · Evaluation</b>KNN, distances &amp; scaling, confusion matrix, accuracy, precision, recall, F1</div>
+    <div><b>Day 3 · Generalisation</b>Over- and underfitting, bias–variance, concept drift, ROC–AUC, model selection, hyperparameter tuning</div>
+  </div>
+</header>
+<div class="layout">
+<aside class="toc"><h4>In this chapter</h4><nav id="tocList"></nav></aside>
+<main>
+
+<section class="chap" id="cls" data-title="What is classification?">
+  <div class="sec-head"><div><div class="secnum">Section 1</div><h2>Classification: supervised learning with categories</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Classification → discrete label</h4><p class="small">spam / not spam · approved / rejected · malignant / benign · cat / dog / bird</p></div>
+    <div class="card"><h4>Regression → continuous value</h4><p class="small">price · temperature · salary (Chapter 2)</p></div>
+  </div>
+  <p style="margin-top:14px">Common classifiers: <span class="tag blue">Logistic Regression</span> <span class="tag blue">K-Nearest Neighbours</span> <span class="tag blue">Decision Trees</span> <span class="tag">Random Forests</span> <span class="tag">SVM</span> <span class="tag">Naive Bayes</span> <span class="tag">Neural Networks</span> <span class="tag">Gradient Boosting</span>. The ones in blue are covered in depth here.</p>
+</section>
+
+<section class="chap" id="logreg" data-title="Logistic regression">
+  <div class="sec-head"><div><div class="secnum">Section 2</div><h2>Logistic regression and the decision threshold</h2></div></div>
+  <p>Despite the name, logistic regression is a <b>classifier</b>. It computes a linear score, squashes it into a probability between 0 and 1, then compares that probability with a <b>threshold</b> to get a class label.</p>
+  <div class="grid2">
+    <div class="formula"><span class="lbl">1 · linear score</span>z = β₀ + β₁x₁ + … + β<sub>n</sub>x<sub>n</sub></div>
+    <div class="formula"><span class="lbl">2 · sigmoid → probability</span>p = σ(z) = <span class="frac"><span>1</span><span>1 + e<sup>−z</sup></span></span></div>
+  </div>
+  <div class="widget"><div class="wtitle">Tumour size → malignant? Move the threshold</div>
+    <div class="ctrls"><label><b>Intercept β₀ <span data-for="lb0">−6.0</span></b><input type="range" id="lb0" min="-15" max="5" step="0.1" value="-6"></label><label><b>Slope β₁ <span data-for="lb1">1.2</span></b><input type="range" id="lb1" min="0" max="4" step="0.05" value="1.2"></label><label><b>Decision threshold <span data-for="lth">0.50</span></b><input type="range" id="lth" min="0.05" max="0.95" step="0.01" value="0.5"></label></div>
+    <div class="btnrow"><button class="btn primary" id="lFit">Fit β by maximum likelihood</button></div>
+    <div class="twocol"><div id="lPlot"></div><div><div id="lCM"></div><div class="kpis" id="lKpi"></div></div></div>
+    <div class="feedback info show" id="lOut"></div>
+  </div>
+  <div class="grid2">
+    <div class="callout green" style="margin:0"><b>Lower threshold → higher recall</b>More cases are flagged positive, so fewer are missed. Preferred in <b>medical screening</b>, where missing a disease (FN) is the expensive error.</div>
+    <div class="callout blue" style="margin:0"><b>Higher threshold → higher precision</b>Only confident cases are flagged positive, so there are fewer false alarms. Preferred in <b>spam filtering</b>, where losing a real email (FP) is the expensive error.</div>
+  </div>
+</section>
+
+<section class="chap" id="funcs" data-title="Sigmoid, softmax, tanh">
+  <div class="sec-head"><div><div class="secnum">Section 3</div><h2>Logistic and classification functions</h2></div></div>
+  <div class="grid3">
+    <div class="card"><h4>Sigmoid</h4><div class="formula" style="font-size:1rem">σ(z) = 1 / (1 + e<sup>−z</sup>)</div><p class="small">Output 0…1 = a probability. Used for <b>binary</b> classification (spam vs. not spam).</p></div>
+    <div class="card"><h4>Softmax</h4><div class="formula" style="font-size:1rem">p<sub>i</sub> = e<sup>z<sub>i</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup></div><p class="small">Turns K scores into K probabilities that <b>sum to 1</b>. Used for <b>multi-class</b> problems (cat / dog / bird).</p></div>
+    <div class="card"><h4>tanh</h4><div class="formula" style="font-size:1rem">tanh(z) ∈ (−1, 1)</div><p class="small">Zero-centred. Mostly an <b>activation</b> in neural-network hidden layers, not a final classifier output.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Softmax: scores → probabilities</div>
+    <div class="ctrls"><label><b>Score: cat <span data-for="smA">2.0</span></b><input type="range" id="smA" min="-4" max="6" step="0.1" value="2"></label><label><b>Score: dog <span data-for="smB">1.0</span></b><input type="range" id="smB" min="-4" max="6" step="0.1" value="1"></label><label><b>Score: bird <span data-for="smC">0.1</span></b><input type="range" id="smC" min="-4" max="6" step="0.1" value="0.1"></label></div>
+    <div class="grid2"><div id="smPlot"></div><div id="sgPlot"></div></div>
+    <div class="legend" id="sgLeg"></div>
+  </div>
+</section>
+
+<section class="chap" id="tree" data-title="Decision trees & entropy">
+  <div class="sec-head"><div><div class="secnum">Section 4</div><h2>Decision trees, entropy and information gain</h2></div></div>
+  <p>A decision tree classifies by asking a <b>sequence of simple questions</b> about the features, like a flowchart, until it reaches a leaf with a class label. Each split is chosen to make the groups <b>purer</b>.</p>
+  <div class="grid2">
+    <div class="formula"><span class="lbl">Entropy (impurity)</span>H(S) = − Σ p<sub>i</sub> log₂ p<sub>i</sub><br><span class="small">0 = pure · 1 = 50/50 (binary)</span></div>
+    <div class="formula"><span class="lbl">Information gain</span>Gain(S, A) = H(S) − Σ<sub>v</sub> <span class="frac"><span>|S<sub>v</sub>|</span><span>|S|</span></span> H(S<sub>v</sub>)</div>
+  </div>
+  <div class="widget"><div class="wtitle">Entropy vs. Gini</div>
+    <div class="ctrls"><label><b>Share of positive class p₊ <span data-for="enP">0.25</span></b><input type="range" id="enP" min="0" max="1" step="0.01" value="0.25"></label></div>
+    <div class="twocol"><div id="enPlot"></div><div class="kpis" id="enKpi"></div></div>
+    <p class="small">Slide example: 6 negatives and 2 positives → p₊ = 0.25 → H = −0.75·log₂0.75 − 0.25·log₂0.25 ≈ <b>0.81</b>. Scikit-learn's default criterion is Gini, 1 − Σp<sub>i</sub>². It behaves almost the same and is faster to compute.</p>
+  </div>
+  <h3>ID3 step by step: who buys a computer?</h3>
+  <p>ID3 picks the attribute with the <b>highest information gain</b> at every node, then repeats recursively on each branch until the groups are pure. Click an attribute to split the selected node.</p>
+  <div class="widget"><div class="wtitle">Build the ID3 tree yourself</div>
+    <div class="twocol">
+      <div><div class="tablewrap"><table id="idTbl"></table></div></div>
+      <div><p class="small" id="idNode"></p><div class="tablewrap"><table id="idGain"></table></div><div class="btnrow"><button class="btn" id="idAuto">Auto-build (ID3)</button><button class="btn" id="idReset">Reset</button><label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="idUseId"> include “Customer_ID”</label></div></div>
+    </div>
+    <div class="out tree" id="idTree"></div>
+    <div class="feedback show info" id="idOut"></div>
+  </div>
+  <div class="callout amber"><b>The Student_ID trap</b>An ID column gives every row its own pure branch, so its information gain is the maximum possible (0.940 here). Yet it predicts nothing for a new customer. <b>Gain ratio</b> (C4.5) divides the gain by the split's own entropy, which punishes attributes with many values. Tick “include Customer_ID” above to see it happen.</div>
+  <div class="grid3">
+    <div class="card"><h4>Single decision tree</h4><p class="small">Interpretable, handles non-linear patterns and interactions. Very deep trees overfit: they <b>memorise instead of learning</b>. Control this with max_depth or pruning.</p></div>
+    <div class="card"><h4>Random forest</h4><p class="small">Many trees on bootstrapped data and random feature subsets, combined by <b>majority vote</b>. More stable and accurate.</p></div>
+    <div class="card"><h4>Gradient boosting</h4><p class="small">Trees built <b>sequentially</b>, each one fixing the previous trees' errors. XGBoost, LightGBM and CatBoost are often the best choice for tabular data.</p></div>
+  </div>
+</section>
+
+<section class="chap" id="knn" data-title="K-nearest neighbours">
+  <div class="sec-head"><div><div class="secnum">Section 5</div><h2>K-Nearest Neighbours (KNN)</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>How it works</h4><p class="small"><b>Instance-based:</b> there is no real training phase; KNN just stores the data. To classify a new point, find its k closest training points and take a <b>majority vote</b> (for regression, take their mean).</p></div>
+    <div class="card"><h4>Trade-offs</h4><p class="small">✓ simple, no assumptions, multi-class, works for regression too<br>✗ slow and memory-hungry on big data, sensitive to irrelevant features and imbalance, <b>needs feature scaling</b></p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Click anywhere to classify a new point</div>
+    <div class="ctrls"><label><b>k <span data-for="kk">5</span></b><input type="range" id="kk" min="1" max="25" step="1" value="5"></label><label><b>Distance</b><select id="kDist"><option value="e">Euclidean √Σ(Δ)²</option><option value="m">Manhattan Σ|Δ|</option></select></label><label><b>Show decision regions</b><select id="kReg"><option value="1">Yes</option><option value="0">No</option></select></label><label><b>Feature scale</b><select id="kScale"><option value="1">Both features scaled</option><option value="0">y in different units (×10), not scaled</option></select></label></div>
+    <div id="kPlot"></div><div class="legend" id="kLeg"></div><div class="feedback show info" id="kOut"></div>
+  </div>
+  <details class="reveal"><summary>Slide example: is painting #8 a Mondrian? (standardised features, distances given)</summary>
+    <div class="tablewrap"><table><tr><th>Example</th><th class="num">Distance to #8</th><th>Mondrian?</th><th>Rank</th></tr><tr><td>3</td><td class="num">2.395</td><td class="good">Yes</td><td>1</td></tr><tr><td>1</td><td class="num">2.517</td><td class="bad">No</td><td>2</td></tr><tr><td>4</td><td class="num">3.164</td><td class="good">Yes</td><td>3</td></tr><tr><td>5</td><td class="num">3.472</td><td class="bad">No</td><td>4</td></tr><tr><td>7</td><td class="num">3.490</td><td class="bad">No</td><td>5</td></tr><tr><td>2</td><td class="num">3.644</td><td class="bad">No</td><td>6</td></tr><tr><td>6</td><td class="num">3.808</td><td class="good">Yes</td><td>7</td></tr></table></div>
+    <p class="small">1-NN → <b>Yes</b> · 3-NN → Yes (2:1) → <b>Yes</b> · 5-NN → 2 Yes, 3 No → <b>No</b> · 7-NN → 3 Yes, 4 No → <b>No</b>. The answer depends on k, which is why k is tuned with cross-validation.</p></details>
+</section>
+
+<section class="chap" id="cm" data-title="Confusion matrix & metrics">
+  <div class="sec-head"><div><div class="secnum">Section 6</div><h2>Confusion matrix and classification metrics</h2></div></div>
+  <div class="grid2">
+    <div class="formula"><span class="lbl">Accuracy · overall</span><span class="frac"><span>TP + TN</span><span>TP + TN + FP + FN</span></span></div>
+    <div class="formula"><span class="lbl">Precision · when FP is costly</span><span class="frac"><span>TP</span><span>TP + FP</span></span></div>
+    <div class="formula"><span class="lbl">Recall / sensitivity · when FN is costly</span><span class="frac"><span>TP</span><span>TP + FN</span></span></div>
+    <div class="formula"><span class="lbl">F1 · balance, imbalanced data</span>2 · <span class="frac"><span>P · R</span><span>P + R</span></span></div>
+  </div>
+  <div class="widget"><div class="wtitle">Metrics calculator</div>
+    <div class="btnrow"><button class="btn" data-cm="0,0,50,950">Everyone “healthy” (50 sick of 1,000)</button><button class="btn" data-cm="30,20,10,940">Fraud model 1</button><button class="btn" data-cm="20,80,10,890">Fraud model 2</button><button class="btn" data-cm="10,5,40,945">Disease model A</button><button class="btn" data-cm="40,35,10,915">Disease model B</button></div>
+    <div class="twocol"><div class="cm" id="cmBox"></div><div class="kpis" id="cmKpi"></div></div>
+    <div class="feedback show info" id="cmOut"></div>
+  </div>
+  <div class="tablewrap"><table><tr><th>Metric</th><th>Best for</th><th>Examples</th></tr><tr><td><b>Accuracy</b></td><td>Balanced classes, equal error costs</td><td>Fitness tracker activity, overall grading</td></tr><tr><td><b>Precision</b></td><td>Avoiding false positives</td><td>Spam filter, fraud alerts that block cards</td></tr><tr><td><b>Recall</b></td><td>Avoiding false negatives</td><td>Cancer screening, disease detection</td></tr><tr><td><b>F1</b></td><td>Imbalanced data, both errors matter</td><td>Rare-event detection</td></tr></table></div>
+</section>
+
+<section class="chap" id="fit" data-title="Over/underfitting & bias–variance">
+  <div class="sec-head"><div><div class="secnum">Section 7</div><h2>Overfitting, underfitting and the bias–variance trade-off</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Underfitting = high bias</h4><p class="small">Model too simple. Poor on <b>both</b> training and test data (e.g. train 60 %, test 58 %). Fix: more complexity, better features, less regularisation, train longer, boosting.</p></div>
+    <div class="card"><h4>Overfitting = high variance</h4><p class="small">Model too complex: it memorises noise. Excellent on training data, poor on new data (e.g. train 99 %, test 68 %). Fix: simpler model, regularisation, pruning, more data, cross-validation, early stopping, dropout, augmentation.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Grow a decision tree deeper and deeper</div>
+    <div class="ctrls"><label><b>max_depth <span data-for="dtD">3</span></b><input type="range" id="dtD" min="1" max="12" value="3"></label><label><b>Label noise <span data-for="dtN">10</span>%</b><input type="range" id="dtN" min="0" max="30" value="10"></label></div>
+    <div class="grid2"><div><p class="small"><b>Decision regions</b> (dots = training data)</p><div id="dtPlot"></div></div><div><p class="small"><b>Accuracy vs. depth</b></p><div id="dtCurve"></div><div class="legend" id="dtLeg"></div></div></div>
+    <div class="feedback show" id="dtOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="drift" data-title="Concept drift">
+  <div class="sec-head"><div><div class="secnum">Section 8</div><h2>Concept drift: when the world changes</h2></div></div>
+  <p><b>Concept drift</b> happens when the <b>relationship between the inputs and the target</b> changes over time: spammers invent new tricks, fraud patterns evolve, user preferences shift. A model that was accurate last year quietly gets worse.</p>
+  <div class="widget"><div class="wtitle">Loan-default model in production</div>
+    <div class="btnrow" id="drBtns"><button class="btn sel" data-d="none">No change</button><button class="btn" data-d="cov">Data drift only (lower incomes)</button><button class="btn" data-d="sudden">Sudden concept drift</button><button class="btn" data-d="grad">Gradual concept drift</button><button class="btn" data-d="temp">Temporary spike (Black Friday)</button></div>
+    <div class="ctrls"><label><b>Month <span data-for="drT">1</span></b><input type="range" id="drT" min="1" max="24" value="1"></label></div>
+    <div class="btnrow"><button class="btn primary" id="drRetrain">Retrain on the last 3 months</button><button class="btn" id="drOrig">Back to the original model</button></div>
+    <div class="grid2"><div><p class="small"><b>This month's data</b> · solid line = model, dashed = true boundary</p><div id="drScat"></div></div><div><p class="small"><b>Model accuracy by month</b></p><div id="drAcc"></div></div></div>
+    <div class="feedback show info" id="drOut"></div>
+  </div>
+  <div class="grid3">
+    <div class="card"><h4>Retrain regularly</h4><p class="small">Update on fresh data (schedule or trigger).</p></div>
+    <div class="card"><h4>Online learning</h4><p class="small">The model adapts continuously as data streams in.</p></div>
+    <div class="card"><h4>Windowing &amp; weighting</h4><p class="small">Train on recent data, drop or down-weight old data.</p></div>
+    <div class="card"><h4>Ensembles</h4><p class="small">Combine models trained on old and new data.</p></div>
+    <div class="card"><h4>ADWIN</h4><p class="small">Adaptive windowing: shrinks the window when the distribution changes significantly, which triggers an update.</p></div>
+    <div class="card"><h4>DDM</h4><p class="small">Drift detection method: watches the error rate and its variance and flags drift when they cross thresholds.</p></div>
+  </div>
+  <div class="callout amber"><b>Not every drop is drift</b>A one-week dip during Black Friday that recovers by itself is a <b>temporary spike</b>. Retraining on it would be a false alarm. Applicants with lower incomes but the <i>same</i> income→risk relationship is <b>data (covariate) drift</b>: inputs change, the concept doesn't. Monitor both, but react differently.</div>
+</section>
+
+<section class="chap" id="roc" data-title="ROC curve & AUC">
+  <div class="sec-head"><div><div class="secnum">Section 9</div><h2>ROC curve and AUC</h2></div></div>
+  <p>The <b>ROC curve</b> plots the true-positive rate (recall) against the false-positive rate for <b>every possible threshold</b>. <b>AUC</b> is the area under it: 1.0 = perfect separation, 0.5 = random guessing. It compares models <i>independently of any one threshold</i>.</p>
+  <div class="widget"><div class="wtitle">Separation and threshold</div>
+    <div class="ctrls"><label><b>Class separation (model quality) <span data-for="rcD">1.5</span></b><input type="range" id="rcD" min="0" max="4" step="0.05" value="1.5"></label><label><b>Threshold <span data-for="rcT">0.75</span></b><input type="range" id="rcT" min="-3" max="6" step="0.05" value="0.75"></label></div>
+    <div class="grid2"><div><p class="small"><b>Model scores</b> for negatives vs. positives</p><div id="rcDist"></div><div class="legend" id="rcLeg"></div></div><div><p class="small"><b>ROC curve</b> (dot = current threshold)</p><div id="rcRoc"></div></div></div>
+    <div class="kpis" id="rcKpi"></div>
+  </div>
+</section>
+
+<section class="chap" id="select" data-title="Model selection & tuning">
+  <div class="sec-head"><div><div class="secnum">Section 10</div><h2>Model selection and hyperparameter tuning</h2></div></div>
+  <div class="grid3">
+    <div class="card"><h4>1 · Trial and error</h4><p class="small">Try a few candidate models on the same split or CV folds.</p></div>
+    <div class="card"><h4>2 · Algorithm traits</h4><p class="small">Interpretable? Non-linear? Needs scaling? Small or big data?</p></div>
+    <div class="card"><h4>3 · Domain knowledge</h4><p class="small">In medicine, avoiding FN can matter more than accuracy.</p></div>
+    <div class="card"><h4>4 · The right metric</h4><p class="small">Accuracy (balanced), precision (FP costly), recall (FN costly), F1 (imbalanced), ROC–AUC (threshold-free).</p></div>
+    <div class="card"><h4>5 · Generalisation</h4><p class="small">Good on unseen data and stable across CV folds.</p></div>
+    <div class="card"><h4>Hyperparameters</h4><p class="small">Set <i>before</i> training: KNN k, tree max_depth / min_samples_split, logistic C. Search them with grid or random search + CV.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Grid search for KNN's k with 5-fold CV</div>
+    <div class="btnrow"><button class="btn primary" id="gsRun">Run grid search: k = 1, 3, 5 … 31</button><button class="btn" id="gsNew">New dataset</button></div>
+    <div id="gsPlot"></div><div class="legend" id="gsLeg"></div><div class="kpis" id="gsKpi"></div>
+    <p class="small">Training accuracy is always 100 % at k = 1 because every point is its own nearest neighbour, which is useless for choosing k. Choose k with the <b>CV score</b>, then report the <b>untouched test set</b> once at the very end.</p>
+  </div>
+  <pre><code data-hl="py">from sklearn.model_selection import GridSearchCV
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import classification_report, roc_auc_score
+
+pipe = make_pipeline(StandardScaler(), KNeighborsClassifier())
+grid = GridSearchCV(pipe, {"kneighborsclassifier__n_neighbors": range(1, 32, 2)}, cv=5, scoring="f1")
+grid.fit(X_train, y_train)
+print(grid.best_params_, grid.best_score_)
+best = grid.best_estimator_
+print(classification_report(y_test, best.predict(X_test)))      # test set used ONCE
+print("AUC", roc_auc_score(y_test, best.predict_proba(X_test)[:, 1]))</code></pre>
+</section>
+
+<section class="chap" id="links" data-title="Notebooks & homework">
+  <div class="sec-head"><div><div class="secnum">Section 11</div><h2>Course notebooks, homework &amp; resources</h2></div></div>
+  <div class="links">
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_03_Classification_Evaluation_and_Regularization/Lecture_Support/01_Week3_Day1_Decision_Trees_and_Evaluation.ipynb" target="_blank" rel="noopener"><b>Day 1 · Logistic regression &amp; trees</b><span>Baseline, probabilities &amp; threshold, Gini vs. entropy, max_depth</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_03_Classification_Evaluation_and_Regularization/Lecture_Support/02_Week3_Day2_KNN_Best_k_and_Model_Comparison.ipynb" target="_blank" rel="noopener"><b>Day 2 · KNN, best k, metrics</b><span>Scaling, confusion matrix, k plots, CV comparison</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_03_Classification_Evaluation_and_Regularization/Lecture_Support/03_Week3_Day3_Concept_Drift_Model_Selection_ROC_AUC.ipynb" target="_blank" rel="noopener"><b>Day 3 · Drift, ROC–AUC, tuning</b><span>Generalisation, drift simulation, thresholds, GridSearchCV</span></a>
+    <a href="https://www.datacamp.com/tutorial/k-nearest-neighbor-classification-scikit-learn" target="_blank" rel="noopener"><b>DataCamp · KNN with scikit-learn</b><span>Workflow, distances, choosing k</span></a>
+    <a href="https://www.datacamp.com/tutorial/decision-tree-classification-python" target="_blank" rel="noopener"><b>DataCamp · Decision trees</b><span>Attribute selection, visualisation, tuning</span></a>
+    <a href="https://www.datacamp.com/tutorial/what-is-a-confusion-matrix-in-machine-learning" target="_blank" rel="noopener"><b>DataCamp · Confusion matrix</b><span>TP, TN, FP, FN, precision and recall</span></a>
+    <a href="https://scikit-learn.org/stable/modules/model_evaluation.html" target="_blank" rel="noopener"><b>scikit-learn · Model evaluation</b><span>All classification metrics and ROC</span></a>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_breast_cancer.html" target="_blank" rel="noopener"><b>Breast Cancer Wisconsin dataset</b><span>Data for the individual homework</span></a>
+  </div>
+  <div class="nb"><span class="ico">📝</span><div><b>Individual homework: breast cancer (malignant vs. benign).</b> Explore the classes and their balance. Train logistic regression, a decision tree and KNN, and evaluate each with the confusion matrix, accuracy, precision, recall and F1. Tune at least two of max_depth, n_neighbors and C. Plot ROC curves and compare AUCs. Test thresholds 0.3, 0.5 and 0.7 for logistic regression. Discuss over- or underfitting, and argue which metric matters most for cancer screening.</div></div>
+</section>
+
+<section class="chap" id="quiz" data-title="Self-check quiz">
+  <div class="sec-head"><div><div class="secnum">Section 12</div><h2>Self-check quiz</h2></div></div>
+  <div id="quizBox"></div>
+</section>
+</main></div>
+
+<footer class="foot">Statistics and Machine Learning · Prof. Dr. Mehrdad Jalali · SRH University of Applied Sciences Heidelberg · Course repository: <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials" target="_blank" rel="noopener">github.com/MehrdadJalali-AI/stat-ml-teaching-materials</a></footer>
+<script>// ---------- shared helpers for all chapter pages ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// theme
+(function () {
+  const saved = store.get('sml-theme', null);
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  const b = $('#themeBtn');
+  if (!b) return;
+  const label = () => {
+    const t = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    b.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+  };
+  label();
+  b.onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nxt);
+    store.set('sml-theme', nxt); label();
+  };
+})();
+
+// TOC, scroll spy, progress, "mark as understood"
+(function () {
+  const toc = $('#tocList'); const secs = $$('section.chap');
+  const key = 'sml-done-' + (document.body.dataset.chapter || 'x');
+  const done = new Set(store.get(key, []));
+  secs.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id; a.innerHTML = '<span class="dot"></span>' + esc(s.dataset.title || s.id);
+    if (done.has(s.id)) a.classList.add('done');
+    toc && toc.appendChild(a);
+    const head = s.querySelector('.sec-head');
+    if (head) {
+      const b = document.createElement('button'); b.className = 'donebtn';
+      const paint = () => { b.classList.toggle('on', done.has(s.id)); b.textContent = done.has(s.id) ? '✓ Understood' : 'Mark as understood'; a.classList.toggle('done', done.has(s.id)); updCount(); };
+      b.onclick = () => { done.has(s.id) ? done.delete(s.id) : done.add(s.id); store.set(key, [...done]); paint(); };
+      head.appendChild(b); setTimeout(paint);
+    }
+  });
+  function updCount() { const c = $('#doneCount'); if (c) c.textContent = done.size + ' / ' + secs.length + ' sections understood'; }
+  const links = toc ? $$('a', toc) : [];
+  const onScroll = () => {
+    const h = document.documentElement; const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    const bar = $('#progress'); if (bar) bar.style.width = (p * 100) + '%';
+    let cur = 0; secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 140) cur = i; });
+    links.forEach((l, i) => l.classList.toggle('active', i === cur));
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+})();
+
+// tabs: <div class="tabs" data-group="x"><button data-tab="a">..</button></div> + <div class="tabpanel" data-group="x" data-tab="a">
+document.addEventListener('click', e => {
+  const b = e.target.closest('.tabs button'); if (!b) return;
+  const g = b.parentElement.dataset.group;
+  $$('.tabs[data-group="' + g + '"] button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tabpanel[data-group="' + g + '"]').forEach(p => p.classList.toggle('on', p.dataset.tab === b.dataset.tab));
+});
+
+// copy buttons on code
+function addCopy(root = document) {
+  $$('pre', root).forEach(p => {
+    if (p.querySelector('.copy')) return;
+    const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'Copy';
+    b.onclick = () => { const t = p.querySelector('code') ? p.querySelector('code').innerText : p.innerText.replace(/Copy$/, ''); navigator.clipboard && navigator.clipboard.writeText(t); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1200); };
+    p.appendChild(b);
+  });
+}
+addCopy();
+
+// quiz engine: renderQuiz('#el', [{q, opts:[...], a: idx, why}])
+function renderQuiz(sel, items) {
+  const root = $(sel); if (!root) return; root.classList.add('quiz');
+  let right = 0, answered = 0;
+  const sc = document.createElement('p'); sc.className = 'score';
+  const upd = () => sc.textContent = `Score: ${right} / ${items.length}` + (answered === items.length ? (right === items.length ? ' — perfect! 🎉' : ' — review the explanations and try again.') : '');
+  items.forEach((it, qi) => {
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = `<p>${qi + 1}. ${it.q}</p><div class="opts"></div><div class="why">💡 ${it.why}</div>`;
+    const o = d.querySelector('.opts');
+    it.opts.forEach((t, i) => {
+      const b = document.createElement('button'); b.innerHTML = t;
+      b.onclick = () => {
+        if (d.classList.contains('answered')) return;
+        d.classList.add('answered'); answered++;
+        if (i === it.a) { b.classList.add('right'); right++; } else { b.classList.add('wrong'); o.children[it.a].classList.add('right'); }
+        upd();
+      };
+      o.appendChild(b);
+    });
+    root.appendChild(d);
+  });
+  const r = document.createElement('button'); r.className = 'btn'; r.textContent = '↺ Reset quiz';
+  r.onclick = () => { root.innerHTML = ''; renderQuiz(sel, items); };
+  root.appendChild(sc); root.appendChild(r); upd();
+}
+
+// sorter engine (click a chip, then click a bucket — or drag): makeSorter('#el', cats:[{id,label}], items:[{t, c, why?}])
+function makeSorter(sel, cats, items) {
+  const root = $(sel); if (!root) return;
+  root.innerHTML = `<div class="pool small">Click an item, then click the box it belongs to (or drag it).</div><div class="sorter"></div><div class="btnrow"><button class="btn primary chk">Check answers</button><button class="btn rst">Reset</button></div><div class="feedback"></div>`;
+  const pool = $('.pool', root), sorter = $('.sorter', root), fb = $('.feedback', root);
+  let selected = null;
+  const shuffled = items.map((x, i) => ({ ...x, i })).sort(() => Math.random() - .5);
+  shuffled.forEach(it => {
+    const c = document.createElement('span'); c.className = 'chip'; c.textContent = it.t; c.draggable = true; c.dataset.c = it.c; c.dataset.i = it.i;
+    if (it.why) c.title = it.why;
+    c.onclick = e => { e.stopPropagation(); $$('.chip', root).forEach(x => x.classList.remove('sel')); selected = c; c.classList.add('sel'); };
+    c.ondragstart = ev => { selected = c; ev.dataTransfer.setData('text', it.i); };
+    pool.appendChild(c);
+  });
+  cats.forEach(cat => {
+    const b = document.createElement('div'); b.className = 'bucket'; b.dataset.id = cat.id; b.innerHTML = `<h5>${cat.label}</h5>`;
+    const drop = () => { if (selected) { b.appendChild(selected); selected.classList.remove('sel', 'right', 'wrong'); selected = null; } };
+    b.onclick = drop;
+    b.ondragover = e => { e.preventDefault(); b.classList.add('over'); };
+    b.ondragleave = () => b.classList.remove('over');
+    b.ondrop = e => { e.preventDefault(); b.classList.remove('over'); drop(); };
+    sorter.appendChild(b);
+  });
+  pool.onclick = () => { if (selected) { pool.appendChild(selected); selected.classList.remove('sel'); selected = null; } };
+  $('.chk', root).onclick = () => {
+    let ok = 0, placed = 0;
+    $$('.bucket .chip', root).forEach(c => { placed++; const good = c.parentElement.dataset.id === c.dataset.c; c.classList.toggle('right', good); c.classList.toggle('wrong', !good); if (good) ok++; });
+    fb.className = 'feedback show ' + (ok === items.length ? 'ok' : 'info');
+    fb.textContent = ok === items.length ? `All ${ok} correct — well done!` : `${ok} of ${items.length} correct (${items.length - placed} not placed yet). Red items are in the wrong box — hover them for a hint.`;
+  };
+  $('.rst', root).onclick = () => makeSorter(sel, cats, items);
+}
+
+// tiny syntax highlighter for python / sql / yaml snippets marked data-hl
+function hl(code, lang) {
+  let s = esc(code);
+  if (lang === 'py' || lang === 'sql') {
+    s = s.replace(/(#.*|--.*)$/gm, '<span class="c-c">$1</span>');
+    s = s.replace(/(&quot;.*?&quot;|'[^'\n]*')/g, '<span class="c-s">$1</span>');
+    const kw = lang === 'py' ? 'def|return|import|from|as|for|in|if|else|try|except|with|lambda|True|False|None|print' : 'SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|LEFT JOIN|ON|AS|WITH|SUM|COUNT|AND|OR|MATCH|RETURN|PREFIX';
+    s = s.replace(new RegExp('\\b(' + kw + ')\\b', 'g'), '<span class="c-k">$1</span>');
+  } else if (lang === 'yaml') {
+    s = s.replace(/(#.*)$/gm, '<span class="c-c">$1</span>').replace(/^(\s*-?\s*)([\w_]+):/gm, '$1<span class="c-k">$2</span>:');
+  }
+  return s;
+}
+$$('pre code[data-hl]').forEach(c => { c.innerHTML = hl(c.textContent, c.dataset.hl); });
+
+// ---------- maths + SVG plotting helpers (shared by the Statistics & ML chapter pages) ----------
+const fmt = (x, d = 2) => (x === null || x === undefined || !isFinite(x)) ? '—' : (+x).toFixed(d);
+const sum = a => a.reduce((s, x) => s + x, 0);
+const mean = a => a.length ? sum(a) / a.length : NaN;
+const variance = (a, ddof = 0) => { const m = mean(a); return a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - ddof); };
+const sd = (a, ddof = 0) => Math.sqrt(variance(a, ddof));
+const median = a => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+const quantile = (a, q) => { const s = [...a].sort((x, y) => x - y); const p = (s.length - 1) * q, lo = Math.floor(p), hi = Math.ceil(p); return s[lo] + (s[hi] - s[lo]) * (p - lo); };
+const modes = a => { const c = new Map(); a.forEach(x => c.set(x, (c.get(x) || 0) + 1)); const m = Math.max(...c.values()); return m === 1 && a.length > 1 ? [] : [...c].filter(e => e[1] === m).map(e => e[0]); };
+const skewness = a => { const m = mean(a), s = sd(a); return s === 0 ? 0 : mean(a.map(x => ((x - m) / s) ** 3)); };
+const pearson = (x, y) => { const mx = mean(x), my = mean(y); let a = 0, b = 0, c = 0; for (let i = 0; i < x.length; i++) { a += (x[i] - mx) * (y[i] - my); b += (x[i] - mx) ** 2; c += (y[i] - my) ** 2; } return a / Math.sqrt(b * c); };
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const range = (a, b, step = 1) => { const r = []; for (let x = a; step > 0 ? x <= b + 1e-9 : x >= b - 1e-9; x += step) r.push(x); return r; };
+
+// seeded RNG so every student sees the same "random" example until they press re-sample
+function rng(seed = 42) { let t = seed >>> 0; return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+function gauss(R) { let u = 0, v = 0; while (u === 0) u = R(); v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+// special functions
+function lgamma(x) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5]; let y = x, t = x + 5.5; t -= (x + .5) * Math.log(t); let s = 1.000000000190015; for (const k of c) s += k / ++y; return -t + Math.log(2.5066282746310005 * s / x); }
+function betacf(a, b, x) { let qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap; if (Math.abs(d) < 1e-30) d = 1e-30; d = 1 / d; let h = d; for (let m = 1; m <= 200; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((qam + m2) * (a + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; h *= d * c; aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break; } return h; }
+function ibeta(x, a, b) { if (x <= 0) return 0; if (x >= 1) return 1; const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b; }
+const tCDF = (t, df) => { const x = df / (df + t * t); const p = 0.5 * ibeta(x, df / 2, 0.5); return t > 0 ? 1 - p : p; };
+const tTwoSided = (t, df) => ibeta(df / (df + t * t), df / 2, 0.5);
+const fSurvival = (f, d1, d2) => f <= 0 ? 1 : ibeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2);
+function tCrit(conf, df) { let lo = 0, hi = 100; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (tCDF(m, df) < 1 - (1 - conf) / 2) ? lo = m : hi = m; } return (lo + hi) / 2; }
+function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+const normCDF = (x, m = 0, s = 1) => 0.5 * (1 + erf((x - m) / (s * Math.SQRT2)));
+const normPDF = (x, m = 0, s = 1) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+const lchoose = (n, k) => lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+const binomPMF = (k, n, p) => p === 0 ? +(k === 0) : p === 1 ? +(k === n) : Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+const poisPMF = (k, l) => Math.exp(k * Math.log(l) - l - lgamma(k + 1));
+
+// nice tick values
+function ticks(a, b, n = 5) { const span = b - a || 1; const step0 = span / n; const mag = 10 ** Math.floor(Math.log10(step0)); const err = step0 / mag; const step = (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1) * mag; const out = []; for (let x = Math.ceil(a / step) * step; x <= b + step * 1e-6; x += step) out.push(+x.toFixed(10)); return out; }
+const tickFmt = v => Math.abs(v) >= 10000 ? (v / 1000).toFixed(0) + 'k' : Math.abs(v) < 1e-9 ? '0' : (Math.abs(v) < 1 ? +v.toPrecision(2) : +v.toFixed(2)).toString();
+
+// Plot: lightweight SVG chart.  const p = new Plot('#el', {w, h, x:[a,b], y:[a,b], xlabel, ylabel});
+const PAL = ['var(--blue)', 'var(--accent)', 'var(--green)', 'var(--purple)', 'var(--amber)', 'var(--red)', 'var(--muted)'];
+class Plot {
+  constructor(sel, o = {}) {
+    this.el = typeof sel === 'string' ? $(sel) : sel;
+    this.o = Object.assign({ w: 640, h: 300, x: [0, 1], y: [0, 1], m: { l: 48, r: 14, t: 14, b: 40 }, grid: true, xticks: null, yticks: null }, o);
+    this.el.classList.add('plot');
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg.setAttribute('viewBox', `0 0 ${this.o.w} ${this.o.h}`);
+    this.svg.setAttribute('role', 'img');
+    if (o.label) this.svg.setAttribute('aria-label', o.label);
+    this.el.innerHTML = ''; this.el.appendChild(this.svg);
+    this.clear();
+  }
+  get iw() { return this.o.w - this.o.m.l - this.o.m.r; }
+  get ih() { return this.o.h - this.o.m.t - this.o.m.b; }
+  sx(x) { const [a, b] = this.o.x; return this.o.m.l + (x - a) / (b - a) * this.iw; }
+  sy(y) { const [a, b] = this.o.y; return this.o.m.t + this.ih - (y - a) / (b - a) * this.ih; }
+  ix(px) { const [a, b] = this.o.x; return a + (px - this.o.m.l) / this.iw * (b - a); }
+  iy(py) { const [a, b] = this.o.y; return a + (this.o.m.t + this.ih - py) / this.ih * (b - a); }
+  add(tag, attrs, parent) { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); } (parent || this.svg).appendChild(e); return e; }
+  clear(x, y) { if (x) this.o.x = x; if (y) this.o.y = y; this.svg.innerHTML = ''; this.axes(); return this; }
+  axes() {
+    const { m, w, h } = this.o; const g = this.add('g', { class: 'ax' });
+    const xt = this.o.xticks || ticks(...this.o.x, Math.max(3, Math.round(this.iw / 80)));
+    const yt = this.o.yticks || ticks(...this.o.y, Math.max(3, Math.round(this.ih / 50)));
+    yt.forEach(v => { const y = this.sy(v); if (this.o.grid) this.add('line', { x1: m.l, x2: w - m.r, y1: y, y2: y, class: 'gl' }, g); this.add('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end', text: this.o.yfmt ? this.o.yfmt(v) : tickFmt(v) }, g); });
+    xt.forEach(v => { const x = this.sx(v); if (this.o.grid) this.add('line', { x1: x, x2: x, y1: m.t, y2: h - m.b, class: 'gl' }, g); this.add('text', { x, y: h - m.b + 16, 'text-anchor': 'middle', text: this.o.xfmt ? this.o.xfmt(v) : tickFmt(v) }, g); });
+    this.add('line', { x1: m.l, x2: w - m.r, y1: h - m.b, y2: h - m.b, class: 'axl' }, g);
+    this.add('line', { x1: m.l, x2: m.l, y1: m.t, y2: h - m.b, class: 'axl' }, g);
+    if (this.o.xlabel) this.add('text', { x: m.l + this.iw / 2, y: h - 4, 'text-anchor': 'middle', class: 'lab', text: this.o.xlabel }, g);
+    if (this.o.ylabel) this.add('text', { x: 12, y: m.t + this.ih / 2, 'text-anchor': 'middle', class: 'lab', transform: `rotate(-90 12 ${m.t + this.ih / 2})`, text: this.o.ylabel }, g);
+    const id = 'clip' + (Plot.n = (Plot.n || 0) + 1);
+    const cp = this.add('clipPath', { id }); this.add('rect', { x: m.l - 1, y: m.t - 1, width: this.iw + 2, height: this.ih + 2 }, cp);
+    this.layer = this.add('g', { 'clip-path': `url(#${id})` });
+  }
+  path(xs, ys, s = {}) { let d = ''; let pen = false; for (let i = 0; i < xs.length; i++) { if (ys[i] === null || !isFinite(ys[i])) { pen = false; continue; } d += (pen ? 'L' : 'M') + this.sx(xs[i]).toFixed(1) + ',' + this.sy(ys[i]).toFixed(1); pen = true; } return this.add('path', { d, style: `fill:none;stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  area(xs, ys, s = {}) { const y0 = this.sy(Math.max(this.o.y[0], 0)); let d = `M${this.sx(xs[0])},${y0}`; xs.forEach((x, i) => d += `L${this.sx(x).toFixed(1)},${this.sy(ys[i]).toFixed(1)}`); d += `L${this.sx(xs[xs.length - 1])},${y0}Z`; return this.add('path', { d, style: `fill:${s.color || 'var(--accent)'};opacity:${s.opacity || .18};stroke:none` }, this.layer); }
+  dot(x, y, s = {}) { return this.add('circle', { cx: this.sx(x), cy: this.sy(y), r: s.r || 4, style: `fill:${s.color || 'var(--accent)'};stroke:${s.stroke || 'var(--surface)'};stroke-width:${s.sw ?? 1};${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  bar(x0, x1, y, s = {}) { const yb = this.sy(Math.max(this.o.y[0], 0)), yt = this.sy(y); return this.add('rect', { x: this.sx(x0) + (s.gap ?? 1), y: Math.min(yt, yb), width: Math.max(0, this.sx(x1) - this.sx(x0) - 2 * (s.gap ?? 1)), height: Math.abs(yb - yt), rx: 2, style: `fill:${s.color || 'var(--blue)'};opacity:${s.opacity ?? .85}` }, this.layer); }
+  vline(x, s = {}) { const l = this.add('line', { x1: this.sx(x), x2: this.sx(x), y1: this.o.m.t, y2: this.o.h - this.o.m.b, style: `stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); if (s.label) this.text(x, this.o.y[1], s.label, { color: s.color, dy: s.dy ?? 12, anchor: s.anchor || 'start', dx: s.dx ?? 4 }); return l; }
+  hline(y, s = {}) { return this.add('line', { x1: this.o.m.l, x2: this.o.w - this.o.m.r, y1: this.sy(y), y2: this.sy(y), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); }
+  seg(x1, y1, x2, y2, s = {}) { return this.add('line', { x1: this.sx(x1), y1: this.sy(y1), x2: this.sx(x2), y2: this.sy(y2), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  text(x, y, t, s = {}) { return this.add('text', { x: this.sx(x) + (s.dx || 0), y: this.sy(y) + (s.dy || 0), 'text-anchor': s.anchor || 'middle', class: 'pt', style: `fill:${s.color || 'var(--ink)'};font-size:${s.size || 12}px;font-weight:${s.weight || 600}`, text: t }, s.noclip ? this.svg : this.layer); }
+  hist(data, bins, s = {}) { const [a, b] = s.range || [Math.min(...data), Math.max(...data)]; const w = (b - a) / bins || 1; const c = new Array(bins).fill(0); data.forEach(v => { const i = Math.min(bins - 1, Math.max(0, Math.floor((v - a) / w))); c[i]++; }); return { edges: c.map((_, i) => a + i * w), w, counts: c }; }
+  onClick(fn) { this.svg.style.cursor = 'crosshair'; this.svg.addEventListener('click', e => { const pt = this.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(this.svg.getScreenCTM().inverse()); fn(this.ix(q.x), this.iy(q.y), e); }); }
+}
+function legend(sel, items) { $(sel).innerHTML = items.map(([c, t, dash]) => `<span class="lg"><i style="background:${c};${dash ? 'height:0;border-top:2px dashed ' + c + ';background:none' : ''}"></i>${t}</span>`).join(''); }
+const kpi = (l, v, d = '') => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${d ? `<div class="small">${d}</div>` : ''}</div>`;
+// bind a range input to a label: slide('#id', fn) -> calls fn on input, shows value in [data-for=id]
+function slide(id, fn, f = v => v) { const el = $('#' + id); const out = $$(`[data-for="${id}"]`); const run = () => { out.forEach(o => o.textContent = f(+el.value)); fn(+el.value); }; el.addEventListener('input', run); return run; }
+
+// ---------- small linear algebra ----------
+function solve(A, b) { const n = b.length; const M = A.map((r, i) => [...r, b[i]]); for (let c = 0; c < n; c++) { let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r; [M[c], M[p]] = [M[p], M[c]]; const d = M[c][c] || 1e-12; for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / d; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; } } return M.map((r, i) => r[n] / (r[i] || 1e-12)); }
+// least squares with optional ridge penalty (lam applied to all but column 0 when intercept=true)
+function lstsq(X, y, lam = 0, intercept = true) { const p = X[0].length; const A = Array.from({ length: p }, () => new Array(p).fill(0)), b = new Array(p).fill(0); X.forEach((r, i) => { for (let j = 0; j < p; j++) { b[j] += r[j] * y[i]; for (let k = 0; k < p; k++) A[j][k] += r[j] * r[k]; } }); for (let j = intercept ? 1 : 0; j < p; j++) A[j][j] += lam; for (let j = 0; j < p; j++) A[j][j] += 1e-10; return solve(A, b); }
+const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
+const col = (M, j) => M.map(r => r[j]);
+function standardize(M) { const p = M[0].length; const mu = [], s = []; for (let j = 0; j < p; j++) { const c = col(M, j); mu.push(mean(c)); s.push(sd(c) || 1); } return { Z: M.map(r => r.map((v, j) => (v - mu[j]) / s[j])), mu, s }; }
+const r2 = (y, p) => { const m = mean(y); return 1 - sum(y.map((v, i) => (v - p[i]) ** 2)) / sum(y.map(v => (v - m) ** 2)); };
+const rmse = (y, p) => Math.sqrt(mean(y.map((v, i) => (v - p[i]) ** 2)));
+</script>
+<script>
+const sigm = z => 1 / (1 + Math.exp(-z));
+// logistic regression by Newton/IRLS. X rows include a leading 1.
+function fitLogit(X, y, iters = 30, lam = 1e-4) {
+  const p = X[0].length; let b = new Array(p).fill(0);
+  for (let it = 0; it < iters; it++) {
+    const g = new Array(p).fill(0), H = Array.from({ length: p }, () => new Array(p).fill(0));
+    X.forEach((r, i) => { const pr = sigm(dot(b, r)), w = pr * (1 - pr); for (let j = 0; j < p; j++) { g[j] += (y[i] - pr) * r[j]; for (let k = 0; k < p; k++) H[j][k] += w * r[j] * r[k]; } });
+    for (let j = 0; j < p; j++) { H[j][j] += lam; g[j] -= lam * b[j]; }
+    const step = solve(H, g); b = b.map((v, j) => v + step[j]); if (Math.max(...step.map(Math.abs)) < 1e-8) break;
+  }
+  return b;
+}
+function cmHTML(tp, fp, fn, tn) { return `<div class="h"></div><div class="h">Predicted +</div><div class="h">Predicted −</div><div class="h">Actual +</div><div class="tp">TP<br>${tp}</div><div class="fn">FN<br>${fn}</div><div class="h">Actual −</div><div class="fp">FP<br>${fp}</div><div class="tn">TN<br>${tn}</div>`; }
+function metrics(tp, fp, fn, tn) { const n = tp + fp + fn + tn, acc = (tp + tn) / n, pre = tp + fp ? tp / (tp + fp) : NaN, rec = tp + fn ? tp / (tp + fn) : NaN, f1 = pre + rec ? 2 * pre * rec / (pre + rec) : NaN, spec = tn + fp ? tn / (tn + fp) : NaN; return { acc, pre, rec, f1, spec }; }
+const pct = v => isFinite(v) ? (v * 100).toFixed(1) + '%' : '—';
+
+// ===== Section 2: logistic regression =====
+(function () {
+  const R = rng(17), X = [], Y = [];
+  for (let i = 0; i < 44; i++) { const x = .5 + 9.5 * R(); X.push(x); Y.push(+(R() < sigm(1.3 * (x - 5.5)))); }
+  const jit = X.map(() => (R() - .5) * .08);
+  function draw() {
+    const b0 = +$('#lb0').value, b1 = +$('#lb1').value, th = +$('#lth').value;
+    const p = new Plot('#lPlot', { w: 460, h: 300, x: [0, 10.5], y: [-.12, 1.12], xlabel: 'tumour size (cm)', ylabel: 'P(malignant)', yticks: [0, .25, .5, .75, 1] });
+    const xs = range(0, 10.5, .05); p.path(xs, xs.map(x => sigm(b0 + b1 * x)), { color: 'var(--purple)', width: 2.5 });
+    p.hline(th, { color: 'var(--accent)', dash: '6 4', width: 1.5 });
+    const xb = b1 > 0 ? (Math.log(th / (1 - th)) - b0) / b1 : NaN; if (xb > 0 && xb < 10.5) { p.vline(xb, { color: 'var(--accent)', width: 1.5, label: 'boundary', dy: 14 }); }
+    let tp = 0, fp = 0, fn = 0, tn = 0;
+    X.forEach((x, i) => { const pred = sigm(b0 + b1 * x) >= th ? 1 : 0, y = Y[i]; if (pred && y) tp++; else if (pred && !y) fp++; else if (!pred && y) fn++; else tn++; p.dot(x, y + jit[i], { r: 5.5, color: y ? 'var(--red)' : 'var(--green)', stroke: pred !== y ? 'var(--ink)' : 'var(--surface)', sw: pred !== y ? 2.5 : 1 }); });
+    $('#lCM').innerHTML = `<div class="cm">${cmHTML(tp, fp, fn, tn)}</div>`;
+    const m = metrics(tp, fp, fn, tn); const ll = -sum(X.map((x, i) => { const q = clamp(sigm(b0 + b1 * x), 1e-9, 1 - 1e-9); return Y[i] ? Math.log(q) : Math.log(1 - q); }));
+    $('#lKpi').innerHTML = kpi('Accuracy', pct(m.acc)) + kpi('Precision', pct(m.pre)) + kpi('Recall', pct(m.rec)) + kpi('Log-loss', fmt(ll / X.length, 3), 'lower = better fit');
+    $('#lOut').innerHTML = `Red dots = malignant (1), green = benign (0). Dots with a black ring are misclassified. A tumour of 6 cm gets p = <b>${fmt(sigm(b0 + b1 * 6), 2)}</b> → ${sigm(b0 + b1 * 6) >= th ? 'predicted malignant' : 'predicted benign'} at threshold ${th.toFixed(2)}. ${th < .4 ? 'Low threshold: recall goes up, but so do false alarms.' : th > .6 ? 'High threshold: precision goes up, but more malignant tumours are missed.' : ''}`;
+  }
+  ['lb0', 'lb1', 'lth'].forEach(id => slide(id, draw, v => id === 'lth' ? v.toFixed(2) : id === 'lb1' ? v.toFixed(2) : v.toFixed(1)));
+  $('#lFit').onclick = () => { const b = fitLogit(X.map(x => [1, x]), Y); $('#lb0').value = b[0]; $('#lb1').value = b[1]; $('#lb0').dispatchEvent(new Event('input')); $('#lb1').dispatchEvent(new Event('input')); };
+  draw();
+})();
+
+// ===== Section 3: softmax / sigmoid / tanh =====
+(function () {
+  const L = ['cat', 'dog', 'bird'];
+  function draw() {
+    const z = ['smA', 'smB', 'smC'].map(id => +$('#' + id).value), e = z.map(Math.exp), s = sum(e), p = e.map(v => v / s);
+    const q = new Plot('#smPlot', { w: 380, h: 240, x: [0, 3], y: [0, 1], xticks: [], ylabel: 'probability', m: { l: 48, r: 10, t: 14, b: 30 } });
+    p.forEach((v, i) => { q.bar(i + .15, i + .85, v, { color: PAL[i] }); q.text(i + .5, v, (v * 100).toFixed(1) + '%', { dy: -6 }); q.text(i + .5, 0, L[i], { dy: 18, noclip: true, color: 'var(--muted)' }); });
+    q.text(1.5, .97, 'Σ = ' + sum(p).toFixed(3), { color: 'var(--muted)', size: 11 });
+  }
+  ['smA', 'smB', 'smC'].forEach(id => slide(id, draw, v => v.toFixed(1))); draw();
+  const g = new Plot('#sgPlot', { w: 380, h: 240, x: [-6, 6], y: [-1.1, 1.1], xlabel: 'z' }); const zs = range(-6, 6, .05);
+  g.hline(0, { color: 'var(--line)' }); g.path(zs, zs.map(sigm), { color: 'var(--accent)', width: 2.5 }); g.path(zs, zs.map(Math.tanh), { color: 'var(--blue)', width: 2.5, dash: '6 4' });
+  legend('#sgLeg', [['var(--accent)', 'sigmoid: 0 → 1 (probability)'], ['var(--blue)', 'tanh: −1 → 1 (zero-centred)', true]]);
+})();
+
+// ===== Section 4: entropy + ID3 =====
+const H2 = ps => -sum(ps.filter(p => p > 0).map(p => p * Math.log2(p)));
+(function () {
+  slide('enP', p => {
+    const q = new Plot('#enPlot', { w: 420, h: 230, x: [0, 1], y: [0, 1.05], xlabel: 'p₊', ylabel: 'impurity' }); const ps = range(0, 1, .005);
+    q.path(ps, ps.map(v => H2([v, 1 - v])), { color: 'var(--accent)', width: 2.5 }); q.path(ps, ps.map(v => 1 - v * v - (1 - v) ** 2), { color: 'var(--blue)', width: 2.5, dash: '6 4' });
+    q.dot(p, H2([p, 1 - p]), { r: 6, color: 'var(--accent)' }); q.dot(p, 1 - p * p - (1 - p) ** 2, { r: 6, color: 'var(--blue)' });
+    q.text(.5, 1.0, 'entropy', { dy: -4, color: 'var(--accent)' }); q.text(.5, .5, 'Gini', { dy: -6, color: 'var(--blue)' });
+    $('#enKpi').innerHTML = kpi('Entropy', fmt(H2([p, 1 - p]), 3)) + kpi('Gini', fmt(1 - p * p - (1 - p) ** 2, 3)) + kpi('Purity', p === 0 || p === 1 ? 'pure leaf' : Math.abs(p - .5) < .05 ? 'maximally mixed' : 'mixed');
+  }, v => v.toFixed(2))();
+})();
+(function () {
+  const A = ['age', 'income', 'student', 'credit_rating'];
+  const D = [['<=30', 'high', 'no', 'fair', 'no'], ['<=30', 'high', 'no', 'excellent', 'no'], ['31..40', 'high', 'no', 'fair', 'yes'], ['>40', 'medium', 'no', 'fair', 'yes'], ['>40', 'low', 'yes', 'fair', 'yes'], ['>40', 'low', 'yes', 'excellent', 'no'], ['31..40', 'low', 'yes', 'excellent', 'yes'], ['<=30', 'medium', 'no', 'fair', 'no'], ['<=30', 'low', 'yes', 'fair', 'yes'], ['>40', 'medium', 'yes', 'fair', 'yes'], ['<=30', 'medium', 'yes', 'excellent', 'yes'], ['31..40', 'medium', 'no', 'excellent', 'yes'], ['31..40', 'high', 'yes', 'fair', 'yes'], ['>40', 'medium', 'no', 'excellent', 'no']];
+  D.forEach((r, i) => r.push('C' + String(i + 1).padStart(2, '0')));
+  const AT = () => $('#idUseId').checked ? [...A, 'Customer_ID'] : A;
+  const ai = a => a === 'Customer_ID' ? 5 : A.indexOf(a);
+  const ent = rows => { const y = rows.filter(i => D[i][4] === 'yes').length; return H2([y / rows.length, 1 - y / rows.length]); };
+  const groups = (rows, a) => { const g = {}; rows.forEach(i => { const v = D[i][ai(a)]; (g[v] = g[v] || []).push(i); }); return g; };
+  const gain = (rows, a) => { const g = groups(rows, a); const H = ent(rows); let rem = 0, si = 0; for (const v in g) { const w = g[v].length / rows.length; rem += w * ent(g[v]); si -= w * Math.log2(w); } return { g: H - rem, gr: si ? (H - rem) / si : 0 }; };
+  let nid = 0, root, sel;
+  const mk = (rows, used) => ({ id: nid++, rows, used, attr: null, kids: {} });
+  const find = (n, id) => { if (n.id === id) return n; for (const v in n.kids) { const r = find(n.kids[v], id); if (r) return r; } return null; };
+  const cnt = rows => { const y = rows.filter(i => D[i][4] === 'yes').length; return [y, rows.length - y]; };
+  function split(n, a) { n.attr = a; n.kids = {}; const g = groups(n.rows, a); Object.keys(g).sort().forEach(v => n.kids[v] = mk(g[v], [...n.used, a])); }
+  function render() {
+    const lines = [];
+    const walk = (n, pre, label) => {
+      const [y, no] = cnt(n.rows), pure = !y || !no, avail = AT().filter(a => !n.used.includes(a));
+      let tag = n.attr ? `<b>${n.attr}?</b>` : pure ? `<span class="pill" style="background:${y ? 'var(--green-soft)' : 'var(--red-soft)'};color:${y ? 'var(--green)' : 'var(--red)'}">${y ? 'YES' : 'NO'}</span>` : !avail.length ? `<span class="pill" style="background:var(--amber-soft);color:var(--amber)">${y >= no ? 'YES' : 'NO'} (majority)</span>` : `<span class="small">impure, click to split</span>`;
+      lines.push(`${pre}${label}<a href="#" data-n="${n.id}" style="${sel === n ? 'background:var(--accent-soft);' : ''}text-decoration:none;color:inherit;padding:1px 4px;border-radius:5px">[${n.rows.length}: ${y} yes / ${no} no]</a> ${tag}`);
+      const ks = Object.keys(n.kids); ks.forEach((v, i) => walk(n.kids[v], pre.replace('├─ ', '│  ').replace('└─ ', '   ') + (i === ks.length - 1 ? '└─ ' : '├─ '), `${v} → `));
+    };
+    walk(root, '', 'root ');
+    $('#idTree').innerHTML = lines.join('\n');
+    $$('#idTree [data-n]').forEach(a => a.onclick = e => { e.preventDefault(); sel = find(root, +a.dataset.n); render(); });
+    const rs = new Set(sel.rows);
+    $('#idTbl').innerHTML = '<tr><th>ID</th><th>age</th><th>income</th><th>student</th><th>credit</th><th>buys</th></tr>' + D.map((r, i) => `<tr style="${rs.has(i) ? '' : 'opacity:.3'}"><td>${r[5]}</td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="${r[4] === 'yes' ? 'good' : 'bad'}">${r[4]}</td></tr>`).join('');
+    const [y, no] = cnt(sel.rows), avail = AT().filter(a => !sel.used.includes(a));
+    $('#idNode').innerHTML = `Selected node: <b>${sel.rows.length}</b> rows (${y} yes / ${no} no), entropy H = <b>${fmt(ent(sel.rows), 3)}</b>`;
+    const gs = avail.map(a => [a, gain(sel.rows, a)]); const best = gs.length ? gs.reduce((m, x) => x[1].g > m[1].g ? x : m) : null;
+    $('#idGain').innerHTML = (!y || !no) ? '<tr><td class="good">Pure node: this is a leaf, no split needed.</td></tr>' : '<tr><th>Attribute</th><th class="num">Gain</th><th class="num">Gain ratio</th><th></th></tr>' + gs.map(([a, g]) => `<tr class="${best && a === best[0] ? 'hl' : ''}"><td>${a}</td><td class="num">${fmt(g.g, 3)}</td><td class="num">${fmt(g.gr, 3)}</td><td><button class="btn" data-split="${a}" style="padding:3px 10px">Split</button></td></tr>`).join('');
+    $$('#idGain [data-split]').forEach(b => b.onclick = () => { split(sel, b.dataset.split); const k = Object.values(sel.kids).find(c => { const [a1, a2] = cnt(c.rows); return a1 && a2; }); const chosen = b.dataset.split; const wasBest = best && chosen === best[0]; sel = k || sel; render(); $('#idOut').className = 'feedback show ' + (chosen === 'Customer_ID' ? 'no' : wasBest ? 'ok' : 'info'); $('#idOut').innerHTML = chosen === 'Customer_ID' ? 'Every leaf is pure, yet this “tree” only memorises the 14 customers and cannot classify customer #15. Compare its gain ratio with the gain: the ratio exposes the trap.' : wasBest ? `✓ <b>${chosen}</b> had the highest information gain, so this is ID3's choice.` : `You split on <b>${chosen}</b>; ID3 would have chosen <b>${best[0]}</b> (gain ${fmt(best[1].g, 3)}). The tree still works but needs more splits.`; });
+  }
+  function reset() { nid = 0; root = mk(range(0, 13), []); sel = root; render(); $('#idOut').className = 'feedback show info'; $('#idOut').innerHTML = 'Root: 9 yes / 5 no → H(S) = 0.940. Compare the gains: age ≈ 0.25, student ≈ 0.15, credit ≈ 0.05, income ≈ 0.03 (the slides round intermediate steps, so they show 0.246 / 0.151). Split on the best one.'; }
+  $('#idReset').onclick = reset; $('#idUseId').onchange = () => render();
+  $('#idAuto').onclick = () => { const grow = n => { const [y, no] = cnt(n.rows); const av = A.filter(a => !n.used.includes(a)); if (!y || !no || !av.length) return; const b = av.reduce((m, a) => gain(n.rows, a).g > gain(n.rows, m).g ? a : m); split(n, b); Object.values(n.kids).forEach(grow); }; reset(); grow(root); render(); $('#idOut').className = 'feedback show ok'; $('#idOut').innerHTML = 'Finished ID3 tree: <b>age</b> at the root; <b>31..40 → yes</b>; <b>≤30 → student?</b>; <b>&gt;40 → credit_rating?</b>. Every leaf is pure. As rules: “IF age ≤ 30 AND student = yes THEN buys”, …'; };
+  reset();
+})();
+
+// ===== shared 2-D dataset for trees / grid search =====
+function sinData(n, noise, seed) { const R = rng(seed); return Array.from({ length: n }, () => { const x = -3 + 6 * R(), y = -2 + 4 * R(); let c = +(y > .9 * Math.sin(1.3 * x)); if (R() < noise) c = 1 - c; return [x, y, c]; }); }
+function cart(pts, depth, minLeaf = 1) {
+  const node = rows => { const c1 = rows.filter(p => p[2]).length; return { leaf: true, cls: +(c1 * 2 >= rows.length), n: rows.length }; };
+  const gini = (a, b) => { const n = a + b; return n ? 1 - (a / n) ** 2 - (b / n) ** 2 : 0; };
+  function build(rows, d) {
+    const c1 = rows.filter(p => p[2]).length;
+    if (d === 0 || c1 === 0 || c1 === rows.length || rows.length < 2 * minLeaf) return node(rows);
+    let best = null;
+    for (const f of [0, 1]) {
+      const s = [...rows].sort((a, b) => a[f] - b[f]); let l1 = 0;
+      for (let i = 0; i < s.length - 1; i++) { l1 += s[i][2]; if (s[i][f] === s[i + 1][f] || i + 1 < minLeaf || s.length - i - 1 < minLeaf) continue; const nl = i + 1, nr = s.length - nl, r1 = c1 - l1; const g = (nl * gini(l1, nl - l1) + nr * gini(r1, nr - r1)) / s.length; if (!best || g < best.g) best = { g, f, t: (s[i][f] + s[i + 1][f]) / 2 }; }
+    }
+    if (!best) return node(rows);
+    return { f: best.f, t: best.t, l: build(rows.filter(p => p[best.f] <= best.t), d - 1), r: build(rows.filter(p => p[best.f] > best.t), d - 1) };
+  }
+  return build(pts, depth);
+}
+const cartPred = (n, p) => n.leaf ? n.cls : cartPred(p[n.f] <= n.t ? n.l : n.r, p);
+const acc = (f, pts) => mean(pts.map(p => +(f(p) === p[2])));
+function regions(plot, f, nx = 60, ny = 40, op = .16) { const [x0, x1] = plot.o.x, [y0, y1] = plot.o.y, dx = (x1 - x0) / nx, dy = (y1 - y0) / ny; for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) { const c = f([x0 + (i + .5) * dx, y0 + (j + .5) * dy]); plot.add('rect', { x: plot.sx(x0 + i * dx), y: plot.sy(y0 + (j + 1) * dy), width: plot.sx(x0 + dx) - plot.sx(x0) + .5, height: plot.sy(y0) - plot.sy(y0 + dy) + .5, style: `fill:${c ? 'var(--accent)' : 'var(--blue)'};opacity:${op};shape-rendering:crispEdges` }, plot.layer); } }
+
+// ===== Section 5: KNN =====
+(function () {
+  const R = rng(31), pts = [];
+  for (let i = 0; i < 70; i++) { const c = i % 2; pts.push([c ? .9 + .95 * gauss(R) : -.9 + .95 * gauss(R), c ? .5 + .8 * gauss(R) : -.4 + .8 * gauss(R), c]); }
+  let q = [.15, .05];
+  legend('#kLeg', [['var(--blue)', 'Class A'], ['var(--accent)', 'Class B'], ['var(--ink)', 'Query point']]);
+  const P = new Plot('#kPlot', { h: 340, x: [-3.5, 3.5], y: [-2.6, 2.6], xlabel: 'feature 1', ylabel: 'feature 2' });
+  P.onClick((x, y) => { q = [x, y]; draw(); });
+  function knn(p, k) { const sy = $('#kScale').value === '1' ? 1 : 10, man = $('#kDist').value === 'm'; const d = pts.map((t, i) => { const dx = t[0] - p[0], dy = (t[1] - p[1]) * sy; return [man ? Math.abs(dx) + Math.abs(dy) : Math.hypot(dx, dy), i]; }).sort((a, b) => a[0] - b[0]).slice(0, k); const v = sum(d.map(x => pts[x[1]][2])); return { cls: +(v * 2 > k), v, d }; }
+  function draw() {
+    const k = +$('#kk').value; P.clear();
+    if ($('#kReg').value === '1') regions(P, p => knn(p, k).cls, 56, 40, .14);
+    const r = knn(q, k);
+    r.d.forEach(([, i]) => P.seg(q[0], q[1], pts[i][0], pts[i][1], { color: 'var(--ink)', opacity: .35, width: 1.2 }));
+    const nb = new Set(r.d.map(x => x[1]));
+    pts.forEach((t, i) => P.dot(t[0], t[1], { r: nb.has(i) ? 6.5 : 4.5, color: t[2] ? 'var(--accent)' : 'var(--blue)', stroke: nb.has(i) ? 'var(--ink)' : 'var(--surface)', sw: nb.has(i) ? 1.5 : 1 }));
+    P.add('path', { d: `M${P.sx(q[0]) - 9},${P.sy(q[1])}h18M${P.sx(q[0])},${P.sy(q[1]) - 9}v18`, style: 'stroke:var(--ink);stroke-width:3' }, P.layer);
+    $('#kOut').innerHTML = `The ${k} nearest neighbours vote <b>${k - r.v} × A</b> vs <b>${r.v} × B</b> → predicted <b>${r.cls ? 'Class B' : 'Class A'}</b>. ${k === 1 ? 'k = 1 follows every single point, so the boundary is jagged (high variance).' : k >= 19 ? 'Large k gives a very smooth boundary that can miss local structure (high bias).' : ''} ${$('#kScale').value === '0' ? '<br>⚠️ <b>Unscaled:</b> feature 2 is in bigger units, so it dominates the distance and the regions turn into horizontal bands. Feature 1 is almost ignored.' : ''}`;
+  }
+  slide('kk', draw); ['kDist', 'kReg', 'kScale'].forEach(id => $('#' + id).onchange = draw); draw();
+})();
+
+// ===== Section 6: confusion matrix calculator =====
+(function () {
+  let v = [30, 20, 10, 940];
+  const box = $('#cmBox');
+  function build() {
+    box.innerHTML = `<div class="h"></div><div class="h">Predicted +</div><div class="h">Predicted −</div><div class="h">Actual +</div><div class="tp">TP<br><input type="number" min="0" data-k="0" value="${v[0]}"></div><div class="fn">FN<br><input type="number" min="0" data-k="2" value="${v[2]}"></div><div class="h">Actual −</div><div class="fp">FP<br><input type="number" min="0" data-k="1" value="${v[1]}"></div><div class="tn">TN<br><input type="number" min="0" data-k="3" value="${v[3]}"></div>`;
+    $$('input', box).forEach(i => i.oninput = () => { v[+i.dataset.k] = Math.max(0, +i.value || 0); calc(); });
+    calc();
+  }
+  function calc() {
+    const [tp, fp, fn, tn] = v, m = metrics(tp, fp, fn, tn);
+    $('#cmKpi').innerHTML = kpi('Accuracy', pct(m.acc)) + kpi('Precision', pct(m.pre)) + kpi('Recall', pct(m.rec)) + kpi('F1-score', pct(m.f1)) + kpi('Specificity', pct(m.spec), 'TN / (TN + FP)');
+    const o = $('#cmOut'), pos = tp + fn, n = tp + fp + fn + tn;
+    let msg = `${pos} actual positives out of ${n} (${pct(pos / n)}). `;
+    if (tp === 0 && fp === 0) msg += `<b>Accuracy paradox:</b> ${pct(m.acc)} accuracy without finding a single positive case! On imbalanced data, accuracy alone is misleading. Look at recall.`;
+    else if (m.pre < .5 && m.rec > .6) msg += `Most alerts are false alarms: only ${pct(m.pre)} of flagged cases are real, even though recall is ${pct(m.rec)}. Fine for screening, annoying for blocking customers' cards.`;
+    else if (m.rec < .5) msg += `Recall is only ${pct(m.rec)}: the model misses most real positives (${fn} FN). Dangerous for disease screening, even with high accuracy.`;
+    else msg += `Precision ${pct(m.pre)} and recall ${pct(m.rec)} are both reasonable. F1 = ${pct(m.f1)} summarises the balance.`;
+    o.innerHTML = msg;
+  }
+  $$('[data-cm]').forEach(b => b.onclick = () => { v = b.dataset.cm.split(',').map(Number); build(); }); build();
+})();
+
+// ===== Section 7: depth vs over/underfitting =====
+(function () {
+  let tr, te, curve;
+  legend('#dtLeg', [['var(--blue)', 'Training accuracy'], ['var(--accent)', 'Test accuracy']]);
+  function data() { const nz = +$('#dtN').value / 100; tr = sinData(220, nz, 5); te = sinData(500, nz, 6); curve = range(1, 12).map(d => { const t = cart(tr, d); return [d, acc(p => cartPred(t, p), tr), acc(p => cartPred(t, p), te)]; }); }
+  function draw() {
+    const d = +$('#dtD').value, t = cart(tr, d);
+    const p = new Plot('#dtPlot', { w: 420, h: 300, x: [-3, 3], y: [-2, 2], xlabel: 'x₁', ylabel: 'x₂' });
+    regions(p, q => cartPred(t, q), 72, 48, .22);
+    const xs = range(-3, 3, .05); p.path(xs, xs.map(x => .9 * Math.sin(1.3 * x)), { color: 'var(--ink)', dash: '4 4', width: 1.5, opacity: .7 });
+    tr.forEach(q => p.dot(q[0], q[1], { r: 3.5, color: q[2] ? 'var(--accent)' : 'var(--blue)' }));
+    const c = new Plot('#dtCurve', { w: 420, h: 300, x: [1, 12], y: [.5, 1.01], xlabel: 'max_depth', ylabel: 'accuracy' });
+    c.path(curve.map(r => r[0]), curve.map(r => r[1]), { color: 'var(--blue)', width: 2.5 }); c.path(curve.map(r => r[0]), curve.map(r => r[2]), { color: 'var(--accent)', width: 2.5 });
+    c.vline(d, { color: 'var(--muted)', dash: '3 3', width: 1.5 });
+    const [_, a1, a2] = curve[d - 1], best = curve.reduce((m, r) => r[2] > m[2] ? r : m);
+    c.dot(best[0], best[2], { r: 6, color: 'var(--accent)' });
+    const o = $('#dtOut');
+    if (d <= 2) { o.className = 'feedback show info'; o.innerHTML = `<b>Underfitting (high bias):</b> depth ${d} draws only a few straight cuts. Train ${pct(a1)} ≈ test ${pct(a2)}, both low. The model is too simple for the wavy boundary (dashed).`; }
+    else if (a1 - a2 > .1) { o.className = 'feedback show no'; o.innerHTML = `<b>Overfitting (high variance):</b> train ${pct(a1)} vs test ${pct(a2)}. The tree carves little boxes around individual noisy points, which means memorising, not learning. Best test accuracy is at depth ${best[0]}.`; }
+    else { o.className = 'feedback show ok'; o.innerHTML = `<b>Good balance:</b> train ${pct(a1)}, test ${pct(a2)}. The regions follow the true boundary without chasing noise. (Best test score at depth ${best[0]}.)`; }
+  }
+  slide('dtD', draw); slide('dtN', () => { data(); draw(); }); data(); draw();
+})();
+
+// ===== Section 8: concept drift =====
+(function () {
+  let sc = 'none', model, orig;
+  const ramp = t => clamp((t - 6) / 14, 0, 1);
+  const concept = t => sc === 'sudden' ? (t >= 12 ? [-.7, .4] : [.5, 0]) : sc === 'grad' ? [.5 - 1.3 * ramp(t), .5 * ramp(t)] : sc === 'temp' ? (t === 11 || t === 12 ? [.5, 1.1] : [.5, 0]) : [.5, 0];
+  const shift = t => sc === 'cov' ? [-.13 * (t - 1), .03 * (t - 1)] : [0, 0];
+  const month = t => { const R = rng(t * 97 + sc.length * 13), [a, b] = concept(t), [m1, m2] = shift(t); return Array.from({ length: 160 }, () => { const x1 = m1 + gauss(R), x2 = m2 + gauss(R); let c = +(x2 > a * x1 + b); if (R() < .04) c = 1 - c; return [x1, x2, c]; }); };
+  const fit = ts => { const D = ts.flatMap(month); return fitLogit(D.map(p => [1, p[0], p[1]]), D.map(p => p[2])); };
+  const pred = (b, p) => +(b[0] + b[1] * p[0] + b[2] * p[1] > 0);
+  const accM = (b, t) => acc(p => pred(b, p), month(t));
+  function reset() { orig = fit([1, 2, 3]); model = orig; draw(); }
+  function draw() {
+    const t = +$('#drT').value, D = month(t), [a, bb] = concept(t);
+    const p = new Plot('#drScat', { w: 420, h: 300, x: [-5, 3.5], y: [-3.5, 3.5], xlabel: 'income (standardised)', ylabel: 'debt ratio' });
+    D.forEach(q => p.dot(q[0], q[1], { r: 3.5, color: q[2] ? 'var(--red)' : 'var(--green)', opacity: .8 }));
+    p.path([-5, 3.5], [-5, 3.5].map(x => a * x + bb), { color: 'var(--ink)', dash: '5 4', width: 1.5 });
+    p.path([-5, 3.5], [-5, 3.5].map(x => -(model[0] + model[1] * x) / model[2]), { color: 'var(--purple)', width: 3 });
+    const ms = range(1, 24), ao = ms.map(m => accM(orig, m)), am = ms.map(m => accM(model, m));
+    const c = new Plot('#drAcc', { w: 420, h: 300, x: [1, 24], y: [.4, 1], xlabel: 'month', ylabel: 'accuracy' });
+    c.add('rect', { x: c.sx(1), y: c.sy(1), width: c.sx(3) - c.sx(1), height: c.sy(.4) - c.sy(1), style: 'fill:var(--green-soft);opacity:.6' }, c.layer); c.text(2, .43, 'trained', { size: 10, color: 'var(--green)' });
+    c.path(ms, ao, { color: 'var(--muted)', dash: '5 4', width: 2 }); if (model !== orig) c.path(ms, am, { color: 'var(--purple)', width: 2.5 });
+    c.vline(t, { color: 'var(--accent)', width: 1.5 }); c.dot(t, accM(model, t), { r: 6, color: 'var(--accent)' });
+    const now = accM(model, t), o = $('#drOut');
+    const txt = { none: 'Stable world: the inputs and the input→target relationship stay the same, so accuracy stays high all the time.', cov: '<b>Data drift (covariate shift):</b> the applicants move to the left (lower incomes), but the <i>rule</i> linking income and debt to default is unchanged. The old model still works, so watch the inputs but there is no need to panic.', sudden: '<b>Sudden concept drift</b> at month 12: the boundary itself rotates (e.g. a policy or market shock). Accuracy falls off a cliff. Detectors like DDM catch this; retraining fixes it.', grad: '<b>Gradual concept drift:</b> the relationship rotates slowly, so accuracy erodes month by month. This is harder to notice than a sudden drop and is a case for regular retraining or online learning.', temp: '<b>Temporary spike</b> in months 11–12 (Black Friday): performance dips, then recovers <i>without</i> retraining. Retraining on that week would teach the model the wrong thing. This is a false alarm.' };
+    o.className = 'feedback show ' + (now < .8 ? 'no' : 'info');
+    o.innerHTML = `${txt[sc]}<br>Month ${t}: accuracy <b>${pct(now)}</b>${model !== orig ? ' (retrained model)' : ''}.`;
+  }
+  $$('#drBtns [data-d]').forEach(b => b.onclick = () => { $$('#drBtns [data-d]').forEach(x => x.classList.toggle('sel', x === b)); sc = b.dataset.d; reset(); });
+  $('#drRetrain').onclick = () => { const t = +$('#drT').value; model = fit([Math.max(1, t - 2), Math.max(1, t - 1), t]); draw(); };
+  $('#drOrig').onclick = () => { model = orig; draw(); };
+  slide('drT', draw); reset();
+})();
+
+// ===== Section 9: ROC =====
+(function () {
+  legend('#rcLeg', [['var(--blue)', 'Negatives'], ['var(--accent)', 'Positives']]);
+  function draw() {
+    const d = +$('#rcD').value, t = +$('#rcT').value;
+    const xs = range(-4, 7, .05), p = new Plot('#rcDist', { w: 420, h: 260, x: [-4, 7], y: [0, .45], xlabel: 'model score', yticks: [] });
+    const rr = xs.filter(x => x >= t);
+    if (rr.length) { p.area(rr, rr.map(x => normPDF(x)), { color: 'var(--blue)', opacity: .35 }); p.area(rr, rr.map(x => normPDF(x, d)), { color: 'var(--accent)', opacity: .35 }); }
+    p.path(xs, xs.map(x => normPDF(x)), { color: 'var(--blue)', width: 2.5 }); p.path(xs, xs.map(x => normPDF(x, d)), { color: 'var(--accent)', width: 2.5 });
+    p.vline(t, { color: 'var(--ink)', label: 'threshold', width: 1.5 });
+    const tpr = 1 - normCDF(t - d), fpr = 1 - normCDF(t), auc = normCDF(d / Math.SQRT2);
+    const r = new Plot('#rcRoc', { w: 420, h: 260, x: [0, 1], y: [0, 1], xlabel: 'false positive rate', ylabel: 'true positive rate (recall)' });
+    const ts = range(-6, 9, .05).reverse(); const fx = ts.map(v => 1 - normCDF(v)), fy = ts.map(v => 1 - normCDF(v - d));
+    r.area([0, ...fx, 1], [0, ...fy, 1], { color: 'var(--purple)', opacity: .15 }); r.path([0, 1], [0, 1], { color: 'var(--muted)', dash: '4 4', width: 1.5 }); r.path(fx, fy, { color: 'var(--purple)', width: 2.5 });
+    r.dot(fpr, tpr, { r: 7, color: 'var(--accent)' }); r.text(.62, .12, 'AUC = ' + fmt(auc, 3), { size: 14, color: 'var(--purple)' });
+    $('#rcKpi').innerHTML = kpi('AUC', fmt(auc, 3), auc > .9 ? 'excellent' : auc > .8 ? 'good' : auc > .7 ? 'fair' : auc > .6 ? 'poor' : '≈ random') + kpi('TPR / recall', pct(tpr)) + kpi('FPR', pct(fpr)) + kpi('Specificity', pct(1 - fpr));
+  }
+  slide('rcD', draw, v => v.toFixed(2)); slide('rcT', draw, v => v.toFixed(2)); draw();
+})();
+
+// ===== Section 10: grid search =====
+(function () {
+  let seed = 41;
+  legend('#gsLeg', [['var(--blue)', 'Training accuracy'], ['var(--accent)', '5-fold CV accuracy']]);
+  function run() {
+    const tr = sinData(200, .15, seed), te = sinData(400, .15, seed + 1), K = range(1, 31, 2);
+    const nbrs = (pool, p) => pool.map(q => [(q[0] - p[0]) ** 2 + (q[1] - p[1]) ** 2, q[2]]).sort((a, b) => a[0] - b[0]).map(x => x[1]);
+    const trainN = tr.map(p => nbrs(tr, p)), folds = range(0, 4).map(f => tr.filter((_, i) => i % 5 === f));
+    const cvN = folds.map((f, fi) => { const pool = tr.filter((_, i) => i % 5 !== fi); return f.map(p => [nbrs(pool, p), p[2]]); });
+    const vote = (lab, k) => +(sum(lab.slice(0, k)) * 2 > k);
+    const res = K.map(k => [k, mean(tr.map((p, i) => +(vote(trainN[i], k) === p[2]))), mean(cvN.flat().map(([lab, y]) => +(vote(lab, k) === y)))]);
+    const best = res.reduce((m, r) => r[2] > m[2] ? r : m);
+    const testAcc = mean(te.map(p => +(vote(nbrs(tr, p), best[0]) === p[2])));
+    const p = new Plot('#gsPlot', { h: 260, x: [1, 31], y: [.6, 1.01], xlabel: 'k (n_neighbors)', ylabel: 'accuracy', xticks: K.filter(k => k % 4 === 1) });
+    p.path(res.map(r => r[0]), res.map(r => r[1]), { color: 'var(--blue)', width: 2.5 }); p.path(res.map(r => r[0]), res.map(r => r[2]), { color: 'var(--accent)', width: 2.5 });
+    res.forEach(r => { p.dot(r[0], r[1], { r: 3.5, color: 'var(--blue)' }); p.dot(r[0], r[2], { r: 3.5, color: 'var(--accent)' }); });
+    p.vline(best[0], { color: 'var(--green)', label: 'best k = ' + best[0], width: 2 });
+    $('#gsKpi').innerHTML = kpi('Best k (by CV)', best[0]) + kpi('CV accuracy', pct(best[2])) + kpi('Test accuracy (once)', pct(testAcc), 'close to CV → honest estimate') + kpi('k = 1 training acc.', pct(res[0][1]), 'misleading');
+  }
+  $('#gsRun').onclick = run; $('#gsNew').onclick = () => { seed += 7; run(); }; run();
+})();
+
+// ===== Quiz =====
+renderQuiz('#quizBox', [
+  { q: 'Logistic regression mainly predicts…', opts: ['A continuous value', 'The probability of belonging to a class', 'Cluster labels', 'A time series'], a: 1, why: 'It outputs σ(z) ∈ (0, 1), which a threshold turns into a class.' },
+  { q: 'In ID3, entropy measures…', opts: ['Model accuracy', 'How mixed (impure) the class labels are', 'Feature scale', 'Tree depth'], a: 1, why: '0 = pure node, 1 = 50/50 split (binary).' },
+  { q: 'ID3 selects the feature with the…', opts: ['Lowest information gain', 'Highest information gain', 'Most categories', 'Highest entropy'], a: 1, why: 'The biggest reduction in entropy = the most informative question.' },
+  { q: 'A medical model lowers its threshold from 0.5 to 0.3. Most likely…', opts: ['Recall ↑, more false positives', 'Precision ↑, recall ↓', 'Nothing changes', 'Accuracy is always 100 %'], a: 0, why: 'More cases cross the bar → fewer missed diseases but more false alarms.' },
+  { q: 'Student_ID has a unique value per student. Why is a high information gain a problem?', opts: ['IDs are numeric', 'It memorises the training rows and cannot generalise to new students', 'Entropy cannot be computed', 'It makes the tree too shallow'], a: 1, why: 'Every branch is pure by construction; gain ratio penalises such splits.' },
+  { q: '1,000 patients, 50 sick. A model predicts everyone healthy. Accuracy?', opts: ['5 %', '50 %', '95 %', '100 %'], a: 2, why: '950 / 1,000 correct, yet recall = 0. This is the accuracy paradox.' },
+  { q: 'Fraud model: TP = 30, FP = 20, FN = 10, TN = 940. Precision?', opts: ['0.75', '0.60', '0.97', '0.30'], a: 1, why: '30 / (30 + 20) = 0.60.' },
+  { q: 'For cancer screening, which model? A: P 0.95 R 0.55 Acc 0.96 · B: P 0.70 R 0.92 Acc 0.90 · D: P 0.99 R 0.40 Acc 0.97', opts: ['A', 'B', 'D', 'Whichever has the highest accuracy'], a: 1, why: 'Missing cancer (FN) is the costly error → prioritise recall.' },
+  { q: 'A very strict spam filter only flags emails it is very confident about. Likely…', opts: ['High recall, low precision', 'High precision, some spam gets through (lower recall)', 'Accuracy drops to 0', 'More false positives'], a: 1, why: 'A high threshold means few false alarms but more misses.' },
+  { q: 'Training accuracy 99 %, test accuracy 68 %. Problem?', opts: ['Underfitting', 'Overfitting', 'Concept drift', 'Perfect model'], a: 1, why: 'A large gap between train and test means high variance.' },
+  { q: 'Training 60 %, test 58 %. Problem?', opts: ['Overfitting', 'Underfitting', 'Data leakage', 'Nothing'], a: 1, why: 'Both are low → the model is too simple (high bias).' },
+  { q: 'Spam emails now use new wording and the old model\'s performance drops. This is…', opts: ['Underfitting', 'Concept drift', 'A temporary spike', 'Scaling error'], a: 1, why: 'The input→label relationship has changed over time.' },
+  { q: 'Applicants have much lower incomes than before, but income→risk is unchanged. This is mainly…', opts: ['Concept drift', 'Data (covariate) drift', 'Overfitting', 'Label noise'], a: 1, why: 'Input distribution shifts while the concept stays the same.' },
+  { q: 'Model A has AUC 0.91, model B has AUC 0.84. Best interpretation?', opts: ['A has higher accuracy at every threshold', 'A separates the classes better overall, across thresholds', 'B is better because it is lower', 'AUC is just accuracy'], a: 1, why: 'AUC summarises ranking quality across all thresholds.' },
+  { q: 'Tuning KNN with k = 1, 3, 5, 7, 9. Best practice?', opts: ['Pick k with the best test accuracy', 'Pick k with cross-validation on the training data, then test once', 'Always use k = 1', 'Pick the largest k'], a: 1, why: 'The test set must stay untouched until the final evaluation.' },
+  { q: 'Missing a true disease case is much costlier than a false alarm. Which metric should guide selection?', opts: ['Precision', 'Recall', 'Accuracy', 'Specificity'], a: 1, why: 'Recall = TP / (TP + FN) directly penalises misses.' }
+]);
+</script>
+</body></html>

@@ -1,0 +1,1018 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ch2 · Machine Learning Foundations & Regression</title>
+<meta name="description" content="Interactive study guide — Statistics and Machine Learning, Chapter 2: Machine Learning Foundations & Regression">
+<style>:root{
+  --bg:#f7f5f2; --surface:#ffffff; --surface2:#f1eee9; --ink:#1f1d1a; --muted:#5f5a53; --line:#e3ded6;
+  --accent:#c9471a; --accent-soft:#fbe9e1; --blue:#1f5fa8; --blue-soft:#e6eef8; --green:#21794f; --green-soft:#e2f2ea;
+  --amber:#9a5a0f; --amber-soft:#fbf0de; --purple:#5a43a6; --purple-soft:#ece8f8; --red:#b42318; --red-soft:#fde8e6;
+  --code-bg:#1e1f24; --code-ink:#e8e6e3; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --radius:14px; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);padding:.1em .35em;border-radius:5px}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .5em}
+h2{font-size:1.65rem;letter-spacing:-.01em}
+h3{font-size:1.15rem}
+p{margin:0 0 1em}
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:10px 20px}
+.brand{font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+.chapnav{display:flex;gap:6px;overflow-x:auto;flex:1}
+.chapnav a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:.9rem;white-space:nowrap;border:1px solid transparent}
+.chapnav a.on{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent);font-weight:600}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.progress{height:3px;background:var(--accent);width:0;transition:width .1s}
+.hero{max-width:1240px;margin:0 auto;padding:48px 20px 24px}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}
+.hero h1{font-size:clamp(1.9rem,4vw,2.8rem);letter-spacing:-.02em;margin:.2em 0 .35em}
+.hero p.lead{font-size:1.12rem;color:var(--muted);max-width:760px}
+.objectives{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px}
+.objectives div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.93rem}
+.objectives b{display:block;color:var(--accent);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;padding:0 20px 80px}
+.toc{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 96px);overflow:auto;font-size:.9rem}
+.toc h4{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:8px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
+.toc a.active{color:var(--ink);background:var(--surface);border-left-color:var(--accent)}
+.toc a .dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--line);flex:none}
+.toc a.done .dot{background:var(--green);border-color:var(--green)}
+section.chap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow)}
+section.chap > .sec-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
+.secnum{color:var(--accent);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.donebtn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 10px;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.donebtn.on{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h4{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.green{border-color:var(--green);background:var(--green-soft)}
+.callout.blue{border-color:var(--blue);background:var(--blue-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b:first-child{display:block;margin-bottom:2px}
+.analogy{display:flex;gap:12px;background:var(--purple-soft);border-radius:12px;padding:14px 16px;margin:16px 0}
+.analogy .ico{font-size:1.5rem;line-height:1}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.tag.blue{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.tag.green{background:var(--green-soft);color:var(--green);border-color:transparent}
+.tag.amber{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.tag.red{background:var(--red-soft);color:var(--red);border-color:transparent}
+.tag.purple{background:var(--purple-soft);color:var(--purple);border-color:transparent}
+.widget{border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:12px;padding:18px;margin:18px 0;background:var(--bg)}
+.widget > .wtitle{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:10px}
+.widget > .wtitle::before{content:"▶ TRY IT";font-size:.7rem;letter-spacing:.08em;background:var(--accent);color:#fff;padding:2px 8px;border-radius:999px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:9px;cursor:pointer;font:inherit;font-size:.92rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+input[type=text],input[type=number],select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{font-family:var(--mono);font-size:.85rem;width:100%}
+label{font-size:.9rem}
+input[type=range]{accent-color:var(--accent);width:100%}
+.tablewrap{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:600;white-space:nowrap}
+td.bad,span.bad{background:var(--red-soft);color:var(--red)}
+td.good{background:var(--green-soft);color:var(--green)}
+td.warn{background:var(--amber-soft);color:var(--amber)}
+tr.hl td{background:var(--accent-soft)}
+td[contenteditable]{outline:none;cursor:text}
+td[contenteditable]:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;overflow:auto;font:13px/1.55 var(--mono);position:relative;margin:10px 0}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre .copy{position:absolute;top:8px;right:8px;font-size:.72rem;background:#ffffff1a;color:#ddd;border:1px solid #ffffff30;border-radius:6px;padding:2px 8px;cursor:pointer}
+.c-k{color:#f4a261}.c-s{color:#9ad59a}.c-c{color:#8b8f98;font-style:italic}.c-n{color:#82b8ff}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+.tabs button{border:0;background:none;color:var(--muted);padding:9px 14px;cursor:pointer;font:inherit;font-size:.93rem;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tabpanel{display:none}.tabpanel.on{display:block}
+details.reveal{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+details.reveal summary{cursor:pointer;font-weight:600}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.links a{display:block;text-decoration:none;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;transition:border-color .15s,transform .15s}
+.links a:hover{border-color:var(--accent);transform:translateY(-1px)}
+.links a b{display:block;color:var(--accent);font-size:.95rem}
+.links a span{font-size:.84rem;color:var(--muted)}
+.quiz .q{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.quiz .q p{font-weight:600;margin-bottom:8px}
+.quiz .opts{display:grid;gap:6px}
+.quiz .opts button{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;font-size:.93rem}
+.quiz .opts button.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.quiz .opts button.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.quiz .why{display:none;margin-top:8px;font-size:.9rem;color:var(--muted)}
+.quiz .q.answered .why{display:block}
+.score{font-weight:700;color:var(--accent)}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0}
+.flow .step{flex:1 1 130px;background:var(--surface2);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;position:relative}
+.flow .step small{display:block;color:var(--muted);font-size:.8rem}
+.flow .step.on{border-color:var(--accent);background:var(--accent-soft)}
+.flow .arrow{align-self:center;color:var(--muted)}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:.92rem;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-soft);color:var(--green)}
+.feedback.no{background:var(--red-soft);color:var(--red)}
+.feedback.info{background:var(--blue-soft);color:var(--blue)}
+.meter{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.meter > div{height:100%;background:var(--green);transition:width .3s}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:10px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi .v{font-size:1.5rem;font-weight:700}
+.kpi .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.sorter{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.bucket{min-height:110px;border:2px dashed var(--line);border-radius:10px;padding:8px}
+.bucket h5{margin:0 0 6px;font-size:.85rem}
+.bucket.over{border-color:var(--accent);background:var(--accent-soft)}
+.chip{display:inline-block;margin:3px;padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:.85rem;cursor:grab;user-select:none}
+.chip.sel{outline:2px solid var(--accent)}
+.chip.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.chip.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.pool{min-height:50px;padding:8px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
+.small{font-size:.86rem;color:var(--muted)}
+.foot{max-width:1240px;margin:0 auto;padding:20px;color:var(--muted);font-size:.85rem;text-align:center}
+svg text{font-family:inherit}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .toc{display:none}
+  section.chap{padding:18px}
+  .hero{padding:28px 16px 16px}
+  .layout{padding:0 16px 60px}
+  .topbar-inner{padding:8px 16px}
+}
+@media print{.topbar,.toc,.widget,.donebtn{display:none}.layout{display:block}}
+@media (max-width:700px){#doneCount{display:none}.brand{display:none}}
+
+/* ---- additions for the Statistics & ML pages ---- */
+.plot svg{width:100%;height:auto;display:block;overflow:visible}
+.plot .ax text{fill:var(--muted);font-size:11px}
+.plot .ax text.lab{font-size:12px;fill:var(--muted);font-weight:600}
+.plot .gl{stroke:var(--line);stroke-width:1}
+.plot .axl{stroke:var(--muted);stroke-width:1}
+
+.grid2>*,.grid3>*{min-width:0}
+.plot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;margin:10px 0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--muted);margin:4px 0 6px}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.lg i{display:inline-block;width:14px;height:10px;border-radius:3px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;margin:8px 0}
+.ctrls label{display:flex;flex-direction:column;gap:3px}
+.ctrls label b{font-weight:600;font-size:.86rem;display:flex;justify-content:space-between;gap:8px}
+.ctrls label b span{font-family:var(--mono);color:var(--accent)}
+.formula{font-family:"Cambria Math","STIX Two Math","Latin Modern Math",Georgia,serif;font-size:1.12rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0;overflow-x:auto;text-align:center}
+.formula .lbl{display:block;font-family:inherit;font-size:.78rem;color:var(--muted);text-align:left;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.frac>span:last-child{padding:0 3px}
+.out{font-family:var(--mono);font-size:.88rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
+.die{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:1.1rem;margin:3px;cursor:pointer;user-select:none}
+.die.a{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.die.b{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.die.a.b{background:linear-gradient(135deg,var(--blue-soft) 50%,var(--amber-soft) 50%);border-color:var(--purple);color:var(--purple)}
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;max-width:420px;font-size:.9rem;text-align:center}
+.cm div{padding:10px 6px;border-radius:8px}
+.cm .h{color:var(--muted);font-weight:600;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.cm .tp,.cm .tn{background:var(--green-soft);color:var(--green);font-weight:700}
+.cm .fp,.cm .fn{background:var(--red-soft);color:var(--red);font-weight:700}
+.cm input{width:70px;text-align:center}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;align-items:start}
+.twocol>*{min-width:0}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
+.nb{display:flex;gap:10px;align-items:flex-start;background:var(--blue-soft);border-radius:12px;padding:12px 14px;margin:14px 0;font-size:.93rem}
+.nb .ico{font-size:1.3rem;line-height:1}
+.nb a{font-weight:600}
+.tree{font-family:var(--mono);font-size:.86rem;line-height:1.5}
+.check{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--green)}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+.hlcell{outline:2px solid var(--accent);outline-offset:-2px}
+
+.kpi .v{font-size:1.3rem;line-height:1.25}
+
+section.chap > .sec-head{flex-wrap:wrap}
+section.chap > .sec-head > div{min-width:0}
+h2{overflow-wrap:break-word}
+</style></head>
+<body data-chapter="2">
+<div class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">Statistics &amp; ML</a><nav class="chapnav"><a href="Chapter1_Statistical_Foundations_Inference.html" class="">Ch 1 · Statistics & Inference</a><a href="Chapter2_ML_Foundations_Regression.html" class="on">Ch 2 · ML & Regression</a><a href="Chapter3_Classification_Evaluation.html" class="">Ch 3 · Classification</a><a href="Chapter4_Unsupervised_TimeSeries_Reporting.html" class="">Ch 4 · Clustering & Time Series</a></nav><span class="small" id="doneCount"></span><button class="iconbtn" id="themeBtn">☾ Dark</button></div><div class="progress" id="progress"></div></div>
+<header class="hero" id="top">
+  <div class="kicker">Chapter 2 · Interactive study guide</div>
+  <h1>Machine Learning Foundations &amp; Regression</h1>
+  <p class="lead">In machine learning, <b>we provide data and the model learns the patterns</b> instead of us writing every rule. This chapter covers the full supervised workflow: get the data ready, pick useful features, split correctly, fit regression models, then judge them with metrics and residuals.</p>
+  <div class="objectives">
+    <div><b>Day 1 · Data readiness</b>ML vs. programming, ML types, missing values, noise &amp; outliers, encoding, scaling, feature engineering</div>
+    <div><b>Day 2 · Selection &amp; splitting</b>Filter, wrapper and embedded methods, Lasso vs. Ridge, train/test split, k-fold CV, leakage</div>
+    <div><b>Day 3 · Regression</b>Simple, multiple and polynomial regression, MAE / MSE / RMSE / R², residual analysis</div>
+  </div>
+</header>
+<div class="layout">
+<aside class="toc"><h4>In this chapter</h4><nav id="tocList"></nav></aside>
+<main>
+
+<section class="chap" id="ml" data-title="What is ML?">
+  <div class="sec-head"><div><div class="secnum">Section 1</div><h2>What is machine learning?</h2></div></div>
+  <p><b>Machine learning</b> is a field of AI where computers <b>learn patterns from data</b> to make predictions or decisions, without being explicitly programmed for every rule.</p>
+  <div class="grid2">
+    <div class="card"><h4>Traditional programming</h4><div class="formula" style="font-size:.98rem">Rules + Data → <b>Answers</b></div><p class="small">The programmer writes the algorithm. Works well when the rules are clear: sorting numbers, payroll calculation with fixed tax rules.</p></div>
+    <div class="card"><h4>Machine learning</h4><div class="formula" style="font-size:.98rem">Data + Answers → <b>Rules (a model)</b></div><p class="small">The computer infers the rules from examples. Needed when rules are too complex or keep changing: image recognition, speech, self-driving, Mars rover navigation.</p></div>
+  </div>
+  <div class="analogy"><span class="ico">🐱</span><div><b>Like a child learning cats vs. dogs.</b> Nobody hands the child a rulebook. After seeing many examples they notice shape, ears, size and behaviour, and can later recognise a cat they have never seen. That is <b>learning from data</b> followed by <b>generalisation</b> to new data.</div></div>
+  <div class="widget"><div class="wtitle">Rules or ML?</div><div id="sortRules"></div></div>
+  <div class="grid3">
+    <div class="card"><h4>🏥 Healthcare</h4><p class="small">Early disease detection, drug discovery, patient care</p></div>
+    <div class="card"><h4>💶 Finance</h4><p class="small">Risk assessment, fraud detection, credit scoring</p></div>
+    <div class="card"><h4>🛒 E-commerce</h4><p class="small">Recommendations, churn prediction, dynamic pricing</p></div>
+    <div class="card"><h4>📣 Marketing</h4><p class="small">Customer segmentation, campaign optimisation, lead scoring</p></div>
+    <div class="card"><h4>🏭 Manufacturing</h4><p class="small">Predictive maintenance, quality control, efficiency</p></div>
+    <div class="card"><h4>🧪 Materials science</h4><p class="small">Property prediction, materials design &amp; discovery</p></div>
+  </div>
+</section>
+
+<section class="chap" id="types" data-title="Types of ML">
+  <div class="sec-head"><div><div class="secnum">Section 2</div><h2>Three types of machine learning</h2></div></div>
+  <div class="grid3">
+    <div class="card"><h4><span class="tag blue">Supervised</span></h4><p>Learns from <b>labelled</b> data: inputs <i>X</i> and known outputs <i>y</i>. Goal: predict labels or values for new data.</p><p class="small"><b>Classification</b> → categories (spam / not spam). <b>Regression</b> → continuous values (price, temperature).</p></div>
+    <div class="card"><h4><span class="tag green">Unsupervised</span></h4><p>Learns from <b>unlabelled</b> data to discover hidden structure. Goal: group, organise or summarise.</p><p class="small">Customer segmentation, recommendation, anomaly detection (Chapter 4).</p></div>
+    <div class="card"><h4><span class="tag purple">Reinforcement</span></h4><p>Learns by <b>taking actions</b> and receiving <b>rewards or penalties</b>. Goal: maximise long-term reward.</p><p class="small">Self-driving cars, robotics, game playing, campaign optimisation.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Which type of ML?</div><div id="sortTypes"></div></div>
+</section>
+
+<section class="chap" id="steps" data-title="The ML workflow">
+  <div class="sec-head"><div><div class="secnum">Section 3</div><h2>The 10 steps of a supervised ML project</h2></div></div>
+  <p><b>Predictive modelling</b> uses historical, labelled data to predict future or unseen outcomes. Click each step.</p>
+  <div class="flow" id="mlFlow"></div>
+  <div class="callout blue" id="mlOut"></div>
+</section>
+
+<section class="chap" id="quality" data-title="Data quality & datasets">
+  <div class="sec-head"><div><div class="secnum">Section 4</div><h2>Data preprocessing and data quality</h2></div></div>
+  <p><b>Data preprocessing</b> turns raw data into clean, consistent, usable data: handling missing values, noise and outliers, then encoding and scaling. It is often 60–80 % of the work, and the model can only be as good as its data.</p>
+  <div class="grid3">
+    <div class="card"><h4>Reliable</h4><p class="small">Collected and recorded in a dependable way</p></div>
+    <div class="card"><h4>Accurate</h4><p class="small">Correctly represents the real world</p></div>
+    <div class="card"><h4>Consistent</h4><p class="small">Same format and rules everywhere</p></div>
+    <div class="card"><h4>Relevant</h4><p class="small">Useful for the current ML task</p></div>
+    <div class="card"><h4>Complete</h4><p class="small">No important values are missing</p></div>
+    <div class="card"><h4>Poor quality →</h4><p class="small">Wrong predictions, misleading decisions, wasted resources. Fix with validation, cleaning and clear data rules.</p></div>
+  </div>
+  <h3 style="margin-top:18px">Where to find benchmark datasets</h3>
+  <div class="links">
+    <a href="https://archive.ics.uci.edu/datasets" target="_blank" rel="noopener"><b>UCI ML Repository</b><span>Classic teaching datasets for regression &amp; classification</span></a>
+    <a href="https://www.kaggle.com/datasets" target="_blank" rel="noopener"><b>Kaggle Datasets</b><span>Real-world CSVs, notebooks and competitions</span></a>
+    <a href="https://www.openml.org/search?type=data" target="_blank" rel="noopener"><b>OpenML</b><span>Reproducible datasets with metadata and tasks</span></a>
+    <a href="https://huggingface.co/datasets" target="_blank" rel="noopener"><b>Hugging Face Datasets</b><span>NLP, vision, audio and modern AI datasets</span></a>
+  </div>
+</section>
+
+<section class="chap" id="missing" data-title="Missing values">
+  <div class="sec-head"><div><div class="secnum">Section 5</div><h2>Handling missing data: imputation</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Simple: mean / median / mode</h4><p class="small">Replace NA with one summary value of the column. Fast and works for numeric (mean/median) and categorical (mode) data, but it <b>reduces variability</b> and ignores relationships with other columns.</p></div>
+    <div class="card"><h4>Model-based: KNN, trees, regression</h4><p class="small">Predict the missing value from the other features. Captures relationships, but costs more computation and needs careful model choice.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Impute Feature 1 (the slide example)</div>
+    <div class="btnrow" id="impBtns"><button class="btn sel" data-m="mean">Mean</button><button class="btn" data-m="median">Median</button><button class="btn" data-m="mode">Mode</button><button class="btn" data-m="knn">KNN (k neighbours)</button><button class="btn" data-m="reg">Linear regression on F2</button></div>
+    <div class="ctrls" id="impK" style="display:none"><label><b>k <span data-for="impKv">2</span></b><input type="range" id="impKv" min="1" max="6" value="2"></label></div>
+    <div class="twocol"><div class="tablewrap"><table id="impTbl"></table></div><div id="impPlot"></div></div>
+    <div class="kpis" id="impKpi"></div>
+    <p class="small">Points coloured <span class="tag amber">amber</span> are imputed. With mean, median or mode, every imputed point lands at the same height no matter what F2 is, so the relationship is broken. KNN and regression follow the trend.</p>
+  </div>
+  <pre><code data-hl="py">from sklearn.impute import SimpleImputer, KNNImputer
+SimpleImputer(strategy="median").fit_transform(X)    # "mean", "most_frequent"
+KNNImputer(n_neighbors=3).fit_transform(X)            # uses the other columns</code></pre>
+</section>
+
+<section class="chap" id="noise" data-title="Noise & outliers">
+  <div class="sec-head"><div><div class="secnum">Section 6</div><h2>Noise vs. outliers</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Noise</h4><p>Small random fluctuations or measurement errors that hide the true pattern. Example: a step counter that jumps a little because of sensor error. <b>Affects many values slightly.</b></p><p class="small">Fix: <b>smoothing</b> (moving average), filtering, or deleting clearly wrong records.</p></div>
+    <div class="card"><h4>Outlier</h4><p>An extreme observation far from the rest. It might be an error, a rare event, or an important anomaly. Example: ice-cream sales doubling in a heatwave week. <b>Affects few values strongly.</b></p><p class="small">Fix: <b>investigate first</b> (domain knowledge + plots), then remove, cap, impute, or keep and model separately.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Smooth the noise, flag the outlier</div>
+    <div class="ctrls"><label><b>Moving-average window <span data-for="maW">1</span> days</b><input type="range" id="maW" min="1" max="15" value="1"></label><label><b>Outlier threshold |z| &gt; <span data-for="zT">3.0</span></b><input type="range" id="zT" min="1.5" max="5" step="0.1" value="3"></label><label><b>Noise level <span data-for="nzL">1.0</span></b><input type="range" id="nzL" min="0" max="3" step="0.1" value="1"></label></div>
+    <div id="maPlot"></div><div class="legend" id="maLeg"></div><div class="feedback info show" id="maOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="transform" data-title="Encoding & scaling">
+  <div class="sec-head"><div><div class="secnum">Section 7</div><h2>Data transformation: encoding and scaling</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Scaling</h4><p class="small">Put numeric features on comparable scales.</p></div>
+    <div class="card"><h4>Encoding</h4><p class="small">Turn categories into numbers the model can use.</p></div>
+    <div class="card"><h4>Binning</h4><p class="small">Group continuous values into intervals (age groups).</p></div>
+    <div class="card"><h4>Feature generation</h4><p class="small">Build new useful features from existing ones (Section 8).</p></div>
+  </div>
+  <h3 style="margin-top:18px">One-hot encoding</h3>
+  <p>Each category becomes its own binary column: 1 if the row belongs to that category, 0 otherwise. Why not just code HR = 1, Engineering = 2, Sales = 3? Because the model would think Sales is “3 × HR” and that Engineering lies between them.</p>
+  <div class="widget"><div class="wtitle">Encode the Department column</div>
+    <div class="btnrow"><button class="btn sel" id="ohRaw">Original</button><button class="btn" id="ohLab">Label encoding (risky)</button><button class="btn" id="ohOne">One-hot encoding</button></div>
+    <div class="tablewrap"><table id="ohTbl"></table></div><p class="small" id="ohNote"></p>
+  </div>
+  <h3>Feature scaling</h3>
+  <div class="grid2">
+    <div class="formula"><span class="lbl">Standardisation (z-score) · mean 0, SD 1</span>z = <span class="frac"><span>x − μ</span><span>σ</span></span></div>
+    <div class="formula"><span class="lbl">Normalisation (min–max) · range [0, 1]</span>x′ = <span class="frac"><span>x − x<sub>min</sub></span><span>x<sub>max</sub> − x<sub>min</sub></span></span></div>
+  </div>
+  <div class="widget"><div class="wtitle">Scale the credit dataset</div>
+    <div class="btnrow" id="scBtns"><button class="btn sel" data-s="raw">Raw values</button><button class="btn" data-s="z">Standardise (z-score)</button><button class="btn" data-s="mm">Min–max [0, 1]</button></div>
+    <div class="twocol"><div class="tablewrap"><table id="scTbl"></table></div><div id="scPlot"></div></div>
+    <div class="callout amber" id="scNote" style="margin-bottom:0"></div>
+  </div>
+  <pre><code data-hl="py">from sklearn.preprocessing import StandardScaler, MinMaxScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+pre = ColumnTransformer([
+    ("num", StandardScaler(), ["credit_score", "income", "age"]),
+    ("cat", OneHotEncoder(handle_unknown="ignore"), ["department"]),
+])</code></pre>
+</section>
+
+<section class="chap" id="fe" data-title="Feature engineering">
+  <div class="sec-head"><div><div class="secnum">Section 8</div><h2>Feature engineering: creating more useful features</h2></div></div>
+  <p>A good feature can matter more than a fancy algorithm. <b>Feature engineering</b> creates or transforms inputs so that patterns become easier to learn.</p>
+  <div class="widget"><div class="wtitle">Engineer features</div>
+    <div class="btnrow"><button class="btn" data-fe="ratio">÷ Ratio: credit / income</button><button class="btn" data-fe="inter">× Interaction: income × age</button><button class="btn" data-fe="bin">▤ Binning: age group</button><button class="btn" data-fe="date">📅 Date: days since purchase</button><button class="btn" data-fe="log">log(income)</button><button class="btn" id="feReset">Reset</button></div>
+    <div class="tablewrap"><table id="feTbl"></table></div><p class="small" id="feNote">Click a button to add a feature.</p>
+  </div>
+</section>
+
+<section class="chap" id="select" data-title="Feature selection">
+  <div class="sec-head"><div><div class="secnum">Section 9</div><h2>Feature selection: keep what helps, drop what doesn't</h2></div></div>
+  <p>Fewer, better features mean lower dimensionality, often better generalisation, and a simpler model that is easier to explain. Our toy house-price dataset has 8 candidate features. Only some of them really drive the price.</p>
+  <div class="tabs" data-group="fs"><button class="on" data-tab="filter">Filter methods</button><button data-tab="wrap">Wrapper methods</button><button data-tab="emb">Embedded: Lasso vs. Ridge</button></div>
+  <div class="tabpanel on" data-group="fs" data-tab="filter">
+    <p>Score each feature against the target <b>before</b> training. These methods are fast and model-agnostic.</p>
+    <div class="grid3"><div class="card"><h4>Pearson correlation</h4><p class="small">Linear relationship between two numeric variables, −1…+1.</p></div><div class="card"><h4>Mutual information</h4><p class="small">How much a feature tells you about the target, including <b>non-linear</b> relationships.</p></div><div class="card"><h4>ANOVA F-test</h4><p class="small">Does a numeric feature differ across target <b>classes</b>? Mainly for classification. Keep low-p features: blood glucose (p = 0.001) ✓, patient ID (p = 0.72) ✗.</p></div></div>
+    <div id="fsFilter"></div><div class="legend" id="fsFLeg"></div>
+    <p class="small">Notice <code>distance_km</code>: its effect on price is U-shaped, so |r| is small, but mutual information picks it up. That is why the slide says MI “captures non-linear relationships”.</p>
+  </div>
+  <div class="tabpanel" data-group="fs" data-tab="wrap">
+    <p>Try feature <b>subsets</b> with an actual model and keep the subset that validates best. More accurate, but slower.</p>
+    <div class="btnrow"><button class="btn primary" id="rfeStep">RFE: remove weakest feature</button><button class="btn primary" id="fwdStep">Forward: add best feature</button><button class="btn" id="wrReset">Reset</button></div>
+    <div class="twocol"><div class="tablewrap"><table id="wrTbl"></table></div><div id="wrPlot"></div></div>
+    <div class="feedback info show" id="wrOut"></div>
+  </div>
+  <div class="tabpanel" data-group="fs" data-tab="emb">
+    <p>Selection happens <b>during training</b> through a penalty on large coefficients.</p>
+    <div class="grid2">
+      <div class="formula"><span class="lbl">Lasso (L1)</span>Cost = <span class="frac"><span>1</span><span>n</span></span>Σ(y<sub>i</sub> − ŷ<sub>i</sub>)² + α Σ|β<sub>j</sub>|</div>
+      <div class="formula"><span class="lbl">Ridge (L2)</span>Cost = <span class="frac"><span>1</span><span>n</span></span>Σ(y<sub>i</sub> − ŷ<sub>i</sub>)² + α Σβ<sub>j</sub>²</div>
+    </div>
+    <div class="ctrls"><label><b>Regularisation strength α <span data-for="alpha">0.10</span></b><input type="range" id="alpha" min="-3" max="1.3" step="0.05" value="-1"></label></div>
+    <div class="grid2"><div><p class="small"><b>Lasso:</b> coefficients hit <b>exactly 0</b>, which is automatic feature selection</p><div id="lassoPlot"></div></div><div><p class="small"><b>Ridge:</b> coefficients <b>shrink towards</b> 0 but stay non-zero</p><div id="ridgePlot"></div></div></div>
+    <div class="kpis" id="embKpi"></div>
+    <div class="callout green"><b>Which one?</b>Lasso suits 100 features where only a few matter. Ridge suits cases where most features are useful (age, BMI, blood pressure, cholesterol, glucose) and you just want a more stable model. Tree models such as random forests and XGBoost also give feature importances while training.</div>
+  </div>
+</section>
+
+<section class="chap" id="split" data-title="Splitting & cross-validation">
+  <div class="sec-head"><div><div class="secnum">Section 10</div><h2>Data splitting and cross-validation</h2></div></div>
+  <p>We judge a model on data it has <b>never seen</b>. Test on the training data and you only measure memorisation; the score will look great and mean nothing.</p>
+  <div class="grid2">
+    <div class="card"><h4>Hold-out split</h4><p class="small">Train (fit) → validation (tune) → test (final, touched once). Common: 70/30 or 60/20/20.</p></div>
+    <div class="card"><h4>k-fold cross-validation</h4><p class="small">Split into k folds; train k times, each time testing on a different fold; average the k scores. More stable. Common: k = 5 or 10.</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">k-fold cross-validation</div>
+    <div class="ctrls"><label><b>k folds <span data-for="kf">5</span></b><input type="range" id="kf" min="2" max="10" value="5"></label><label><b>Hold-out test share <span data-for="ho">20</span>%</b><input type="range" id="ho" min="10" max="40" step="5" value="20"></label></div>
+    <div id="kfPlot"></div>
+    <div class="kpis" id="kfKpi"></div>
+  </div>
+  <div class="callout"><b>Data leakage: the silent killer</b>Split <i>first</i>, then fit imputers, scalers and feature selectors on the <b>training part only</b>. If you scale using the mean of the full dataset, information from the test set leaks into training and your score is too optimistic. A scikit-learn <code>Pipeline</code> inside <code>cross_val_score</code> prevents this automatically.</div>
+  <pre><code data-hl="py">from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.pipeline import make_pipeline
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42)
+model = make_pipeline(StandardScaler(), Ridge(alpha=1.0))   # scaler fitted inside each fold
+scores = cross_val_score(model, X_tr, y_tr, cv=5, scoring="neg_root_mean_squared_error")</code></pre>
+</section>
+
+<section class="chap" id="reg" data-title="Regression models">
+  <div class="sec-head"><div><div class="secnum">Section 11</div><h2>Regression: predicting a continuous value</h2></div></div>
+  <div class="tabs" data-group="rt"><button class="on" data-tab="s">Simple linear</button><button data-tab="m">Multiple linear</button><button data-tab="p">Polynomial</button></div>
+  <div class="tabpanel on" data-group="rt" data-tab="s"><div class="formula">ŷ = β₀ + β₁x &nbsp;&nbsp; <span class="small">β₀ = intercept, β₁ = slope (change in y per unit of x)</span></div><p class="small">One input feature: temperature → energy use, study hours → exam score, house size → price, experience → salary, ad budget → revenue. The line is chosen to minimise the sum of squared residuals (ordinary least squares).</p></div>
+  <div class="tabpanel" data-group="rt" data-tab="m"><div class="formula">ŷ = β₀ + β₁x₁ + β₂x₂ + … + β<sub>p</sub>x<sub>p</sub></div><p class="small">Several inputs and one continuous target: size + location score + rooms → price; age + BMI + exercise → healthcare cost; composition + pressure + temperature → material strength. Each β<sub>j</sub> is the effect of x<sub>j</sub> <i>holding the others fixed</i>.</p></div>
+  <div class="tabpanel" data-group="rt" data-tab="p"><div class="formula">ŷ = β₀ + β₁x + β₂x² + … + β<sub>d</sub>x<sup>d</sup></div><p class="small">For curved relationships: study hours with diminishing returns, speed → fuel consumption, temperature → crop yield. It is still “linear regression” because it is linear in the β's. A high degree d fits noise.</p></div>
+  <div class="widget"><div class="wtitle">Fit a regression: click to add points</div>
+    <div class="ctrls"><label><b>Polynomial degree <span data-for="deg">1</span></b><input type="range" id="deg" min="1" max="10" value="1"></label><label><b>Show residuals</b><select id="showRes"><option value="1">Yes</option><option value="0">No</option></select></label></div>
+    <div class="btnrow"><button class="btn" id="rgDim">Diminishing returns data</button><button class="btn" id="rgLin">Linear data</button><button class="btn" id="rgNew">↻ New sample</button><button class="btn" id="rgClear">Clear</button></div>
+    <div id="rgPlot"></div><div class="legend" id="rgLeg"></div>
+    <div class="kpis" id="rgKpi"></div><div class="feedback show" id="rgOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="metrics" data-title="Regression metrics">
+  <div class="sec-head"><div><div class="secnum">Section 12</div><h2>Evaluation metrics for regression</h2></div></div>
+  <div class="grid2">
+    <div class="formula"><span class="lbl">MAE · mean absolute error</span>MAE = <span class="frac"><span>1</span><span>n</span></span>Σ|y<sub>i</sub> − ŷ<sub>i</sub>|<br><span class="small">easy to read, target units, robust</span></div>
+    <div class="formula"><span class="lbl">MSE · mean squared error</span>MSE = <span class="frac"><span>1</span><span>n</span></span>Σ(y<sub>i</sub> − ŷ<sub>i</sub>)²<br><span class="small">squared units, punishes big errors</span></div>
+    <div class="formula"><span class="lbl">RMSE · root MSE</span>RMSE = √MSE<br><span class="small">target units, still punishes big errors</span></div>
+    <div class="formula"><span class="lbl">R² · coefficient of determination</span>R² = 1 − <span class="frac"><span>Σ(y − ŷ)²</span><span>Σ(y − ȳ)²</span></span><br><span class="small">share of variance explained; can be negative</span></div>
+  </div>
+  <div class="widget"><div class="wtitle">House prices (k€): edit the predictions</div>
+    <div class="btnrow"><button class="btn" id="mtGood">Good model</button><button class="btn" id="mtBig">Add one huge error</button><button class="btn" id="mtMean">Always predict the mean</button><button class="btn" id="mtBad">Worse than the mean</button></div>
+    <div class="twocol"><div class="tablewrap"><table id="mtTbl"></table></div><div id="mtPlot"></div></div>
+    <div class="kpis" id="mtKpi"></div><div class="feedback info show" id="mtOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="resid" data-title="Residual analysis">
+  <div class="sec-head"><div><div class="secnum">Section 13</div><h2>Residual analysis: reading the model's mistakes</h2></div></div>
+  <div class="formula">residual = y − ŷ &nbsp; (actual − predicted)</div>
+  <p>A single metric tells you <i>how big</i> the errors are. The residual plot tells you <i>why</i> they happen.</p>
+  <div class="widget"><div class="wtitle">Diagnose the residual plot</div>
+    <div class="btnrow" id="rsBtns"><button class="btn sel" data-r="rand">Pattern 1</button><button class="btn" data-r="curve">Pattern 2</button><button class="btn" data-r="fan">Pattern 3</button><button class="btn" data-r="out">Pattern 4</button><button class="btn" data-r="struct">Pattern 5</button></div>
+    <div id="rsPlot"></div>
+    <p><b>What does this pattern mean?</b></p>
+    <div class="btnrow" id="rsAns"></div><div class="feedback" id="rsOut"></div>
+  </div>
+  <div class="tablewrap"><table><tr><th>Residual pattern</th><th>Possible meaning</th><th>What to try</th></tr>
+    <tr><td>Random cloud around 0</td><td>Model is reasonable ✓</td><td>—</td></tr>
+    <tr><td>Curved (U or arch)</td><td>Linear model too simple</td><td>Polynomial terms, a transform, or a non-linear model</td></tr>
+    <tr><td>Funnel: spread increases</td><td>Unequal error variance (heteroscedasticity)</td><td>Log-transform the target, weighted regression</td></tr>
+    <tr><td>A few isolated large points</td><td>Possible outliers</td><td>Investigate, robust loss (Huber), MAE</td></tr>
+    <tr><td>Clear structure / groups</td><td>Missing feature or wrong model form</td><td>Add the missing variable (e.g. a category)</td></tr></table></div>
+</section>
+
+<section class="chap" id="links" data-title="Notebooks & homework">
+  <div class="sec-head"><div><div class="secnum">Section 14</div><h2>Course notebooks, homework &amp; resources</h2></div></div>
+  <div class="links">
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_02_Machine_Learning_Foundations_and_Regression/Lecture_Support/01_Week2_Day1_Data_Readiness_Feature_Engineering.ipynb" target="_blank" rel="noopener"><b>Day 1 · Data readiness &amp; feature engineering</b><span>Explore, X / y, imputation, outliers, encoding, scaling, new features</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_02_Machine_Learning_Foundations_and_Regression/Lecture_Support/02_Week2_Day2_Feature_Selection_and_Data_Splitting.ipynb" target="_blank" rel="noopener"><b>Day 2 · Feature selection &amp; splitting</b><span>Filter / wrapper / embedded, train–test, leakage</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_02_Machine_Learning_Foundations_and_Regression/Lecture_Support/03_Week2_Day3_Full_Regression_Workflow.ipynb" target="_blank" rel="noopener"><b>Day 3 · Full regression workflow</b><span>Pipeline, Linear / Ridge / Lasso / Polynomial, metrics, residuals</span></a>
+    <a href="https://scikit-learn.org/stable/modules/preprocessing.html" target="_blank" rel="noopener"><b>scikit-learn · Preprocessing</b><span>Scalers, encoders, transformers</span></a>
+    <a href="https://scikit-learn.org/stable/modules/feature_selection.html" target="_blank" rel="noopener"><b>scikit-learn · Feature selection</b><span>SelectKBest, RFE, SequentialFeatureSelector</span></a>
+    <a href="https://scikit-learn.org/stable/modules/linear_model.html" target="_blank" rel="noopener"><b>scikit-learn · Linear models</b><span>LinearRegression, Ridge, Lasso, ElasticNet</span></a>
+    <a href="https://scikit-learn.org/stable/modules/cross_validation.html" target="_blank" rel="noopener"><b>scikit-learn · Cross-validation</b><span>KFold, cross_val_score, pitfalls</span></a>
+    <a href="https://scikit-learn.org/stable/modules/generated/sklearn.datasets.fetch_california_housing.html" target="_blank" rel="noopener"><b>California Housing dataset</b><span>Dataset for the individual homework</span></a>
+  </div>
+  <div class="nb"><span class="ico">📝</span><div><b>Individual homework: California Housing.</b> Explore the data (features, target, shape, missing values). Define X and a continuous y, then split. Preprocess (imputation, scaling, optional feature engineering). Train Linear Regression plus an improved model (Ridge / Lasso / Polynomial). Evaluate with MAE, MSE, RMSE and R². Plot actual vs. predicted, residuals and a model-comparison chart, and discuss over- or underfitting. Finish with a conclusion: <i>which model is best, and why?</i></div></div>
+  <pre><code data-hl="py">from sklearn.datasets import fetch_california_housing
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+X, y = fetch_california_housing(return_X_y=True, as_frame=True)
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=0.2, random_state=42)
+for name, reg in {"Linear": LinearRegression(), "Ridge": Ridge(1.0), "Lasso": Lasso(0.01)}.items():
+    m = make_pipeline(StandardScaler(), reg).fit(X_tr, y_tr); p = m.predict(X_te)
+    print(name, mean_absolute_error(y_te, p), mean_squared_error(y_te, p) ** 0.5, r2_score(y_te, p))</code></pre>
+</section>
+
+<section class="chap" id="quiz" data-title="Self-check quiz">
+  <div class="sec-head"><div><div class="secnum">Section 15</div><h2>Self-check quiz</h2></div></div>
+  <div id="quizBox"></div>
+</section>
+</main></div>
+
+<footer class="foot">Statistics and Machine Learning · Prof. Dr. Mehrdad Jalali · SRH University of Applied Sciences Heidelberg · Course repository: <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials" target="_blank" rel="noopener">github.com/MehrdadJalali-AI/stat-ml-teaching-materials</a></footer>
+<script>// ---------- shared helpers for all chapter pages ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// theme
+(function () {
+  const saved = store.get('sml-theme', null);
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  const b = $('#themeBtn');
+  if (!b) return;
+  const label = () => {
+    const t = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    b.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+  };
+  label();
+  b.onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nxt);
+    store.set('sml-theme', nxt); label();
+  };
+})();
+
+// TOC, scroll spy, progress, "mark as understood"
+(function () {
+  const toc = $('#tocList'); const secs = $$('section.chap');
+  const key = 'sml-done-' + (document.body.dataset.chapter || 'x');
+  const done = new Set(store.get(key, []));
+  secs.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id; a.innerHTML = '<span class="dot"></span>' + esc(s.dataset.title || s.id);
+    if (done.has(s.id)) a.classList.add('done');
+    toc && toc.appendChild(a);
+    const head = s.querySelector('.sec-head');
+    if (head) {
+      const b = document.createElement('button'); b.className = 'donebtn';
+      const paint = () => { b.classList.toggle('on', done.has(s.id)); b.textContent = done.has(s.id) ? '✓ Understood' : 'Mark as understood'; a.classList.toggle('done', done.has(s.id)); updCount(); };
+      b.onclick = () => { done.has(s.id) ? done.delete(s.id) : done.add(s.id); store.set(key, [...done]); paint(); };
+      head.appendChild(b); setTimeout(paint);
+    }
+  });
+  function updCount() { const c = $('#doneCount'); if (c) c.textContent = done.size + ' / ' + secs.length + ' sections understood'; }
+  const links = toc ? $$('a', toc) : [];
+  const onScroll = () => {
+    const h = document.documentElement; const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    const bar = $('#progress'); if (bar) bar.style.width = (p * 100) + '%';
+    let cur = 0; secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 140) cur = i; });
+    links.forEach((l, i) => l.classList.toggle('active', i === cur));
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+})();
+
+// tabs: <div class="tabs" data-group="x"><button data-tab="a">..</button></div> + <div class="tabpanel" data-group="x" data-tab="a">
+document.addEventListener('click', e => {
+  const b = e.target.closest('.tabs button'); if (!b) return;
+  const g = b.parentElement.dataset.group;
+  $$('.tabs[data-group="' + g + '"] button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tabpanel[data-group="' + g + '"]').forEach(p => p.classList.toggle('on', p.dataset.tab === b.dataset.tab));
+});
+
+// copy buttons on code
+function addCopy(root = document) {
+  $$('pre', root).forEach(p => {
+    if (p.querySelector('.copy')) return;
+    const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'Copy';
+    b.onclick = () => { const t = p.querySelector('code') ? p.querySelector('code').innerText : p.innerText.replace(/Copy$/, ''); navigator.clipboard && navigator.clipboard.writeText(t); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1200); };
+    p.appendChild(b);
+  });
+}
+addCopy();
+
+// quiz engine: renderQuiz('#el', [{q, opts:[...], a: idx, why}])
+function renderQuiz(sel, items) {
+  const root = $(sel); if (!root) return; root.classList.add('quiz');
+  let right = 0, answered = 0;
+  const sc = document.createElement('p'); sc.className = 'score';
+  const upd = () => sc.textContent = `Score: ${right} / ${items.length}` + (answered === items.length ? (right === items.length ? ' — perfect! 🎉' : ' — review the explanations and try again.') : '');
+  items.forEach((it, qi) => {
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = `<p>${qi + 1}. ${it.q}</p><div class="opts"></div><div class="why">💡 ${it.why}</div>`;
+    const o = d.querySelector('.opts');
+    it.opts.forEach((t, i) => {
+      const b = document.createElement('button'); b.innerHTML = t;
+      b.onclick = () => {
+        if (d.classList.contains('answered')) return;
+        d.classList.add('answered'); answered++;
+        if (i === it.a) { b.classList.add('right'); right++; } else { b.classList.add('wrong'); o.children[it.a].classList.add('right'); }
+        upd();
+      };
+      o.appendChild(b);
+    });
+    root.appendChild(d);
+  });
+  const r = document.createElement('button'); r.className = 'btn'; r.textContent = '↺ Reset quiz';
+  r.onclick = () => { root.innerHTML = ''; renderQuiz(sel, items); };
+  root.appendChild(sc); root.appendChild(r); upd();
+}
+
+// sorter engine (click a chip, then click a bucket — or drag): makeSorter('#el', cats:[{id,label}], items:[{t, c, why?}])
+function makeSorter(sel, cats, items) {
+  const root = $(sel); if (!root) return;
+  root.innerHTML = `<div class="pool small">Click an item, then click the box it belongs to (or drag it).</div><div class="sorter"></div><div class="btnrow"><button class="btn primary chk">Check answers</button><button class="btn rst">Reset</button></div><div class="feedback"></div>`;
+  const pool = $('.pool', root), sorter = $('.sorter', root), fb = $('.feedback', root);
+  let selected = null;
+  const shuffled = items.map((x, i) => ({ ...x, i })).sort(() => Math.random() - .5);
+  shuffled.forEach(it => {
+    const c = document.createElement('span'); c.className = 'chip'; c.textContent = it.t; c.draggable = true; c.dataset.c = it.c; c.dataset.i = it.i;
+    if (it.why) c.title = it.why;
+    c.onclick = e => { e.stopPropagation(); $$('.chip', root).forEach(x => x.classList.remove('sel')); selected = c; c.classList.add('sel'); };
+    c.ondragstart = ev => { selected = c; ev.dataTransfer.setData('text', it.i); };
+    pool.appendChild(c);
+  });
+  cats.forEach(cat => {
+    const b = document.createElement('div'); b.className = 'bucket'; b.dataset.id = cat.id; b.innerHTML = `<h5>${cat.label}</h5>`;
+    const drop = () => { if (selected) { b.appendChild(selected); selected.classList.remove('sel', 'right', 'wrong'); selected = null; } };
+    b.onclick = drop;
+    b.ondragover = e => { e.preventDefault(); b.classList.add('over'); };
+    b.ondragleave = () => b.classList.remove('over');
+    b.ondrop = e => { e.preventDefault(); b.classList.remove('over'); drop(); };
+    sorter.appendChild(b);
+  });
+  pool.onclick = () => { if (selected) { pool.appendChild(selected); selected.classList.remove('sel'); selected = null; } };
+  $('.chk', root).onclick = () => {
+    let ok = 0, placed = 0;
+    $$('.bucket .chip', root).forEach(c => { placed++; const good = c.parentElement.dataset.id === c.dataset.c; c.classList.toggle('right', good); c.classList.toggle('wrong', !good); if (good) ok++; });
+    fb.className = 'feedback show ' + (ok === items.length ? 'ok' : 'info');
+    fb.textContent = ok === items.length ? `All ${ok} correct — well done!` : `${ok} of ${items.length} correct (${items.length - placed} not placed yet). Red items are in the wrong box — hover them for a hint.`;
+  };
+  $('.rst', root).onclick = () => makeSorter(sel, cats, items);
+}
+
+// tiny syntax highlighter for python / sql / yaml snippets marked data-hl
+function hl(code, lang) {
+  let s = esc(code);
+  if (lang === 'py' || lang === 'sql') {
+    s = s.replace(/(#.*|--.*)$/gm, '<span class="c-c">$1</span>');
+    s = s.replace(/(&quot;.*?&quot;|'[^'\n]*')/g, '<span class="c-s">$1</span>');
+    const kw = lang === 'py' ? 'def|return|import|from|as|for|in|if|else|try|except|with|lambda|True|False|None|print' : 'SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|LEFT JOIN|ON|AS|WITH|SUM|COUNT|AND|OR|MATCH|RETURN|PREFIX';
+    s = s.replace(new RegExp('\\b(' + kw + ')\\b', 'g'), '<span class="c-k">$1</span>');
+  } else if (lang === 'yaml') {
+    s = s.replace(/(#.*)$/gm, '<span class="c-c">$1</span>').replace(/^(\s*-?\s*)([\w_]+):/gm, '$1<span class="c-k">$2</span>:');
+  }
+  return s;
+}
+$$('pre code[data-hl]').forEach(c => { c.innerHTML = hl(c.textContent, c.dataset.hl); });
+
+// ---------- maths + SVG plotting helpers (shared by the Statistics & ML chapter pages) ----------
+const fmt = (x, d = 2) => (x === null || x === undefined || !isFinite(x)) ? '—' : (+x).toFixed(d);
+const sum = a => a.reduce((s, x) => s + x, 0);
+const mean = a => a.length ? sum(a) / a.length : NaN;
+const variance = (a, ddof = 0) => { const m = mean(a); return a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - ddof); };
+const sd = (a, ddof = 0) => Math.sqrt(variance(a, ddof));
+const median = a => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+const quantile = (a, q) => { const s = [...a].sort((x, y) => x - y); const p = (s.length - 1) * q, lo = Math.floor(p), hi = Math.ceil(p); return s[lo] + (s[hi] - s[lo]) * (p - lo); };
+const modes = a => { const c = new Map(); a.forEach(x => c.set(x, (c.get(x) || 0) + 1)); const m = Math.max(...c.values()); return m === 1 && a.length > 1 ? [] : [...c].filter(e => e[1] === m).map(e => e[0]); };
+const skewness = a => { const m = mean(a), s = sd(a); return s === 0 ? 0 : mean(a.map(x => ((x - m) / s) ** 3)); };
+const pearson = (x, y) => { const mx = mean(x), my = mean(y); let a = 0, b = 0, c = 0; for (let i = 0; i < x.length; i++) { a += (x[i] - mx) * (y[i] - my); b += (x[i] - mx) ** 2; c += (y[i] - my) ** 2; } return a / Math.sqrt(b * c); };
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const range = (a, b, step = 1) => { const r = []; for (let x = a; step > 0 ? x <= b + 1e-9 : x >= b - 1e-9; x += step) r.push(x); return r; };
+
+// seeded RNG so every student sees the same "random" example until they press re-sample
+function rng(seed = 42) { let t = seed >>> 0; return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+function gauss(R) { let u = 0, v = 0; while (u === 0) u = R(); v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+// special functions
+function lgamma(x) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5]; let y = x, t = x + 5.5; t -= (x + .5) * Math.log(t); let s = 1.000000000190015; for (const k of c) s += k / ++y; return -t + Math.log(2.5066282746310005 * s / x); }
+function betacf(a, b, x) { let qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap; if (Math.abs(d) < 1e-30) d = 1e-30; d = 1 / d; let h = d; for (let m = 1; m <= 200; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((qam + m2) * (a + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; h *= d * c; aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break; } return h; }
+function ibeta(x, a, b) { if (x <= 0) return 0; if (x >= 1) return 1; const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b; }
+const tCDF = (t, df) => { const x = df / (df + t * t); const p = 0.5 * ibeta(x, df / 2, 0.5); return t > 0 ? 1 - p : p; };
+const tTwoSided = (t, df) => ibeta(df / (df + t * t), df / 2, 0.5);
+const fSurvival = (f, d1, d2) => f <= 0 ? 1 : ibeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2);
+function tCrit(conf, df) { let lo = 0, hi = 100; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (tCDF(m, df) < 1 - (1 - conf) / 2) ? lo = m : hi = m; } return (lo + hi) / 2; }
+function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+const normCDF = (x, m = 0, s = 1) => 0.5 * (1 + erf((x - m) / (s * Math.SQRT2)));
+const normPDF = (x, m = 0, s = 1) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+const lchoose = (n, k) => lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+const binomPMF = (k, n, p) => p === 0 ? +(k === 0) : p === 1 ? +(k === n) : Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+const poisPMF = (k, l) => Math.exp(k * Math.log(l) - l - lgamma(k + 1));
+
+// nice tick values
+function ticks(a, b, n = 5) { const span = b - a || 1; const step0 = span / n; const mag = 10 ** Math.floor(Math.log10(step0)); const err = step0 / mag; const step = (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1) * mag; const out = []; for (let x = Math.ceil(a / step) * step; x <= b + step * 1e-6; x += step) out.push(+x.toFixed(10)); return out; }
+const tickFmt = v => Math.abs(v) >= 10000 ? (v / 1000).toFixed(0) + 'k' : Math.abs(v) < 1e-9 ? '0' : (Math.abs(v) < 1 ? +v.toPrecision(2) : +v.toFixed(2)).toString();
+
+// Plot: lightweight SVG chart.  const p = new Plot('#el', {w, h, x:[a,b], y:[a,b], xlabel, ylabel});
+const PAL = ['var(--blue)', 'var(--accent)', 'var(--green)', 'var(--purple)', 'var(--amber)', 'var(--red)', 'var(--muted)'];
+class Plot {
+  constructor(sel, o = {}) {
+    this.el = typeof sel === 'string' ? $(sel) : sel;
+    this.o = Object.assign({ w: 640, h: 300, x: [0, 1], y: [0, 1], m: { l: 48, r: 14, t: 14, b: 40 }, grid: true, xticks: null, yticks: null }, o);
+    this.el.classList.add('plot');
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg.setAttribute('viewBox', `0 0 ${this.o.w} ${this.o.h}`);
+    this.svg.setAttribute('role', 'img');
+    if (o.label) this.svg.setAttribute('aria-label', o.label);
+    this.el.innerHTML = ''; this.el.appendChild(this.svg);
+    this.clear();
+  }
+  get iw() { return this.o.w - this.o.m.l - this.o.m.r; }
+  get ih() { return this.o.h - this.o.m.t - this.o.m.b; }
+  sx(x) { const [a, b] = this.o.x; return this.o.m.l + (x - a) / (b - a) * this.iw; }
+  sy(y) { const [a, b] = this.o.y; return this.o.m.t + this.ih - (y - a) / (b - a) * this.ih; }
+  ix(px) { const [a, b] = this.o.x; return a + (px - this.o.m.l) / this.iw * (b - a); }
+  iy(py) { const [a, b] = this.o.y; return a + (this.o.m.t + this.ih - py) / this.ih * (b - a); }
+  add(tag, attrs, parent) { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); } (parent || this.svg).appendChild(e); return e; }
+  clear(x, y) { if (x) this.o.x = x; if (y) this.o.y = y; this.svg.innerHTML = ''; this.axes(); return this; }
+  axes() {
+    const { m, w, h } = this.o; const g = this.add('g', { class: 'ax' });
+    const xt = this.o.xticks || ticks(...this.o.x, Math.max(3, Math.round(this.iw / 80)));
+    const yt = this.o.yticks || ticks(...this.o.y, Math.max(3, Math.round(this.ih / 50)));
+    yt.forEach(v => { const y = this.sy(v); if (this.o.grid) this.add('line', { x1: m.l, x2: w - m.r, y1: y, y2: y, class: 'gl' }, g); this.add('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end', text: this.o.yfmt ? this.o.yfmt(v) : tickFmt(v) }, g); });
+    xt.forEach(v => { const x = this.sx(v); if (this.o.grid) this.add('line', { x1: x, x2: x, y1: m.t, y2: h - m.b, class: 'gl' }, g); this.add('text', { x, y: h - m.b + 16, 'text-anchor': 'middle', text: this.o.xfmt ? this.o.xfmt(v) : tickFmt(v) }, g); });
+    this.add('line', { x1: m.l, x2: w - m.r, y1: h - m.b, y2: h - m.b, class: 'axl' }, g);
+    this.add('line', { x1: m.l, x2: m.l, y1: m.t, y2: h - m.b, class: 'axl' }, g);
+    if (this.o.xlabel) this.add('text', { x: m.l + this.iw / 2, y: h - 4, 'text-anchor': 'middle', class: 'lab', text: this.o.xlabel }, g);
+    if (this.o.ylabel) this.add('text', { x: 12, y: m.t + this.ih / 2, 'text-anchor': 'middle', class: 'lab', transform: `rotate(-90 12 ${m.t + this.ih / 2})`, text: this.o.ylabel }, g);
+    const id = 'clip' + (Plot.n = (Plot.n || 0) + 1);
+    const cp = this.add('clipPath', { id }); this.add('rect', { x: m.l - 1, y: m.t - 1, width: this.iw + 2, height: this.ih + 2 }, cp);
+    this.layer = this.add('g', { 'clip-path': `url(#${id})` });
+  }
+  path(xs, ys, s = {}) { let d = ''; let pen = false; for (let i = 0; i < xs.length; i++) { if (ys[i] === null || !isFinite(ys[i])) { pen = false; continue; } d += (pen ? 'L' : 'M') + this.sx(xs[i]).toFixed(1) + ',' + this.sy(ys[i]).toFixed(1); pen = true; } return this.add('path', { d, style: `fill:none;stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  area(xs, ys, s = {}) { const y0 = this.sy(Math.max(this.o.y[0], 0)); let d = `M${this.sx(xs[0])},${y0}`; xs.forEach((x, i) => d += `L${this.sx(x).toFixed(1)},${this.sy(ys[i]).toFixed(1)}`); d += `L${this.sx(xs[xs.length - 1])},${y0}Z`; return this.add('path', { d, style: `fill:${s.color || 'var(--accent)'};opacity:${s.opacity || .18};stroke:none` }, this.layer); }
+  dot(x, y, s = {}) { return this.add('circle', { cx: this.sx(x), cy: this.sy(y), r: s.r || 4, style: `fill:${s.color || 'var(--accent)'};stroke:${s.stroke || 'var(--surface)'};stroke-width:${s.sw ?? 1};${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  bar(x0, x1, y, s = {}) { const yb = this.sy(Math.max(this.o.y[0], 0)), yt = this.sy(y); return this.add('rect', { x: this.sx(x0) + (s.gap ?? 1), y: Math.min(yt, yb), width: Math.max(0, this.sx(x1) - this.sx(x0) - 2 * (s.gap ?? 1)), height: Math.abs(yb - yt), rx: 2, style: `fill:${s.color || 'var(--blue)'};opacity:${s.opacity ?? .85}` }, this.layer); }
+  vline(x, s = {}) { const l = this.add('line', { x1: this.sx(x), x2: this.sx(x), y1: this.o.m.t, y2: this.o.h - this.o.m.b, style: `stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); if (s.label) this.text(x, this.o.y[1], s.label, { color: s.color, dy: s.dy ?? 12, anchor: s.anchor || 'start', dx: s.dx ?? 4 }); return l; }
+  hline(y, s = {}) { return this.add('line', { x1: this.o.m.l, x2: this.o.w - this.o.m.r, y1: this.sy(y), y2: this.sy(y), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); }
+  seg(x1, y1, x2, y2, s = {}) { return this.add('line', { x1: this.sx(x1), y1: this.sy(y1), x2: this.sx(x2), y2: this.sy(y2), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  text(x, y, t, s = {}) { return this.add('text', { x: this.sx(x) + (s.dx || 0), y: this.sy(y) + (s.dy || 0), 'text-anchor': s.anchor || 'middle', class: 'pt', style: `fill:${s.color || 'var(--ink)'};font-size:${s.size || 12}px;font-weight:${s.weight || 600}`, text: t }, s.noclip ? this.svg : this.layer); }
+  hist(data, bins, s = {}) { const [a, b] = s.range || [Math.min(...data), Math.max(...data)]; const w = (b - a) / bins || 1; const c = new Array(bins).fill(0); data.forEach(v => { const i = Math.min(bins - 1, Math.max(0, Math.floor((v - a) / w))); c[i]++; }); return { edges: c.map((_, i) => a + i * w), w, counts: c }; }
+  onClick(fn) { this.svg.style.cursor = 'crosshair'; this.svg.addEventListener('click', e => { const pt = this.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(this.svg.getScreenCTM().inverse()); fn(this.ix(q.x), this.iy(q.y), e); }); }
+}
+function legend(sel, items) { $(sel).innerHTML = items.map(([c, t, dash]) => `<span class="lg"><i style="background:${c};${dash ? 'height:0;border-top:2px dashed ' + c + ';background:none' : ''}"></i>${t}</span>`).join(''); }
+const kpi = (l, v, d = '') => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${d ? `<div class="small">${d}</div>` : ''}</div>`;
+// bind a range input to a label: slide('#id', fn) -> calls fn on input, shows value in [data-for=id]
+function slide(id, fn, f = v => v) { const el = $('#' + id); const out = $$(`[data-for="${id}"]`); const run = () => { out.forEach(o => o.textContent = f(+el.value)); fn(+el.value); }; el.addEventListener('input', run); return run; }
+
+// ---------- small linear algebra ----------
+function solve(A, b) { const n = b.length; const M = A.map((r, i) => [...r, b[i]]); for (let c = 0; c < n; c++) { let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r; [M[c], M[p]] = [M[p], M[c]]; const d = M[c][c] || 1e-12; for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / d; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; } } return M.map((r, i) => r[n] / (r[i] || 1e-12)); }
+// least squares with optional ridge penalty (lam applied to all but column 0 when intercept=true)
+function lstsq(X, y, lam = 0, intercept = true) { const p = X[0].length; const A = Array.from({ length: p }, () => new Array(p).fill(0)), b = new Array(p).fill(0); X.forEach((r, i) => { for (let j = 0; j < p; j++) { b[j] += r[j] * y[i]; for (let k = 0; k < p; k++) A[j][k] += r[j] * r[k]; } }); for (let j = intercept ? 1 : 0; j < p; j++) A[j][j] += lam; for (let j = 0; j < p; j++) A[j][j] += 1e-10; return solve(A, b); }
+const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
+const col = (M, j) => M.map(r => r[j]);
+function standardize(M) { const p = M[0].length; const mu = [], s = []; for (let j = 0; j < p; j++) { const c = col(M, j); mu.push(mean(c)); s.push(sd(c) || 1); } return { Z: M.map(r => r.map((v, j) => (v - mu[j]) / s[j])), mu, s }; }
+const r2 = (y, p) => { const m = mean(y); return 1 - sum(y.map((v, i) => (v - p[i]) ** 2)) / sum(y.map(v => (v - m) ** 2)); };
+const rmse = (y, p) => Math.sqrt(mean(y.map((v, i) => (v - p[i]) ** 2)));
+</script>
+<script>
+// ===== Section 1/2: sorters =====
+makeSorter('#sortRules', [{ id: 'rule', label: 'Traditional rules are enough' }, { id: 'ml', label: 'Machine learning needed' }], [
+  { t: 'Sort a list of numbers', c: 'rule' }, { t: 'Calculate payroll with fixed tax rates', c: 'rule' }, { t: 'Recognise faces in photos', c: 'ml' },
+  { t: 'Translate spoken German into English', c: 'ml' }, { t: 'Convert °C to °F', c: 'rule' }, { t: 'Navigate a Mars rover over unknown terrain', c: 'ml' },
+  { t: 'Detect new kinds of credit-card fraud', c: 'ml' }, { t: 'Check if a password has ≥ 8 characters', c: 'rule' }, { t: 'Find galaxies in James Webb telescope images', c: 'ml' }
+]);
+makeSorter('#sortTypes', [{ id: 'sup', label: 'Supervised' }, { id: 'uns', label: 'Unsupervised' }, { id: 'rl', label: 'Reinforcement' }], [
+  { t: 'Predict diabetes from past patients with known diagnoses', c: 'sup' }, { t: 'Car learns lanes from rewards and penalties', c: 'rl' }, { t: 'Group shoppers by behaviour, no labels', c: 'uns' },
+  { t: 'Predict house prices from past sales', c: 'sup' }, { t: 'Robot learns to walk by trial and error', c: 'rl' }, { t: 'Find unusual transactions without fraud labels', c: 'uns' },
+  { t: 'Spam filter trained on emails marked spam / not spam', c: 'sup' }, { t: 'Organise news articles into topics', c: 'uns' }, { t: 'Game agent maximising its score', c: 'rl' }
+]);
+
+// ===== Section 3: workflow =====
+(function () {
+  const S = [
+    ['Problem definition', 'What exactly do we predict, for whom, and how do we measure success? Regression or classification?'],
+    ['Data collection', 'Gather labelled historical data: databases, APIs, sensors, benchmark repositories.'],
+    ['Data preprocessing', 'Missing values, noise, outliers, encoding, scaling (Sections 5–7).'],
+    ['Feature selection', 'Keep informative features and drop irrelevant ones (Section 9).'],
+    ['Data splitting', 'Train / validation / test or k-fold CV, done before fitting anything (Section 10).'],
+    ['Model selection', 'Choose candidate algorithms: linear, Ridge / Lasso, polynomial, trees, KNN…'],
+    ['Model training', 'Fit the parameters on the training data (e.g. least squares).'],
+    ['Model evaluation', 'MAE, RMSE, R² on unseen data plus residual plots (Sections 12–13).'],
+    ['Hyperparameter tuning', 'Tune α, polynomial degree, tree depth… with cross-validation, never on the test set.'],
+    ['Model deployment', 'Ship the model, then monitor it for drift and retrain (Chapters 3–4).']
+  ];
+  const f = $('#mlFlow');
+  S.forEach((s, i) => { if (i) f.insertAdjacentHTML('beforeend', '<span class="arrow">→</span>'); const d = document.createElement('div'); d.className = 'step'; d.innerHTML = `<small>Step ${i + 1}</small><b>${s[0]}</b>`; d.onclick = () => { $$('.step', f).forEach(x => x.classList.remove('on')); d.classList.add('on'); $('#mlOut').innerHTML = `<b>${i + 1}. ${s[0]}</b>${s[1]}`; }; f.appendChild(d); });
+  f.querySelectorAll('.step')[2].click();
+})();
+
+// ===== Section 5: imputation =====
+(function () {
+  const F1 = [5.5, 6.1, null, 7.3, null, 8.8, 9, 10.5, null, 12.3], F2 = [3.2, 4.75, 4.5, 5, 5.7, 6.1, 6.4, 7.2, 8, 7.2], F3 = [1.4, 1.1, 1.3, 1.5, 1.7, 1.75, 2, 2.25, 2.5, 2.8];
+  const obs = F1.map((v, i) => v === null ? null : i).filter(i => i !== null), vals = obs.map(i => F1[i]);
+  let m = 'mean';
+  function fill() {
+    if (m === 'mean') return F1.map(v => v ?? mean(vals));
+    if (m === 'median') return F1.map(v => v ?? median(vals));
+    if (m === 'mode') { const mo = modes(vals); const v0 = mo.length ? mo[0] : Math.min(...vals); return F1.map(v => v ?? v0); }
+    if (m === 'knn') { const k = +$('#impKv').value; return F1.map((v, i) => { if (v !== null) return v; const d = obs.map(j => [Math.hypot(F2[i] - F2[j], F3[i] - F3[j]), F1[j]]).sort((a, b) => a[0] - b[0]); return mean(d.slice(0, k).map(x => x[1])); }); }
+    const b = lstsq(obs.map(i => [1, F2[i]]), vals); return F1.map((v, i) => v ?? b[0] + b[1] * F2[i]);
+  }
+  function draw() {
+    $('#impK').style.display = m === 'knn' ? '' : 'none';
+    const f = fill();
+    $('#impTbl').innerHTML = '<tr><th class="num">F1</th><th class="num">F2</th><th class="num">F3</th><th class="num">F1 imputed</th></tr>' + F1.map((v, i) => `<tr><td class="num ${v === null ? 'bad' : ''}">${v === null ? 'NA' : v}</td><td class="num">${F2[i]}</td><td class="num">${F3[i]}</td><td class="num ${v === null ? 'warn' : ''}">${fmt(f[i], 2)}</td></tr>`).join('');
+    const p = new Plot('#impPlot', { w: 380, h: 300, x: [2.5, 8.5], y: [4, 13.5], xlabel: 'Feature 2', ylabel: 'Feature 1' });
+    F1.forEach((v, i) => p.dot(F2[i], f[i], { r: v === null ? 8 : 6, color: v === null ? 'var(--amber)' : 'var(--blue)', stroke: v === null ? 'var(--ink)' : 'var(--surface)', sw: v === null ? 1.5 : 1 }));
+    $('#impKpi').innerHTML = kpi('SD before (observed only)', fmt(sd(vals, 1), 2)) + kpi('SD after imputation', fmt(sd(f, 1), 2), m === 'mean' || m === 'median' || m === 'mode' ? 'variability shrinks' : 'structure kept') + kpi('Imputed values', F1.map((v, i) => v === null ? fmt(f[i], 2) : null).filter(Boolean).join(' · '));
+  }
+  $$('#impBtns [data-m]').forEach(b => b.onclick = () => { $$('#impBtns [data-m]').forEach(x => x.classList.toggle('sel', x === b)); m = b.dataset.m; draw(); });
+  slide('impKv', draw); draw();
+})();
+
+// ===== Section 6: noise & outliers =====
+(function () {
+  const R = rng(9), N = 60, e = Array.from({ length: N }, () => gauss(R));
+  legend('#maLeg', [['var(--muted)', 'Raw daily steps'], ['var(--accent)', 'Moving average'], ['var(--red)', 'Flagged outlier']]);
+  function draw() {
+    const w = +$('#maW').value, zt = +$('#zT').value, nz = +$('#nzL').value;
+    const x = range(1, N), y = x.map((d, i) => 8000 + 900 * Math.sin(2 * Math.PI * d / 7) + 600 * nz * e[i] + (d === 41 ? 8000 : 0));
+    const h = Math.floor(w / 2); const ma = y.map((_, i) => mean(y.slice(Math.max(0, i - h), Math.min(N, i + h + 1))));
+    const mu = mean(y), s = sd(y); const flag = y.map(v => Math.abs((v - mu) / s) > zt);
+    const p = new Plot('#maPlot', { h: 260, x: [1, N], y: [3000, 18000], xlabel: 'day', ylabel: 'steps' });
+    p.path(x, y, { color: 'var(--muted)', width: 1.2 }); x.forEach((d, i) => p.dot(d, y[i], { r: flag[i] ? 6 : 2.5, color: flag[i] ? 'var(--red)' : 'var(--muted)', sw: 0 }));
+    if (w > 1) p.path(x, ma, { color: 'var(--accent)', width: 2.5 });
+    const nf = flag.filter(Boolean).length, real = flag[40];
+    $('#maOut').innerHTML = `Smoothing window = ${w}: ${w === 1 ? 'no smoothing yet — slide it to reduce the day-to-day noise.' : w >= 7 ? 'the weekly wiggle is averaged away and the long-run level is clear. A wide window also flattens real changes.' : 'small random jumps are reduced.'} <br>Outlier rule |z| > ${zt}: <b>${nf}</b> point(s) flagged${real ? ' — including the real spike on day 41 (a marathon? a sensor glitch? check before deleting!)' : ' — the day-41 spike is missed; the threshold is too strict'}${nf > 1 ? '. Several ordinary days are also flagged: the threshold is too loose for this noise level.' : '.'}`;
+  }
+  ['maW', 'zT', 'nzL'].forEach(id => slide(id, draw, v => id === 'maW' ? v : v.toFixed(1))); draw();
+})();
+
+// ===== Section 7: encoding & scaling =====
+(function () {
+  const D = [[25, 50000, 2, 'HR'], [32, 60000, 8, 'Engineering'], [47, 80000, 15, 'HR'], [19, 30000, 1, 'Sales'], [30, 55000, 6, 'Engineering']];
+  function oh(mode) {
+    $$('#ohRaw,#ohLab,#ohOne').forEach(b => b.classList.toggle('sel', b.id === mode));
+    const cats = ['Engineering', 'HR', 'Sales'];
+    let head = ['Age', 'Salary', 'Experience', 'Department'], rows = D.map(r => [...r]);
+    if (mode === 'ohLab') { rows = D.map(r => [r[0], r[1], r[2], cats.indexOf(r[3])]); head[3] = 'Department (label)'; $('#ohNote').innerHTML = '⚠️ Engineering = 0, HR = 1, Sales = 2 invents an <b>order and distance</b> that does not exist. A linear model or KNN would treat Sales as “twice HR”. This is only OK for tree models or truly ordinal data (low &lt; medium &lt; high).'; }
+    else if (mode === 'ohOne') { head = ['Age', 'Salary', 'Experience', ...cats.map(c => 'Dept_' + c)]; rows = D.map(r => [r[0], r[1], r[2], ...cats.map(c => +(r[3] === c))]); $('#ohNote').innerHTML = '✓ One binary column per category, so no fake order. <code>pd.get_dummies(df, columns=["Department"])</code>. Watch out: a column with 1,000 categories becomes 1,000 columns.'; }
+    else $('#ohNote').textContent = 'Models need numbers. How should “Department” become numeric?';
+    $('#ohTbl').innerHTML = '<tr>' + head.map(h => `<th>${h}</th>`).join('') + '</tr>' + rows.map(r => '<tr>' + r.map((c, j) => `<td class="${j >= 3 && mode !== 'ohRaw' ? (mode === 'ohOne' ? (c ? 'good' : '') : 'warn') : ''}">${c}</td>`).join('') + '</tr>').join('');
+  }
+  $('#ohRaw').onclick = () => oh('ohRaw'); $('#ohLab').onclick = () => oh('ohLab'); $('#ohOne').onclick = () => oh('ohOne'); oh('ohRaw');
+
+  const C = [[720, 60000, 25], [650, 45000, 35], [780, 75000, 45], [600, 30000, 23], [700, 80000, 50], [680, 55000, 30]], H = ['Credit score', 'Annual income', 'Age'];
+  let mode = 'raw';
+  function sc() {
+    const cols = [0, 1, 2].map(j => col(C, j));
+    const T = cols.map(c => { const m = mean(c), s = sd(c), lo = Math.min(...c), hi = Math.max(...c); return c.map(v => mode === 'z' ? (v - m) / s : mode === 'mm' ? (v - lo) / (hi - lo) : v); });
+    $('#scTbl').innerHTML = '<tr>' + H.map(h => `<th class="num">${h}</th>`).join('') + '</tr>' + C.map((_, i) => '<tr>' + T.map(c => `<td class="num">${mode === 'raw' ? c[i].toLocaleString() : fmt(c[i], 3)}</td>`).join('') + '</tr>').join('');
+    const all = T.flat(), lo = Math.min(0, ...all), hi = Math.max(...all), pad = (hi - lo) * .08;
+    const p = new Plot('#scPlot', { w: 380, h: 220, x: [lo - pad, hi + pad], y: [0, 4], yticks: [], xlabel: mode === 'raw' ? 'raw value' : mode === 'z' ? 'z-score' : 'scaled value', m: { l: 90, r: 14, t: 10, b: 40 } });
+    T.forEach((c, j) => { p.text(lo - pad, 3 - j, H[j], { anchor: 'end', dx: -6, dy: 4, size: 11, noclip: true }); c.forEach(v => p.dot(v, 3 - j, { r: 6, color: PAL[j], opacity: .85 })); });
+    $('#scNote').innerHTML = mode === 'raw' ? '<b>Problem</b>Income (30,000–80,000) dwarfs age (23–50). In a distance-based model such as KNN, or under gradient descent, income dominates and age is almost ignored. The same happens with “house size in ft²” vs. “number of bedrooms”.' : mode === 'z' ? '<b>Standardised</b>Every feature now has mean 0 and SD 1. Use this for most models (linear, logistic, SVM, PCA). Values are not bounded, so outliers stay visible.' : '<b>Min–max scaled</b>Every feature now lies in [0, 1]. Good when you need a bounded range (e.g. neural networks, images). A single outlier squeezes all the other values together.';
+  }
+  $$('#scBtns [data-s]').forEach(b => b.onclick = () => { $$('#scBtns [data-s]').forEach(x => x.classList.toggle('sel', x === b)); mode = b.dataset.s; sc(); }); sc();
+})();
+
+// ===== Section 8: feature engineering =====
+(function () {
+  const D = [[720, 60000, 25, '2022-01-10'], [650, 45000, 35, '2021-12-01'], [780, 75000, 45, '2020-05-15'], [600, 30000, 23, '2023-04-03'], [700, 80000, 50, '2022-07-07'], [680, 55000, 30, '2021-09-20']];
+  const REF = new Date('2023-09-01');
+  const F = {
+    ratio: ['Credit / income', r => (r[0] / r[1]).toFixed(4), 'A <b>ratio</b> makes values comparable across people: the same score means more on a low income.'],
+    inter: ['Income × age', r => (r[1] * r[2]).toLocaleString(), 'An <b>interaction</b> lets a linear model capture effects that depend on two features at once.'],
+    bin: ['Age group', r => r[2] <= 30 ? '18–30' : r[2] <= 40 ? '31–40' : r[2] <= 50 ? '41–50' : '51–60', '<b>Binning</b> turns a number into groups. This helps with non-linear effects and makes results easier to explain.'],
+    date: ['Days since purchase', r => Math.round((REF - new Date(r[3])) / 864e5), 'A raw <b>date</b> is useless to most models. Extract recency, month, weekday, holiday… (reference date 2023-09-01).'],
+    log: ['log(income)', r => Math.log(r[1]).toFixed(3), 'A <b>log transform</b> compresses right-skewed variables such as income and price, and reduces the pull of outliers.']
+  };
+  let on = [];
+  function draw() {
+    const head = ['Credit score', 'Annual income', 'Age', 'Purchase date', ...on.map(k => F[k][0])];
+    $('#feTbl').innerHTML = '<tr>' + head.map((h, j) => `<th class="${j >= 4 ? 'hlcell' : ''}">${h}</th>`).join('') + '</tr>' + D.map(r => '<tr>' + [r[0], r[1].toLocaleString(), r[2], r[3], ...on.map(k => F[k][1](r))].map((c, j) => `<td class="${j >= 4 ? 'good' : ''}">${c}</td>`).join('') + '</tr>').join('');
+    $('#feNote').innerHTML = on.length ? F[on[on.length - 1]][2] : 'Click a button to add a feature.';
+  }
+  $$('[data-fe]').forEach(b => b.onclick = () => { if (!on.includes(b.dataset.fe)) on.push(b.dataset.fe); b.classList.add('sel'); draw(); });
+  $('#feReset').onclick = () => { on = []; $$('[data-fe]').forEach(b => b.classList.remove('sel')); draw(); }; draw();
+})();
+
+// ===== Section 9: feature selection =====
+(function () {
+  const R = rng(21), N = 200;
+  const names = ['size_m2', 'rooms', 'location_score', 'age_years', 'distance_km', 'garden', 'random_1', 'random_2'];
+  const X = [], y = [];
+  for (let i = 0; i < N; i++) {
+    const size = gauss(R), rooms = .8 * size + .6 * gauss(R), loc = gauss(R), age = gauss(R), dist = -2 + 4 * R(), gar = gauss(R), n1 = gauss(R), n2 = gauss(R);
+    X.push([size, rooms, loc, age, dist, gar, n1, n2]); y.push(3 * size + 1.5 * loc - 1 * age + 1.2 * (dist * dist - 1.33) + .4 * gar + gauss(R));
+  }
+  const { Z } = standardize(X); const ym = mean(y), yc = y.map(v => v - ym);
+  // filter scores
+  function mi(x, t, B = 8) { const qx = range(1, B - 1).map(k => quantile(x, k / B)), qy = range(1, B - 1).map(k => quantile(t, k / B)); const bx = v => qx.filter(q => v > q).length, by = v => qy.filter(q => v > q).length; const J = {}; x.forEach((v, i) => { const k = bx(v) + ',' + by(t[i]); J[k] = (J[k] || 0) + 1; }); let s = 0; for (const k in J) { const p = J[k] / x.length; s += p * Math.log(p / (1 / B / B)); } return Math.max(0, s - (B - 1) ** 2 / (2 * x.length)); }
+  const corr = names.map((_, j) => pearson(col(Z, j), y)), mis = names.map((_, j) => mi(col(Z, j), y));
+  const maxMI = Math.max(...mis);
+  const p = new Plot('#fsFilter', { h: 300, x: [0, 1], y: [0, names.length], yticks: [], xlabel: 'score (|r| and MI rescaled to the max)', m: { l: 110, r: 14, t: 10, b: 40 } });
+  names.forEach((nm, j) => { const yy = names.length - j - .5; p.text(0, yy, nm, { anchor: 'end', dx: -8, dy: 4, size: 11, noclip: true }); p.add('rect', { x: p.sx(0), y: p.sy(yy + .38), width: p.sx(Math.abs(corr[j])) - p.sx(0), height: p.sy(0) - p.sy(.34), rx: 3, style: 'fill:var(--blue)' }, p.layer); p.add('rect', { x: p.sx(0), y: p.sy(yy), width: p.sx(mis[j] / maxMI) - p.sx(0), height: p.sy(0) - p.sy(.34), rx: 3, style: 'fill:var(--accent)' }, p.layer); p.text(Math.abs(corr[j]), yy + .2, fmt(corr[j], 2), { anchor: 'start', dx: 4, size: 10, weight: 400 }); });
+  legend('#fsFLeg', [['var(--blue)', '|Pearson r| with price'], ['var(--accent)', 'Mutual information (relative)']]);
+
+  // wrapper: train / validation split
+  const tr = range(0, 139), va = range(140, 199);
+  const fitVal = feats => { if (!feats.length) return { r: 0, b: [] }; const Xt = tr.map(i => [1, ...feats.map(j => Z[i][j])]); const b = lstsq(Xt, tr.map(i => y[i])); const pr = va.map(i => dot(b, [1, ...feats.map(j => Z[i][j])])); return { r: r2(va.map(i => y[i]), pr), b: b.slice(1) }; };
+  let log = [], mode = null, cur = [];
+  function wdraw() {
+    $('#wrTbl').innerHTML = '<tr><th>Step</th><th>Action</th><th class="num">#</th><th class="num">Val. R²</th></tr>' + log.map((l, i) => `<tr class="${i === log.length - 1 ? 'hl' : ''}"><td>${i}</td><td>${l[0]}</td><td class="num">${l[1].length}</td><td class="num">${fmt(l[2], 3)}</td></tr>`).join('');
+    const q = new Plot('#wrPlot', { w: 380, h: 240, x: [0, 8], y: [0, 1], xlabel: 'number of features', ylabel: 'validation R²' });
+    const pts = log.map(l => [l[1].length, l[2]]).sort((a, b) => a[0] - b[0]); q.path(pts.map(a => a[0]), pts.map(a => clamp(a[1], 0, 1)), { color: 'var(--accent)' }); pts.forEach(a => q.dot(a[0], clamp(a[1], 0, 1), { r: 5 }));
+    $('#wrOut').innerHTML = mode ? `Current set (${cur.length}): <b>${cur.map(j => names[j]).join(', ') || '∅'}</b>` : 'Choose a method. <b>RFE</b> starts with all 8 features and drops the one with the smallest |coefficient|. <b>Forward selection</b> starts empty and adds whichever feature raises validation R² the most.';
+  }
+  $('#rfeStep').onclick = () => {
+    if (mode !== 'rfe') { mode = 'rfe'; cur = range(0, 7); log = [['start with all features', [...cur], fitVal(cur).r]]; }
+    else if (cur.length > 1) { const b = fitVal(cur).b; let k = 0; b.forEach((v, i) => { if (Math.abs(v) < Math.abs(b[k])) k = i; }); const gone = cur[k]; cur = cur.filter(j => j !== gone); log.push([`remove <b>${names[gone]}</b> (|β| = ${fmt(Math.abs(b[k]), 2)})`, [...cur], fitVal(cur).r]); }
+    wdraw();
+  };
+  $('#fwdStep').onclick = () => {
+    if (mode !== 'fwd') { mode = 'fwd'; cur = []; log = [['start with no features', [], 0]]; }
+    else if (cur.length < 8) { let best = null, br = -1e9; range(0, 7).filter(j => !cur.includes(j)).forEach(j => { const r = fitVal([...cur, j]).r; if (r > br) { br = r; best = j; } }); const gain = br - log[log.length - 1][2]; cur = [...cur, best]; log.push([`add <b>${names[best]}</b> (${gain >= 0 ? '+' : ''}${fmt(gain, 3)})${gain < .005 ? ' ← barely helps: stop here' : ''}`, [...cur], br]); }
+    wdraw();
+  };
+  $('#wrReset').onclick = () => { mode = null; log = []; cur = []; wdraw(); }; wdraw();
+
+  // embedded: lasso (coordinate descent) vs ridge on all data
+  const n = N, P = names.length;
+  function lasso(a) { let b = new Array(P).fill(0); for (let it = 0; it < 300; it++) { let mx = 0; for (let j = 0; j < P; j++) { let rho = 0; for (let i = 0; i < n; i++) { let pr = 0; for (let k = 0; k < P; k++) if (k !== j) pr += Z[i][k] * b[k]; rho += Z[i][j] * (yc[i] - pr); } rho /= n; const zz = mean(col(Z, j).map(v => v * v)); const nb = Math.sign(rho) * Math.max(0, Math.abs(rho) - a) / zz; mx = Math.max(mx, Math.abs(nb - b[j])); b[j] = nb; } if (mx < 1e-6) break; } return b; }
+  function ridge(a) { return lstsq(Z, yc, a * n, false); }
+  function bars(sel, b, color) {
+    const q = new Plot(sel, { w: 380, h: 280, x: [-3.5, 3.5], y: [0, P], yticks: [], xlabel: 'coefficient', m: { l: 100, r: 10, t: 8, b: 40 } });
+    q.vline(0, { color: 'var(--muted)', width: 1 });
+    names.forEach((nm, j) => { const yy = P - j - .5; q.text(-3.5, yy, nm, { anchor: 'end', dx: -6, dy: 4, size: 11, noclip: true, color: Math.abs(b[j]) < 1e-4 ? 'var(--muted)' : 'var(--ink)' }); const x0 = q.sx(Math.min(0, b[j])), x1 = q.sx(Math.max(0, b[j])); q.add('rect', { x: x0, y: q.sy(yy + .32), width: Math.max(Math.abs(b[j]) < 1e-4 ? 0 : 1.5, x1 - x0), height: q.sy(0) - q.sy(.64), rx: 3, style: `fill:${color}` }, q.layer); if (Math.abs(b[j]) < 1e-4) q.text(0, yy, '0', { anchor: 'start', dx: 4, dy: 4, size: 10, color: 'var(--muted)' }); });
+  }
+  slide('alpha', v => {
+    const a = 10 ** v; const bl = lasso(a), br = ridge(a);
+    bars('#lassoPlot', bl, 'var(--accent)'); bars('#ridgePlot', br, 'var(--blue)');
+    const zl = bl.filter(x => Math.abs(x) < 1e-4).length, zr = br.filter(x => Math.abs(x) < 1e-4).length;
+    $('#embKpi').innerHTML = kpi('α', fmt(a, 3)) + kpi('Lasso: zero coefficients', `${zl} / ${P}`) + kpi('Ridge: zero coefficients', `${zr} / ${P}`, 'shrunk, never exactly 0') + kpi('Kept by Lasso', names.filter((_, j) => Math.abs(bl[j]) >= 1e-4).join(', ') || 'none');
+  }, v => (10 ** v).toFixed(v < -1.5 ? 3 : 2))();
+})();
+
+// ===== Section 10: k-fold =====
+(function () {
+  function draw() {
+    const k = +$('#kf').value, ho = +$('#ho').value / 100;
+    const W = 100, cvW = W * (1 - ho);
+    const p = new Plot('#kfPlot', { h: 40 + 30 * (k + 1), x: [0, W], y: [0, k + 1.2], xticks: [0, cvW, 100], yticks: [], grid: false, xfmt: v => Math.round(v) + '%', m: { l: 92, r: 10, t: 6, b: 26 } });
+    for (let it = 0; it < k; it++) {
+      const yy = k - it + .5; p.text(0, yy, 'Iteration ' + (it + 1), { anchor: 'end', dx: -8, dy: 4, size: 11, noclip: true, weight: 500 });
+      for (let f = 0; f < k; f++) { const x0 = f * cvW / k, x1 = (f + 1) * cvW / k, test = f === it; p.add('rect', { x: p.sx(x0) + 1, y: p.sy(yy + .38), width: p.sx(x1) - p.sx(x0) - 2, height: p.sy(0) - p.sy(.76), rx: 4, style: `fill:${test ? 'var(--accent)' : 'var(--blue)'};opacity:${test ? .95 : .35}` }, p.layer); if (k <= 7) p.text((x0 + x1) / 2, yy, test ? 'validate' : 'train', { dy: 4, size: 10, color: test ? '#fff' : 'var(--ink)', weight: 500 }); }
+      p.add('rect', { x: p.sx(cvW) + 3, y: p.sy(yy + .38), width: p.sx(W) - p.sx(cvW) - 3, height: p.sy(0) - p.sy(.76), rx: 4, style: 'fill:var(--muted);opacity:.25' }, p.layer);
+    }
+    p.text((cvW + W) / 2, .5, 'hold-out TEST (locked until the end)', { dy: 4, size: 10, color: 'var(--muted)' }); p.text(cvW / 2, .5, 'used for cross-validation', { dy: 4, size: 10, color: 'var(--muted)' });
+    const n = 1000, cv = Math.round(n * (1 - ho));
+    $('#kfKpi').innerHTML = kpi('Models trained', k) + kpi('Train rows / fit', Math.round(cv * (k - 1) / k)) + kpi('Validation rows / fit', Math.round(cv / k)) + kpi('Test rows', n - cv, 'of 1,000');
+  }
+  slide('kf', draw); slide('ho', draw); draw();
+})();
+
+// ===== Section 11: regression playground =====
+(function () {
+  let pts = [];
+  const gen = (kind, seed) => { const R = rng(seed); return Array.from({ length: 30 }, () => { const x = .3 + 9.4 * R(); const y = kind === 'dim' ? 20 + 70 * (1 - Math.exp(-x / 3)) + 6 * gauss(R) : 15 + 7 * x + 8 * gauss(R); return [x, clamp(y, 1, 99), R() < .3]; }); };
+  let kind = 'dim', seed = 3;
+  legend('#rgLeg', [['var(--blue)', 'Training points'], ['var(--accent)', 'Test points (not used for fitting)'], ['var(--purple)', 'Fitted model']]);
+  const P = new Plot('#rgPlot', { h: 300, x: [0, 10], y: [0, 100], xlabel: 'study hours', ylabel: 'exam score' });
+  P.onClick((x, y) => { if (x > 0 && x < 10 && y > 0 && y < 100) { pts.push([x, y, false]); draw(); } });
+  const feat = (x, d) => { const u = (x - 5) / 5; return range(0, d).map(k => u ** k); };
+  function draw() {
+    P.clear(); const d = +$('#deg').value, tr = pts.filter(p => !p[2]), te = pts.filter(p => p[2]);
+    if (tr.length < d + 1) { pts.forEach(p => P.dot(p[0], p[1], { r: 5, color: p[2] ? 'var(--accent)' : 'var(--blue)' })); $('#rgKpi').innerHTML = kpi('Training points', tr.length, `need ≥ ${d + 1} for degree ${d}`); $('#rgOut').className = 'feedback'; return; }
+    const b = lstsq(tr.map(p => feat(p[0], d)), tr.map(p => p[1]), 0, true), f = x => dot(b, feat(x, d));
+    if ($('#showRes').value === '1') tr.forEach(p => P.seg(p[0], p[1], p[0], f(p[0]), { color: 'var(--blue)', opacity: .5 }));
+    const xs = range(0, 10, .02); P.path(xs, xs.map(f), { color: 'var(--purple)', width: 2.5 });
+    pts.forEach(p => P.dot(p[0], p[1], { r: 5, color: p[2] ? 'var(--accent)' : 'var(--blue)' }));
+    const ytr = tr.map(p => p[1]), ptr = tr.map(p => f(p[0])), yte = te.map(p => p[1]), pte = te.map(p => f(p[0]));
+    const rt = rmse(ytr, ptr), rv = te.length ? rmse(yte, pte) : NaN;
+    let eq = ''; if (d === 1) { const slope = b[1] / 5, ic = b[0] - b[1]; eq = `ŷ = ${fmt(ic, 1)} + ${fmt(slope, 2)}·x`; }
+    $('#rgKpi').innerHTML = kpi('Train RMSE', fmt(rt, 2)) + kpi('Test RMSE', fmt(rv, 2)) + kpi('Train R²', fmt(r2(ytr, ptr), 3)) + kpi('Test R²', te.length > 1 ? fmt(r2(yte, pte), 3) : '—') + (eq ? kpi('Equation', eq, 'β₁ = points per extra hour') : kpi('Parameters', d + 1));
+    const o = $('#rgOut');
+    if (!te.length) { o.className = 'feedback info show'; o.textContent = 'Add or generate test points to judge generalisation.'; return; }
+    if (rv > rt * 1.6 && d >= 4) { o.className = 'feedback no show'; o.innerHTML = `<b>Overfitting:</b> the degree-${d} curve chases noise in the training points. Train error is low (${fmt(rt, 1)}) but test error is much higher (${fmt(rv, 1)}).`; }
+    else if (kind === 'dim' && d === 1) { o.className = 'feedback info show'; o.innerHTML = '<b>Underfitting?</b> A straight line cannot bend to the diminishing returns, so the residuals are positive in the middle and negative at the ends. Try degree 2 or 3.'; }
+    else { o.className = 'feedback ok show'; o.innerHTML = `Good balance: train (${fmt(rt, 1)}) and test (${fmt(rv, 1)}) errors are similar. Now push the degree to 10 and watch the test error.`; }
+  }
+  $('#rgDim').onclick = () => { kind = 'dim'; pts = gen('dim', seed); draw(); }; $('#rgLin').onclick = () => { kind = 'lin'; pts = gen('lin', seed); draw(); };
+  $('#rgNew').onclick = () => { seed++; pts = gen(kind, seed); draw(); }; $('#rgClear').onclick = () => { pts = []; draw(); };
+  slide('deg', draw); $('#showRes').onchange = draw; pts = gen('dim', seed); draw();
+})();
+
+// ===== Section 12: metrics =====
+(function () {
+  const Y = [250, 310, 180, 420, 365, 290, 215, 500];
+  const good = [262, 298, 191, 405, 372, 281, 230, 488];
+  let P = [...good];
+  function draw() {
+    $('#mtTbl').innerHTML = '<tr><th>House</th><th class="num">Actual</th><th class="num">Predicted</th><th class="num">Error</th></tr>' + Y.map((y, i) => `<tr><td>#${i + 1}</td><td class="num">${y}</td><td><input type="number" value="${P[i]}" data-i="${i}" style="width:84px"></td><td class="num ${Math.abs(y - P[i]) > 60 ? 'bad' : ''}">${fmt(y - P[i], 0)}</td></tr>`).join('');
+    $$('#mtTbl input').forEach(inp => inp.onchange = () => { P[+inp.dataset.i] = +inp.value; draw(); });
+    const e = Y.map((y, i) => y - P[i]), mae = mean(e.map(Math.abs)), mse = mean(e.map(v => v * v)), R = r2(Y, P);
+    const q = new Plot('#mtPlot', { w: 340, h: 300, x: [100, 600], y: [100, 600], xlabel: 'actual (k€)', ylabel: 'predicted (k€)' });
+    q.path([100, 600], [100, 600], { color: 'var(--muted)', dash: '5 4', width: 1.5 }); Y.forEach((y, i) => { q.seg(y, y, y, P[i], { color: 'var(--red)', opacity: .5 }); q.dot(y, P[i], { r: 6, color: 'var(--purple)' }); });
+    $('#mtKpi').innerHTML = kpi('MAE', fmt(mae, 1) + ' k€') + kpi('MSE', fmt(mse, 0) + ' k€²') + kpi('RMSE', fmt(Math.sqrt(mse), 1) + ' k€') + kpi('R²', fmt(R, 3));
+    $('#mtOut').innerHTML = R < 0 ? '<b>Negative R²:</b> these predictions are worse than always guessing the average price. The model is useless or broken.' : Math.abs(R) < .02 ? '<b>R² ≈ 0:</b> predicting the mean explains none of the variance. This is the baseline any real model must beat.' : Math.sqrt(mse) > 1.6 * mae ? `<b>RMSE (${fmt(Math.sqrt(mse), 0)}) ≫ MAE (${fmt(mae, 0)}):</b> squaring makes one big miss dominate. Use RMSE when big errors are especially costly, MAE when you want a robust “typical error”.` : 'RMSE is close to MAE, so the errors are similar in size. Both are in k€ and easy to explain: “on average we are off by about ' + fmt(mae, 0) + 'k€”.';
+  }
+  $('#mtGood').onclick = () => { P = [...good]; draw(); }; $('#mtBig').onclick = () => { P = [...good]; P[3] = 250; draw(); };
+  $('#mtMean').onclick = () => { P = Y.map(() => Math.round(mean(Y))); draw(); }; $('#mtBad').onclick = () => { P = Y.map(y => Math.round(2 * mean(Y) - y)); draw(); }; draw();
+})();
+
+// ===== Section 13: residual patterns =====
+(function () {
+  const ans = ['Model is reasonable', 'Linear model too simple', 'Unequal error variance', 'Possible outliers', 'Missing feature / wrong form'];
+  const key = { rand: 0, curve: 1, fan: 2, out: 3, struct: 4 };
+  const why = ['Random scatter around zero with constant spread: no pattern left to learn.', 'The U-shape means the true relationship is curved. Add x², transform, or use a non-linear model.', 'Errors fan out as predictions grow (heteroscedasticity). Try log(y) or a weighted model.', 'Most residuals are small but a few are huge. Check them for data errors or rare events.', 'Two separate bands mean a hidden group (e.g. city vs. countryside) that the model does not know about. Add that feature.'];
+  let cur = 'rand';
+  function draw() {
+    const R = rng(cur.length * 7 + 1), xs = Array.from({ length: 90 }, () => 10 + 90 * R());
+    const res = xs.map((x, i) => cur === 'rand' ? 8 * gauss(R) : cur === 'curve' ? .012 * (x - 55) ** 2 - 8 + 4 * gauss(R) : cur === 'fan' ? gauss(R) * x * .2 : cur === 'out' ? (i % 23 === 5 ? (i % 2 ? 1 : -1) * (35 + 10 * R()) : 6 * gauss(R)) : (i % 2 ? 10 : -10) + 3 * gauss(R));
+    const p = new Plot('#rsPlot', { h: 240, x: [0, 105], y: [-50, 50], xlabel: 'predicted value ŷ', ylabel: 'residual y − ŷ' });
+    p.hline(0, { color: 'var(--accent)', dash: '5 4', width: 2 }); xs.forEach((x, i) => p.dot(x, res[i], { r: 4, color: 'var(--blue)', opacity: .8 }));
+    $('#rsAns').innerHTML = ''; $('#rsOut').className = 'feedback';
+    ans.forEach((a, i) => { const b = document.createElement('button'); b.className = 'btn'; b.textContent = a; b.onclick = () => { const ok = i === key[cur]; $('#rsOut').className = 'feedback show ' + (ok ? 'ok' : 'no'); $('#rsOut').innerHTML = (ok ? '✓ Correct. ' : '✗ Not quite. ') + why[key[cur]]; }; $('#rsAns').appendChild(b); });
+  }
+  $$('#rsBtns [data-r]').forEach(b => b.onclick = () => { $$('#rsBtns [data-r]').forEach(x => x.classList.toggle('sel', x === b)); cur = b.dataset.r; draw(); }); draw();
+})();
+
+// ===== Quiz =====
+renderQuiz('#quizBox', [
+  { q: 'A hospital has past patients with age, blood tests and a known diabetes diagnosis, and wants to predict for new patients. Which type of ML?', opts: ['Unsupervised', 'Supervised', 'Reinforcement', 'No ML needed'], a: 1, why: 'Labelled historical data (diagnosis known) → supervised classification.' },
+  { q: 'An online store groups customers by behaviour without any labels. Which approach?', opts: ['Supervised regression', 'Reinforcement learning', 'Unsupervised learning (clustering)', 'Logistic regression'], a: 2, why: 'No labels, discover groups → unsupervised clustering (Chapter 4).' },
+  { q: 'Ice-cream sales double in one week because of a heatwave. This is…', opts: ['Noise', 'An outlier', 'Missing data', 'Data leakage'], a: 1, why: 'A single extreme but real value is an outlier, so investigate rather than smooth it away.' },
+  { q: 'A step counter shows small random jumps from sensor errors. This is…', opts: ['Noise', 'An outlier', 'Concept drift', 'Seasonality'], a: 0, why: 'Small random fluctuations spread over many values are noise.' },
+  { q: 'You predict house price from “size in ft²” and “bedrooms” without scaling, using KNN. Likely outcome?', opts: ['Bedrooms dominate', 'Size dominates the distance and bedrooms are almost ignored', 'No effect', 'The model cannot train'], a: 1, why: 'Large-range features dominate distances and gradient steps, so scale first.' },
+  { q: 'Both the feature and the target are numeric and you want to measure a linear relationship. Which filter method?', opts: ['Pearson correlation', 'Mutual information', 'ANOVA F-test', 'RFE'], a: 0, why: 'Pearson r measures linear association between two numeric variables.' },
+  { q: 'A feature helps predict the target, but not in a straight line. Which filter catches it better?', opts: ['Pearson correlation', 'Mutual information', 'Variance threshold', 'One-hot encoding'], a: 1, why: 'Mutual information captures non-linear dependence.' },
+  { q: 'RFE starts with 10 features; feature 7 is least important. What next?', opts: ['Add feature 7 twice', 'Remove feature 7 and retrain', 'Stop immediately', 'Scale feature 7'], a: 1, why: 'Recursive Feature Elimination drops the weakest feature and repeats.' },
+  { q: '100 features, only a few truly useful; you want weak ones set exactly to zero. Choose…', opts: ['Ridge', 'Lasso', 'Polynomial regression', 'Min–max scaling'], a: 1, why: 'The L1 penalty drives some coefficients exactly to 0.' },
+  { q: 'Most health features are useful; you only want to shrink them for stability. Choose…', opts: ['Lasso', 'Ridge', 'Forward selection', 'Deleting features'], a: 1, why: 'The L2 penalty shrinks all coefficients but keeps them non-zero.' },
+  { q: 'What is the main problem if training and testing sets are the same?', opts: ['Training is slower', 'The score measures memorisation, not generalisation (overly optimistic)', 'R² becomes negative', 'Nothing'], a: 1, why: 'You must evaluate on unseen data.' },
+  { q: 'Price from house size, location score and number of rooms. Which regression type?', opts: ['Simple linear', 'Multiple linear', 'Polynomial', 'Logistic'], a: 1, why: 'Several predictors, one continuous target.' },
+  { q: 'More study hours help a lot at first, then less and less. Which model fits best?', opts: ['Simple linear', 'Polynomial (or another curved model)', 'Logistic', 'Mode imputation'], a: 1, why: 'Diminishing returns is a curved relationship.' },
+  { q: 'Which metric penalises a few very large errors most strongly?', opts: ['MAE', 'RMSE / MSE', 'R²', 'Accuracy'], a: 1, why: 'Squaring errors amplifies large ones.' },
+  { q: 'A regression model has negative R². What does it usually mean?', opts: ['Perfect fit', 'Worse than always predicting the mean', 'Negative correlation', 'Too much data'], a: 1, why: 'R² < 0 ⇔ residual sum of squares > total sum of squares.' },
+  { q: 'The residual plot shows a clear curved pattern. Likely problem?', opts: ['Model is fine', 'A linear model is too simple for a non-linear relationship', 'Too many test points', 'Scaling error'], a: 1, why: 'Systematic curvature = model form is missing non-linearity.' }
+]);
+</script>
+</body></html>

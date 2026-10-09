@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Statistics &amp; ML Study Guides</title>
+<style>
+:root{--bg:#f7f5f2;--card:#fff;--ink:#1f1d1a;--muted:#5f5a53;--line:#e3ded6;--accent:#c9471a}
+@media (prefers-color-scheme:dark){:root{--bg:#141312;--card:#1d1c1a;--ink:#eeebe6;--muted:#a8a29a;--line:#35322e;--accent:#f07a4a}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:900px;margin:0 auto;padding:48px 16px}
+.k{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}
+h1{font-size:clamp(1.8rem,4vw,2.5rem);margin:.2em 0}
+p{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:24px}
+a.c{display:block;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;transition:border-color .15s,transform .15s}
+a.c:hover{border-color:var(--accent);transform:translateY(-2px)}
+a.c b{color:var(--accent);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}
+a.c h2{font-size:1.15rem;margin:.3em 0}
+a.c span{font-size:.9rem;color:var(--muted)}
+footer{margin-top:32px;font-size:.85rem;color:var(--muted)}
+footer a{color:var(--accent)}
+</style></head><body><main>
+<div class="k">Statistics and Machine Learning · SRH University Heidelberg</div>
+<h1>Interactive study guides</h1>
+<p>One page per chapter. Each one has the key concepts, worked examples, simulations you can play with, links to the course notebooks and a self-check quiz.</p>
+<div class="grid">
+<a class="c" href="Chapter1_Statistical_Foundations_Inference.html"><b>Chapter 1</b><h2>Statistical Foundations &amp; Inference</h2><span>Data types, mean/median/mode, variance & SD, plots, probability rules, distributions, skewness, sampling, CLT, confidence intervals, p-values, t-test, ANOVA, correlation</span></a><a class="c" href="Chapter2_ML_Foundations_Regression.html"><b>Chapter 2</b><h2>Machine Learning Foundations &amp; Regression</h2><span>ML vs programming, ML types & workflow, imputation, noise & outliers, encoding & scaling, feature engineering & selection, Lasso/Ridge, splitting & CV, regression, metrics, residuals</span></a><a class="c" href="Chapter3_Classification_Evaluation.html"><b>Chapter 3</b><h2>Classification, Evaluation &amp; Regularization</h2><span>Logistic regression & thresholds, sigmoid/softmax, decision trees, entropy & ID3, KNN, confusion matrix & metrics, over/underfitting, bias–variance, concept drift, ROC–AUC, tuning</span></a><a class="c" href="Chapter4_Unsupervised_TimeSeries_Reporting.html"><b>Chapter 4</b><h2>Unsupervised Learning, Time Series &amp; Reporting</h2><span>K-Means, elbow & silhouette, DBSCAN, PCA, time-series decomposition, stationarity, time-based split, baselines, AR/MA/ARIMA/SARIMA/Prophet/ML/DL, reporting & reproducibility</span></a>
+</div>
+<footer>Prof. Dr. Mehrdad Jalali · <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials">Course repository</a></footer>
+</main></body></html>

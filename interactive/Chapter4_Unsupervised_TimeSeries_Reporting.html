@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ch4 · Unsupervised Learning, Time Series & Reporting</title>
+<meta name="description" content="Interactive study guide — Statistics and Machine Learning, Chapter 4: Unsupervised Learning, Time Series & Reporting">
+<style>:root{
+  --bg:#f7f5f2; --surface:#ffffff; --surface2:#f1eee9; --ink:#1f1d1a; --muted:#5f5a53; --line:#e3ded6;
+  --accent:#c9471a; --accent-soft:#fbe9e1; --blue:#1f5fa8; --blue-soft:#e6eef8; --green:#21794f; --green-soft:#e2f2ea;
+  --amber:#9a5a0f; --amber-soft:#fbf0de; --purple:#5a43a6; --purple-soft:#ece8f8; --red:#b42318; --red-soft:#fde8e6;
+  --code-bg:#1e1f24; --code-ink:#e8e6e3; --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05);
+  --radius:14px; --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}}
+:root[data-theme="dark"]{
+  --bg:#141312; --surface:#1d1c1a; --surface2:#262421; --ink:#eeebe6; --muted:#a8a29a; --line:#35322e;
+  --accent:#f07a4a; --accent-soft:#3a2219; --blue:#7fb0ec; --blue-soft:#1a2738; --green:#6fcf9f; --green-soft:#173027;
+  --amber:#e8b062; --amber-soft:#33281a; --purple:#b3a3f0; --purple-soft:#26213a; --red:#f2877d; --red-soft:#3a1d1a;
+  --code-bg:#0f0f11; --shadow:0 1px 2px rgba(0,0,0,.4);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+code{font-family:var(--mono);font-size:.88em;background:var(--surface2);padding:.1em .35em;border-radius:5px}
+h1,h2,h3,h4{line-height:1.25;margin:0 0 .5em}
+h2{font-size:1.65rem;letter-spacing:-.01em}
+h3{font-size:1.15rem}
+p{margin:0 0 1em}
+.topbar{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:10px 20px}
+.brand{font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+.chapnav{display:flex;gap:6px;overflow-x:auto;flex:1}
+.chapnav a{padding:6px 12px;border-radius:999px;text-decoration:none;color:var(--muted);font-size:.9rem;white-space:nowrap;border:1px solid transparent}
+.chapnav a.on{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 30%,transparent);font-weight:600}
+.iconbtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:.85rem}
+.progress{height:3px;background:var(--accent);width:0;transition:width .1s}
+.hero{max-width:1240px;margin:0 auto;padding:48px 20px 24px}
+.hero .kicker{color:var(--accent);font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.8rem}
+.hero h1{font-size:clamp(1.9rem,4vw,2.8rem);letter-spacing:-.02em;margin:.2em 0 .35em}
+.hero p.lead{font-size:1.12rem;color:var(--muted);max-width:760px}
+.objectives{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:20px}
+.objectives div{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:.93rem}
+.objectives b{display:block;color:var(--accent);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase}
+.layout{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;padding:0 20px 80px}
+.toc{position:sticky;top:76px;align-self:start;max-height:calc(100vh - 96px);overflow:auto;font-size:.9rem}
+.toc h4{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.toc a{display:flex;gap:8px;align-items:center;padding:5px 8px;border-radius:8px;color:var(--muted);text-decoration:none;border-left:2px solid transparent}
+.toc a.active{color:var(--ink);background:var(--surface);border-left-color:var(--accent)}
+.toc a .dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--line);flex:none}
+.toc a.done .dot{background:var(--green);border-color:var(--green)}
+section.chap{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;margin-bottom:24px;box-shadow:var(--shadow)}
+section.chap > .sec-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
+.secnum{color:var(--accent);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.donebtn{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:999px;padding:4px 10px;font-size:.8rem;cursor:pointer;white-space:nowrap}
+.donebtn.on{background:var(--green-soft);color:var(--green);border-color:var(--green)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card h4{margin-bottom:.3em}
+.card p:last-child{margin-bottom:0}
+.callout{border-left:4px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 10px 10px 0;margin:16px 0}
+.callout.green{border-color:var(--green);background:var(--green-soft)}
+.callout.blue{border-color:var(--blue);background:var(--blue-soft)}
+.callout.amber{border-color:var(--amber);background:var(--amber-soft)}
+.callout b:first-child{display:block;margin-bottom:2px}
+.analogy{display:flex;gap:12px;background:var(--purple-soft);border-radius:12px;padding:14px 16px;margin:16px 0}
+.analogy .ico{font-size:1.5rem;line-height:1}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.78rem;font-weight:600;background:var(--surface2);border:1px solid var(--line);color:var(--muted)}
+.tag.blue{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.tag.green{background:var(--green-soft);color:var(--green);border-color:transparent}
+.tag.amber{background:var(--amber-soft);color:var(--amber);border-color:transparent}
+.tag.red{background:var(--red-soft);color:var(--red);border-color:transparent}
+.tag.purple{background:var(--purple-soft);color:var(--purple);border-color:transparent}
+.widget{border:1px dashed color-mix(in srgb,var(--accent) 45%,var(--line));border-radius:12px;padding:18px;margin:18px 0;background:var(--bg)}
+.widget > .wtitle{display:flex;align-items:center;gap:8px;font-weight:700;margin-bottom:10px}
+.widget > .wtitle::before{content:"▶ TRY IT";font-size:.7rem;letter-spacing:.08em;background:var(--accent);color:#fff;padding:2px 8px;border-radius:999px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 14px;border-radius:9px;cursor:pointer;font:inherit;font-size:.92rem}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.sel{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btnrow{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+input[type=text],input[type=number],select,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{font-family:var(--mono);font-size:.85rem;width:100%}
+label{font-size:.9rem}
+input[type=range]{accent-color:var(--accent);width:100%}
+.tablewrap{overflow-x:auto;margin:10px 0}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{border-bottom:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
+th{background:var(--surface2);font-weight:600;white-space:nowrap}
+td.bad,span.bad{background:var(--red-soft);color:var(--red)}
+td.good{background:var(--green-soft);color:var(--green)}
+td.warn{background:var(--amber-soft);color:var(--amber)}
+tr.hl td{background:var(--accent-soft)}
+td[contenteditable]{outline:none;cursor:text}
+td[contenteditable]:focus{box-shadow:inset 0 0 0 2px var(--accent)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:14px 16px;overflow:auto;font:13px/1.55 var(--mono);position:relative;margin:10px 0}
+pre code{background:none;padding:0;color:inherit;font-size:inherit}
+pre .copy{position:absolute;top:8px;right:8px;font-size:.72rem;background:#ffffff1a;color:#ddd;border:1px solid #ffffff30;border-radius:6px;padding:2px 8px;cursor:pointer}
+.c-k{color:#f4a261}.c-s{color:#9ad59a}.c-c{color:#8b8f98;font-style:italic}.c-n{color:#82b8ff}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;overflow-x:auto}
+.tabs button{border:0;background:none;color:var(--muted);padding:9px 14px;cursor:pointer;font:inherit;font-size:.93rem;border-bottom:2px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tabpanel{display:none}.tabpanel.on{display:block}
+details.reveal{background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:8px 0}
+details.reveal summary{cursor:pointer;font-weight:600}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.links a{display:block;text-decoration:none;color:var(--ink);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;transition:border-color .15s,transform .15s}
+.links a:hover{border-color:var(--accent);transform:translateY(-1px)}
+.links a b{display:block;color:var(--accent);font-size:.95rem}
+.links a span{font-size:.84rem;color:var(--muted)}
+.quiz .q{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:10px 0}
+.quiz .q p{font-weight:600;margin-bottom:8px}
+.quiz .opts{display:grid;gap:6px}
+.quiz .opts button{text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:9px;padding:8px 12px;cursor:pointer;font:inherit;font-size:.93rem}
+.quiz .opts button.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.quiz .opts button.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.quiz .why{display:none;margin-top:8px;font-size:.9rem;color:var(--muted)}
+.quiz .q.answered .why{display:block}
+.score{font-weight:700;color:var(--accent)}
+.flow{display:flex;flex-wrap:wrap;align-items:stretch;gap:8px;margin:12px 0}
+.flow .step{flex:1 1 130px;background:var(--surface2);border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;transition:all .15s;position:relative}
+.flow .step small{display:block;color:var(--muted);font-size:.8rem}
+.flow .step.on{border-color:var(--accent);background:var(--accent-soft)}
+.flow .arrow{align-self:center;color:var(--muted)}
+.feedback{margin-top:10px;padding:10px 12px;border-radius:9px;font-size:.92rem;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--green-soft);color:var(--green)}
+.feedback.no{background:var(--red-soft);color:var(--red)}
+.feedback.info{background:var(--blue-soft);color:var(--blue)}
+.meter{height:10px;background:var(--surface2);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.meter > div{height:100%;background:var(--green);transition:width .3s}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:10px 0}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi .v{font-size:1.5rem;font-weight:700}
+.kpi .l{font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.sorter{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.bucket{min-height:110px;border:2px dashed var(--line);border-radius:10px;padding:8px}
+.bucket h5{margin:0 0 6px;font-size:.85rem}
+.bucket.over{border-color:var(--accent);background:var(--accent-soft)}
+.chip{display:inline-block;margin:3px;padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--line);font-size:.85rem;cursor:grab;user-select:none}
+.chip.sel{outline:2px solid var(--accent)}
+.chip.right{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.chip.wrong{background:var(--red-soft);border-color:var(--red);color:var(--red)}
+.pool{min-height:50px;padding:8px;border-radius:10px;background:var(--surface2);margin-bottom:10px}
+.small{font-size:.86rem;color:var(--muted)}
+.foot{max-width:1240px;margin:0 auto;padding:20px;color:var(--muted);font-size:.85rem;text-align:center}
+svg text{font-family:inherit}
+@media (max-width:900px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  .toc{display:none}
+  section.chap{padding:18px}
+  .hero{padding:28px 16px 16px}
+  .layout{padding:0 16px 60px}
+  .topbar-inner{padding:8px 16px}
+}
+@media print{.topbar,.toc,.widget,.donebtn{display:none}.layout{display:block}}
+@media (max-width:700px){#doneCount{display:none}.brand{display:none}}
+
+/* ---- additions for the Statistics & ML pages ---- */
+.plot svg{width:100%;height:auto;display:block;overflow:visible}
+.plot .ax text{fill:var(--muted);font-size:11px}
+.plot .ax text.lab{font-size:12px;fill:var(--muted);font-weight:600}
+.plot .gl{stroke:var(--line);stroke-width:1}
+.plot .axl{stroke:var(--muted);stroke-width:1}
+
+.grid2>*,.grid3>*{min-width:0}
+.plot{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;margin:10px 0}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.84rem;color:var(--muted);margin:4px 0 6px}
+.lg{display:inline-flex;align-items:center;gap:6px}
+.lg i{display:inline-block;width:14px;height:10px;border-radius:3px}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 18px;margin:8px 0}
+.ctrls label{display:flex;flex-direction:column;gap:3px}
+.ctrls label b{font-weight:600;font-size:.86rem;display:flex;justify-content:space-between;gap:8px}
+.ctrls label b span{font-family:var(--mono);color:var(--accent)}
+.formula{font-family:"Cambria Math","STIX Two Math","Latin Modern Math",Georgia,serif;font-size:1.12rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0;overflow-x:auto;text-align:center}
+.formula .lbl{display:block;font-family:inherit;font-size:.78rem;color:var(--muted);text-align:left;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px}
+.frac{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;margin:0 3px}
+.frac>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+.frac>span:last-child{padding:0 3px}
+.out{font-family:var(--mono);font-size:.88rem;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0;white-space:pre-wrap;overflow-x:auto}
+.die{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);font-weight:700;font-size:1.1rem;margin:3px;cursor:pointer;user-select:none}
+.die.a{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+.die.b{background:var(--amber-soft);border-color:var(--amber);color:var(--amber)}
+.die.a.b{background:linear-gradient(135deg,var(--blue-soft) 50%,var(--amber-soft) 50%);border-color:var(--purple);color:var(--purple)}
+.cm{display:grid;grid-template-columns:auto 1fr 1fr;gap:4px;max-width:420px;font-size:.9rem;text-align:center}
+.cm div{padding:10px 6px;border-radius:8px}
+.cm .h{color:var(--muted);font-weight:600;font-size:.8rem;display:flex;align-items:center;justify-content:center}
+.cm .tp,.cm .tn{background:var(--green-soft);color:var(--green);font-weight:700}
+.cm .fp,.cm .fn{background:var(--red-soft);color:var(--red);font-weight:700}
+.cm input{width:70px;text-align:center}
+.twocol{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px;align-items:start}
+.twocol>*{min-width:0}
+.pill{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.78rem;font-weight:700}
+.nb{display:flex;gap:10px;align-items:flex-start;background:var(--blue-soft);border-radius:12px;padding:12px 14px;margin:14px 0;font-size:.93rem}
+.nb .ico{font-size:1.3rem;line-height:1}
+.nb a{font-weight:600}
+.tree{font-family:var(--mono);font-size:.86rem;line-height:1.5}
+.check{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.check input{margin-top:4px;accent-color:var(--green)}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+.hlcell{outline:2px solid var(--accent);outline-offset:-2px}
+
+.kpi .v{font-size:1.3rem;line-height:1.25}
+
+section.chap > .sec-head{flex-wrap:wrap}
+section.chap > .sec-head > div{min-width:0}
+h2{overflow-wrap:break-word}
+</style></head>
+<body data-chapter="4">
+<div class="topbar"><div class="topbar-inner"><a class="brand" href="index.html">Statistics &amp; ML</a><nav class="chapnav"><a href="Chapter1_Statistical_Foundations_Inference.html" class="">Ch 1 · Statistics & Inference</a><a href="Chapter2_ML_Foundations_Regression.html" class="">Ch 2 · ML & Regression</a><a href="Chapter3_Classification_Evaluation.html" class="">Ch 3 · Classification</a><a href="Chapter4_Unsupervised_TimeSeries_Reporting.html" class="on">Ch 4 · Clustering & Time Series</a></nav><span class="small" id="doneCount"></span><button class="iconbtn" id="themeBtn">☾ Dark</button></div><div class="progress" id="progress"></div></div>
+<header class="hero" id="top">
+  <div class="kicker">Chapter 4 · Interactive study guide</div>
+  <h1>Unsupervised Learning, Time Series &amp; Reporting</h1>
+  <p class="lead">Two new kinds of data problems. <b>Unsupervised learning</b> finds structure without labels: clusters, and low-dimensional views of the data with PCA. <b>Time series</b> are data where order matters and the past predicts the future. The chapter closes with turning a model into a <b>reproducible, deployable, monitored</b> project.</p>
+  <div class="objectives">
+    <div><b>Day 1 · Clustering + PCA</b>K-Means, elbow &amp; silhouette, DBSCAN, PCA for visualisation</div>
+    <div><b>Day 2 · Time-series essentials</b>Trend, seasonality, noise, decomposition, stationarity, time-based split, baselines</div>
+    <div><b>Day 3 · Forecasting &amp; reporting</b>AR, MA, ARIMA, SARIMA, Prophet, XGBoost, LSTM / GRU / Transformers, deployment, reproducibility</div>
+  </div>
+</header>
+<div class="layout">
+<aside class="toc"><h4>In this chapter</h4><nav id="tocList"></nav></aside>
+<main>
+
+<section class="chap" id="clust" data-title="What is clustering?">
+  <div class="sec-head"><div><div class="secnum">Section 1</div><h2>Cluster analysis: discovering natural groups</h2></div></div>
+  <p><b>Clustering</b> groups similar data points <b>without predefined labels</b>. A good clustering has <b>high similarity within</b> each cluster and <b>clear differences between</b> clusters. It also has to be <i>interpretable</i>: you should be able to describe each group and act on it.</p>
+  <div class="grid3">
+    <div class="card"><h4>🏥 Healthcare</h4><p class="small">Group similar scans, tissues or patient profiles</p></div>
+    <div class="card"><h4>📣 Marketing</h4><p class="small">Segment customers by behaviour or preferences</p></div>
+    <div class="card"><h4>🔎 Search &amp; recommendation</h4><p class="small">Group similar pages, products or users</p></div>
+    <div class="card"><h4>📄 Documents</h4><p class="small">Organise reports, articles or emails by topic</p></div>
+    <div class="card"><h4>🌐 Web analytics</h4><p class="small">Find visitor behaviour patterns</p></div>
+    <div class="card"><h4>🚨 Anomaly detection</h4><p class="small">Points that belong to no cluster are suspicious</p></div>
+  </div>
+  <div class="callout blue"><b>Quality depends on choices you make</b>The result depends on the distance or similarity measure, the algorithm and its parameters (K, eps…), and the feature scaling. There is usually no single “correct” clustering.</div>
+</section>
+
+<section class="chap" id="kmeans" data-title="K-Means step by step">
+  <div class="sec-head"><div><div class="secnum">Section 2</div><h2>K-Means: assign, update, repeat</h2></div></div>
+  <div class="flow"><div class="step"><small>1</small><b>Choose K</b></div><span class="arrow">→</span><div class="step"><small>2</small><b>Initialise K centroids</b></div><span class="arrow">→</span><div class="step"><small>3</small><b>Assign</b> each point to the nearest centroid</div><span class="arrow">→</span><div class="step"><small>4</small><b>Update</b> each centroid = mean of its points</div><span class="arrow">→</span><div class="step"><small>5</small><b>Repeat</b> until nothing changes</div></div>
+  <div class="formula">Objective: minimise SSE (inertia) = Σ<sub>clusters</sub> Σ<sub>points</sub> ‖x − centroid‖²</div>
+  <div class="widget"><div class="wtitle">Run K-Means by hand</div>
+    <div class="ctrls"><label><b>K <span data-for="kmK">4</span></b><input type="range" id="kmK" min="1" max="8" value="4"></label></div>
+    <div class="btnrow"><button class="btn" id="kmInit">① Random initialisation</button><button class="btn primary" id="kmAssign">② Assign</button><button class="btn primary" id="kmUpdate">③ Update</button><button class="btn" id="kmRun">▶ Run to convergence</button><button class="btn" id="kmData">New data</button></div>
+    <div id="kmPlot"></div>
+    <div class="kpis" id="kmKpi"></div><div class="feedback show info" id="kmOut"></div>
+  </div>
+  <div class="grid2">
+    <div class="card"><h4>✓ Advantages</h4><p class="small">Simple, fast, scales to large data, always converges, works well for well-separated, roughly round clusters.</p></div>
+    <div class="card"><h4>✗ Disadvantages</h4><p class="small">You must choose K. Sensitive to the initial centroids (a different start can give a different answer; use several runs / k-means++). Struggles with outliers, noise and non-spherical shapes.</p></div>
+  </div>
+</section>
+
+<section class="chap" id="eval" data-title="Elbow & silhouette">
+  <div class="sec-head"><div><div class="secnum">Section 3</div><h2>How many clusters? Evaluating clustering</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Compactness: SSE / inertia</h4><p class="small">Always decreases as K grows. Look for the <b>elbow</b>, where adding another cluster stops helping much.</p></div>
+    <div class="card"><h4>Separation: silhouette</h4><div class="formula" style="font-size:1rem">s = <span class="frac"><span>b − a</span><span>max(a, b)</span></span></div><p class="small">a = mean distance to the point's own cluster, b = mean distance to the nearest other cluster. Range −1…+1; <b>higher is better</b>. Other options: Davies–Bouldin (lower is better), Calinski–Harabasz (higher is better).</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Elbow method and silhouette score (same data as above)</div>
+    <div class="grid2"><div><div id="elPlot"></div></div><div><div id="siPlot"></div></div></div>
+    <div class="feedback show ok" id="elOut"></div>
+  </div>
+  <p class="small">Also check <b>stability</b> (do repeated runs agree?) and <b>interpretability</b> (can you name each cluster, e.g. “young high-spenders”?).</p>
+</section>
+
+<section class="chap" id="docs" data-title="Document clustering example">
+  <div class="sec-head"><div><div class="secnum">Section 4</div><h2>Worked example: clustering documents with K-Means</h2></div></div>
+  <p>Eight documents are described by how often five terms T1–T5 appear (a document–term matrix). K = 3, starting from C1 = {D1, D2}, C2 = {D3, D4}, C3 = {D5, D6}. Similarity = dot product between a document and a cluster mean.</p>
+  <div class="widget"><div class="wtitle">Step through the iterations</div>
+    <div class="btnrow"><button class="btn primary" id="dcStep">Next step</button><button class="btn" id="dcReset">Reset</button></div>
+    <div class="out" id="dcState"></div>
+    <div class="tablewrap"><table id="dcTbl"></table></div>
+    <div class="feedback show info" id="dcOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="dbscan" data-title="DBSCAN">
+  <div class="sec-head"><div><div class="secnum">Section 5</div><h2>DBSCAN: density-based clustering</h2></div></div>
+  <p>DBSCAN defines clusters as <b>dense regions</b>. A <b>core point</b> has at least <code>min_samples</code> neighbours within distance <code>eps</code>. <b>Border points</b> are within eps of a core point but are not core themselves. Everything else is <b>noise</b>. It needs <i>no K</i>, finds <b>irregular shapes</b>, and flags outliers.</p>
+  <div class="widget"><div class="wtitle">Tune eps and min_samples</div>
+    <div class="ctrls"><label><b>eps <span data-for="dbE">0.25</span></b><input type="range" id="dbE" min="0.05" max="0.6" step="0.01" value="0.25"></label><label><b>min_samples <span data-for="dbM">5</span></b><input type="range" id="dbM" min="2" max="15" value="5"></label><label><b>Algorithm</b><select id="dbAlg"><option value="db">DBSCAN</option><option value="km">K-Means (K = 2) for comparison</option></select></label></div>
+    <div id="dbPlot"></div><div class="legend" id="dbLeg"></div><div class="kpis" id="dbKpi"></div><div class="feedback show info" id="dbOut"></div>
+  </div>
+  <div class="tablewrap"><table><tr><th></th><th>K-Means</th><th>DBSCAN</th></tr><tr><td>Need to choose</td><td>K</td><td>eps, min_samples</td></tr><tr><td>Cluster shape</td><td>round / convex</td><td>any shape</td></tr><tr><td>Outliers</td><td>forced into a cluster</td><td>labelled noise (−1)</td></tr><tr><td>Typical use</td><td>customer segments</td><td>geospatial hotspots, anomaly detection, image regions</td></tr></table></div>
+</section>
+
+<section class="chap" id="pca" data-title="PCA">
+  <div class="sec-head"><div><div class="secnum">Section 6</div><h2>PCA: seeing high-dimensional data in 2-D</h2></div></div>
+  <p>Real data has many features (age, income, purchase amount, frequency…). <b>Principal Component Analysis</b> builds new axes. <b>PC1</b> is the direction of <b>largest variance</b>, <b>PC2</b> the next largest at a right angle to it, and so on. Plotting PC1 vs. PC2 gives a 2-D picture of the data, which is mainly how PCA is used in a clustering workflow: to visualise and explain clusters.</p>
+  <div class="widget"><div class="wtitle">Find PC1 yourself: rotate the projection axis</div>
+    <div class="ctrls"><label><b>Axis angle <span data-for="pcA">0</span>°</b><input type="range" id="pcA" min="0" max="179" value="0"></label><label><b>Feature scaling</b><select id="pcS"><option value="1">Standardised (correct)</option><option value="0">Raw: income in €k, age in years</option></select></label></div>
+    <div class="btnrow"><button class="btn primary" id="pcSnap">Snap to PC1</button></div>
+    <div class="grid2"><div id="pcPlot"></div><div id="pcProj"></div></div>
+    <div class="kpis" id="pcKpi"></div><div class="feedback show info" id="pcOut"></div>
+  </div>
+  <div class="callout amber"><b>Reading a PCA plot of clusters</b>Each point is coloured by its cluster label. Well-separated colours mean distinct groups. If two clusters <b>strongly overlap</b>, they may not be truly different, or the first two components don't capture what separates them. Check the explained variance and try other components.</div>
+  <h3>Clustering workflow in practice</h3>
+  <div class="flow"><div class="step"><b>Explore</b><small>shape, types, missing</small></div><span class="arrow">→</span><div class="step"><b>Clean &amp; scale</b><small>StandardScaler</small></div><span class="arrow">→</span><div class="step"><b>Cluster</b><small>K-Means / DBSCAN</small></div><span class="arrow">→</span><div class="step"><b>Choose K / eps</b><small>elbow, silhouette</small></div><span class="arrow">→</span><div class="step"><b>Visualise</b><small>PCA 2-D</small></div><span class="arrow">→</span><div class="step"><b>Interpret</b><small>profile each cluster</small></div><span class="arrow">→</span><div class="step"><b>Use</b><small>cluster label as a feature in a supervised model</small></div></div>
+</section>
+
+<section class="chap" id="ts" data-title="Time series & decomposition">
+  <div class="sec-head"><div><div class="secnum">Section 7</div><h2>What makes time series different, and decomposition</h2></div></div>
+  <div class="grid2">
+    <div class="card"><h4>Order matters</h4><p class="small">Observations come at t = 1, 2, 3, …, and the timeline is part of the data.</p></div>
+    <div class="card"><h4>Past influences future</h4><p class="small">Previous values help predict the next ones (<b>autocorrelation</b>).</p></div>
+    <div class="card"><h4>Patterns over time</h4><p class="small">Trend, seasonality, noise and sudden shocks.</p></div>
+    <div class="card"><h4>Evaluation is different</h4><p class="small">Never shuffle: <b>train on the past, test on the future</b>. Forecasts are one-step or multi-step ahead.</p></div>
+  </div>
+  <div class="formula">Additive: y = Trend + Seasonality + Residual &nbsp;·&nbsp; Multiplicative: y = Trend × Seasonality × Residual</div>
+  <div class="widget"><div class="wtitle">Decompose AirPassengers (monthly, 1949–1960)</div>
+    <div class="btnrow" id="decBtns"><button class="btn sel" data-m="mult">Multiplicative</button><button class="btn" data-m="add">Additive</button></div>
+    <div id="decObs"></div><div id="decTr"></div><div id="decSe"></div><div id="decRe"></div>
+    <div class="feedback show info" id="decOut"></div>
+  </div>
+  <div class="grid3">
+    <div class="card"><h4>Trend</h4><p class="small">Long-term direction: more smartphone users each year; web traffic slowly falling after a campaign ends; stable electricity demand.</p></div>
+    <div class="card"><h4>Seasonality</h4><p class="small">A pattern repeating at fixed intervals (day, week, month, year): Christmas and Black Friday sales peaks, summer air travel.</p></div>
+    <div class="card"><h4>Residual / noise</h4><p class="small">What is left after removing trend and season. Ideally random around 0; a huge single residual is an <b>anomaly</b>, such as a market crash or an outage.</p></div>
+  </div>
+  <pre><code data-hl="py">from statsmodels.tsa.seasonal import seasonal_decompose
+res = seasonal_decompose(df["passengers"], model="multiplicative", period=12)
+res.plot()        # observed, trend, seasonal, resid</code></pre>
+</section>
+
+<section class="chap" id="stat" data-title="Stationarity & differencing">
+  <div class="sec-head"><div><div class="secnum">Section 8</div><h2>Stationarity and differencing</h2></div></div>
+  <p>A <b>stationary</b> series has a stable mean, a stable variance, no trend and no changing seasonal pattern. Classical models such as ARMA/ARIMA assume it. The usual fix is <b>differencing</b> (y<sub>t</sub> − y<sub>t−1</sub>) to remove trend, seasonal differencing (y<sub>t</sub> − y<sub>t−12</sub>) to remove seasonality, and a <b>log</b> to stabilise growing variance.</p>
+  <div class="widget"><div class="wtitle">Make AirPassengers stationary</div>
+    <div class="btnrow" id="stBtns"><button class="btn sel" data-t="raw">Raw</button><button class="btn" data-t="log">log</button><button class="btn" data-t="d1">Difference (d = 1)</button><button class="btn" data-t="logd1">log + d = 1</button><button class="btn" data-t="logd1s">log + d = 1 + seasonal D = 1</button></div>
+    <div id="stPlot"></div><div class="legend" id="stLeg"></div><div class="kpis" id="stKpi"></div><div class="feedback show" id="stOut"></div>
+  </div>
+</section>
+
+<section class="chap" id="split" data-title="Time-based split & baselines">
+  <div class="sec-head"><div><div class="secnum">Section 9</div><h2>Time-based split and baseline forecasts</h2></div></div>
+  <div class="callout"><b>Never shuffle a time series</b>A random split puts future months into the training set. The model then “predicts” the past using knowledge of the future (leakage), and its scores are far too optimistic. Instead, train on the first ~80 % of the timeline and test on the last ~20 %. For CV, use <code>TimeSeriesSplit</code> (expanding window).</div>
+  <p>A <b>baseline</b> is the simplest sensible forecast. Every advanced model must beat it. If it can't, the extra complexity is not worth it.</p>
+  <div class="grid3">
+    <div class="card"><h4>Naive</h4><p class="small">ŷ = last observed value</p></div>
+    <div class="card"><h4>Seasonal naive</h4><p class="small">ŷ = value from the same season last year (this December ≈ last December)</p></div>
+    <div class="card"><h4>Moving average</h4><p class="small">ŷ = mean of the last w values</p></div>
+  </div>
+  <div class="widget"><div class="wtitle">Forecast the last 24 months of AirPassengers</div>
+    <div class="ctrls"><label><b>Training cut-off <span data-for="fcCut">Dec 1958</span></b><input type="range" id="fcCut" min="72" max="132" step="12" value="120"></label><label><b>Moving-average window <span data-for="fcW">12</span></b><input type="range" id="fcW" min="1" max="24" value="12"></label><label><b>Holt-Winters α (level) <span data-for="hwA">0.40</span></b><input type="range" id="hwA" min="0.01" max="1" step="0.01" value="0.4"></label><label><b>β (trend) <span data-for="hwB">0.02</span></b><input type="range" id="hwB" min="0" max="0.5" step="0.01" value="0.02"></label><label><b>γ (season) <span data-for="hwG">0.30</span></b><input type="range" id="hwG" min="0" max="1" step="0.01" value="0.3"></label></div>
+    <div class="btnrow" id="fcShow"><label class="small"><input type="checkbox" data-s="naive" checked> Naive</label><label class="small"><input type="checkbox" data-s="snaive" checked> Seasonal naive</label><label class="small"><input type="checkbox" data-s="ma" checked> Moving average</label><label class="small"><input type="checkbox" data-s="hw" checked> Holt-Winters (exp. smoothing)</label></div>
+    <div id="fcPlot"></div><div class="legend" id="fcLeg"></div>
+    <div class="tablewrap"><table id="fcTbl"></table></div>
+    <p class="small">MAPE = mean(|y − ŷ| / y) × 100 %. It is scale-free and easy to explain, but undefined when y = 0. Holt-Winters is a classical exponential-smoothing model with level, trend and season, fitted here on log(y).</p>
+  </div>
+</section>
+
+<section class="chap" id="models" data-title="Forecasting models">
+  <div class="sec-head"><div><div class="secnum">Section 10</div><h2>The forecasting model landscape</h2></div></div>
+  <div class="tabs" data-group="fm"><button class="on" data-tab="ar">AR</button><button data-tab="ma">MA</button><button data-tab="arima">ARMA / ARIMA / SARIMA</button><button data-tab="prophet">Prophet</button><button data-tab="ml">XGBoost (ML)</button><button data-tab="dl">LSTM / GRU / Transformer</button></div>
+  <div class="tabpanel on" data-group="fm" data-tab="ar"><div class="formula">Y<sub>t</sub> = c + φ₁Y<sub>t−1</sub> + φ₂Y<sub>t−2</sub> + … + φ<sub>p</sub>Y<sub>t−p</sub> + ε<sub>t</sub></div><p class="small"><b>Autoregressive:</b> predicts from <b>past values</b> of the series itself, each with a weight φ. p = how many lags. Good for short-term dependence in stationary data.</p></div>
+  <div class="tabpanel" data-group="fm" data-tab="ma"><div class="formula">Y<sub>t</sub> = c + ε<sub>t</sub> + θ₁ε<sub>t−1</sub> + … + θ<sub>q</sub>ε<sub>t−q</sub></div><p class="small"><b>Moving-average model</b> (not the same as a moving-average smoother!): predicts from <b>past forecast errors (shocks)</b>. If the model just made a big error, it adjusts the next prediction. q = how many past errors.</p></div>
+  <div class="tabpanel" data-group="fm" data-tab="arima"><p><b>ARMA(p, q)</b> = AR + MA for stationary data. <b>ARIMA(p, d, q)</b> adds the <b>I</b>ntegrated part: difference the series d times to remove the trend. <b>SARIMA(p, d, q)(P, D, Q)<sub>s</sub></b> adds seasonal AR, differencing and MA terms with season length s (s = 12 for monthly data with yearly seasonality). Typical uses: retail, energy, tourism, weather.</p><pre><code data-hl="py">from statsmodels.tsa.statespace.sarimax import SARIMAX
+m = SARIMAX(train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 12)).fit()
+fc = m.forecast(steps=24)</code></pre></div>
+  <div class="tabpanel" data-group="fm" data-tab="prophet"><div class="formula">Forecast = Trend + Seasonality + Holidays + Error</div><p class="small"><b>Prophet</b> (Meta) is built for business series with weekly/yearly seasonality, holidays and events, missing values and outliers. It is easy to use and its components are interpretable, but it is less flexible than fully custom models. Best for sales, web traffic and demand.</p></div>
+  <div class="tabpanel" data-group="fm" data-tab="ml"><p><b>XGBoost and Random Forest</b> do not understand time order by themselves. You turn the series into a <b>supervised table</b> of lag values, rolling means, calendar features and external variables (weather, promotions). They handle non-linearity and many features, but need feature engineering, and you still need a time-based split.</p><div class="widget"><div class="wtitle">Build lag features</div><div class="btnrow" id="lagBtns"><label class="small"><input type="checkbox" data-l="lag1" checked> lag_1</label><label class="small"><input type="checkbox" data-l="lag12" checked> lag_12</label><label class="small"><input type="checkbox" data-l="roll3" checked> rolling_mean_3</label><label class="small"><input type="checkbox" data-l="month" checked> month</label><label class="small"><input type="checkbox" data-l="summer"> is_summer</label></div><div class="tablewrap"><table id="lagTbl"></table></div><p class="small">The first 12 rows have empty lag_12 and must be dropped. Every feature may only use information available <i>before</i> time t.</p></div></div>
+  <div class="tabpanel" data-group="fm" data-tab="dl"><div class="grid3"><div class="card"><h4>LSTM</h4><p class="small">A recurrent network with memory gates that captures long-term dependencies. Needs lots of data and compute.</p></div><div class="card"><h4>GRU</h4><p class="small">A simplified LSTM: fewer parameters and faster, with similar results on many tasks.</p></div><div class="card"><h4>Transformer</h4><p class="small">Self-attention processes the sequence in parallel; strong for long, complex series. Very data- and compute-hungry.</p></div></div><p class="small"><b>Hybrid models</b> (ARIMA-LSTM, ETS-ANN) combine a linear model for the structure with a neural network for non-linear leftovers.</p></div>
+  <div class="widget"><div class="wtitle">AR vs. MA behaviour: simulate and read the autocorrelation (ACF)</div>
+    <div class="ctrls"><label><b>Model</b><select id="armT"><option value="ar">AR(1)</option><option value="ma">MA(1)</option></select></label><label><b>φ or θ <span data-for="armP">0.80</span></b><input type="range" id="armP" min="-0.95" max="0.98" step="0.01" value="0.8"></label></div>
+    <div class="grid2"><div id="armSer"></div><div id="armAcf"></div></div>
+    <div class="feedback show info" id="armOut"></div>
+  </div>
+  <div class="tablewrap"><table><tr><th>Model</th><th>Main idea</th><th>Trend?</th><th>Season?</th><th>Best when</th></tr>
+    <tr><td><b>AR</b></td><td>past values</td><td>✗</td><td>✗</td><td>short-term dependence, stationary</td></tr>
+    <tr><td><b>MA</b></td><td>past errors (shocks)</td><td>✗</td><td>✗</td><td>temporary disturbances</td></tr>
+    <tr><td><b>ARMA</b></td><td>AR + MA</td><td>✗</td><td>✗</td><td>stationary with short-term patterns</td></tr>
+    <tr><td><b>ARIMA</b></td><td>ARMA + differencing</td><td>✓</td><td>✗</td><td>trend, no strong seasonality</td></tr>
+    <tr><td><b>SARIMA</b></td><td>ARIMA + seasonal terms</td><td>✓</td><td>✓</td><td>stable monthly / yearly cycles</td></tr>
+    <tr><td><b>Prophet</b></td><td>trend + season + holidays</td><td>✓</td><td>✓</td><td>business data with calendar effects</td></tr>
+    <tr><td><b>XGBoost</b></td><td>lag / calendar features</td><td>via features</td><td>via features</td><td>many external drivers, non-linear</td></tr>
+    <tr><td><b>LSTM / GRU / Transformer</b></td><td>learned sequence patterns</td><td>✓</td><td>✓</td><td>long, complex series with lots of data</td></tr></table></div>
+  <div class="widget"><div class="wtitle">Which model would you start with?</div><div id="sortModels"></div></div>
+</section>
+
+<section class="chap" id="report" data-title="Reporting & deployment">
+  <div class="sec-head"><div><div class="secnum">Section 11</div><h2>Reporting, reproducibility, deployment and monitoring</h2></div></div>
+  <p>A model nobody can rerun, understand or trust is worth nothing. <b>Reporting is part of the ML workflow</b>, not something added at the end.</p>
+  <div class="grid2">
+    <div><h3>Reproducible project structure</h3><div class="out tree">final_project/
+├── README.md            ← question, data, how to run, results
+├── requirements.txt     ← pinned versions (pandas==2.2.2 …)
+├── data/
+│   ├── raw/             ← never edited
+│   └── processed/
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_clustering.ipynb
+│   └── 03_forecasting.ipynb
+├── src/                 ← reusable functions
+├── models/model.joblib  ← saved trained model
+└── reports/
+    ├── figures/
+    └── final_report.pdf</div></div>
+    <div><h3>Reproducibility essentials</h3><pre><code data-hl="py">import numpy as np, random, sklearn, sys, joblib
+SEED = 42
+random.seed(SEED); np.random.seed(SEED)
+model = KMeans(n_clusters=4, random_state=SEED, n_init=10)
+print(sys.version, np.__version__, sklearn.__version__)
+
+joblib.dump(pipeline, "models/model.joblib")   # save
+pipeline = joblib.load("models/model.joblib")  # reload & predict</code></pre></div>
+  </div>
+  <h3>Deploy → monitor → maintain</h3>
+  <div class="flow"><div class="step"><b>Train &amp; validate</b><small>pipeline + metrics</small></div><span class="arrow">→</span><div class="step"><b>Package</b><small>joblib, versioned env</small></div><span class="arrow">→</span><div class="step"><b>Deploy</b><small>API, batch job, dashboard</small></div><span class="arrow">→</span><div class="step"><b>Monitor</b><small>data drift, metric decay, latency</small></div><span class="arrow">→</span><div class="step"><b>Retrain / update</b><small>scheduled or triggered</small></div></div>
+  <div class="widget"><div class="wtitle">Monitoring data drift with PSI</div>
+    <p class="small">The Population Stability Index compares this month's feature distribution with the training (reference) distribution. Rule of thumb: <b>&lt; 0.1</b> stable · <b>0.1–0.25</b> moderate shift, investigate · <b>&gt; 0.25</b> major shift, retrain.</p>
+    <div class="ctrls"><label><b>Mean shift <span data-for="psM">0.0</span></b><input type="range" id="psM" min="-2" max="2" step="0.05" value="0"></label><label><b>Spread change ×<span data-for="psS">1.00</span></b><input type="range" id="psS" min="0.5" max="2" step="0.05" value="1"></label></div>
+    <div id="psPlot"></div><div class="legend" id="psLeg"></div><div class="feedback show" id="psOut"></div>
+  </div>
+  <div class="widget"><div class="wtitle">Final-project report checklist</div><div id="chkBox"></div><div class="meter"><div id="chkBar" style="width:0"></div></div><p class="small" id="chkTxt"></p></div>
+</section>
+
+<section class="chap" id="links" data-title="Notebooks & resources">
+  <div class="sec-head"><div><div class="secnum">Section 12</div><h2>Course notebooks &amp; resources</h2></div></div>
+  <div class="links">
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_04_Unsupervised_Learning_Time_Series_and_Reporting/Lecture_Support/01_Week4_Day1_Clustering_PCA.ipynb" target="_blank" rel="noopener"><b>Practical 1 · Clustering + PCA</b><span>K-Means, elbow, silhouette, DBSCAN eps, PCA plots, cluster labels as features</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_04_Unsupervised_Learning_Time_Series_and_Reporting/Lecture_Support/02_Week4_Day2_Time_Series_Forecasting_Refined.ipynb" target="_blank" rel="noopener"><b>Practical 2 · Time-series forecasting</b><span>Decomposition, differencing, baselines, AR…SARIMA, Prophet, XGBoost, LSTM/GRU, MAE/RMSE/MAPE</span></a>
+    <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials/blob/main/Week_04_Unsupervised_Learning_Time_Series_and_Reporting/Lecture_Support/03_Week4_Day3_Reporting_Reproducibility_Final_Project.ipynb" target="_blank" rel="noopener"><b>Practical 3 · Reporting + reproducibility</b><span>Structure, versions, seeds, metric tables, joblib, drift, report template</span></a>
+    <a href="https://www.datacamp.com/tutorial/principal-component-analysis-in-python" target="_blank" rel="noopener"><b>DataCamp · PCA in Python</b><span>Step-by-step tutorial</span></a>
+    <a href="https://scikit-learn.org/stable/modules/clustering.html" target="_blank" rel="noopener"><b>scikit-learn · Clustering</b><span>K-Means, DBSCAN and the comparison gallery</span></a>
+    <a href="https://www.statsmodels.org/stable/tsa.html" target="_blank" rel="noopener"><b>statsmodels · Time series</b><span>Decomposition, ARIMA, SARIMAX, ADF test</span></a>
+    <a href="https://facebook.github.io/prophet/" target="_blank" rel="noopener"><b>Prophet</b><span>Forecasting with trend, seasonality &amp; holidays</span></a>
+    <a href="https://otexts.com/fpp3/" target="_blank" rel="noopener"><b>Forecasting: Principles and Practice</b><span>Free online textbook (Hyndman &amp; Athanasopoulos)</span></a>
+  </div>
+</section>
+
+<section class="chap" id="quiz" data-title="Self-check quiz">
+  <div class="sec-head"><div><div class="secnum">Section 13</div><h2>Self-check quiz</h2></div></div>
+  <div id="quizBox"></div>
+</section>
+</main></div>
+
+<footer class="foot">Statistics and Machine Learning · Prof. Dr. Mehrdad Jalali · SRH University of Applied Sciences Heidelberg · Course repository: <a href="https://github.com/MehrdadJalali-AI/stat-ml-teaching-materials" target="_blank" rel="noopener">github.com/MehrdadJalali-AI/stat-ml-teaching-materials</a></footer>
+<script>// ---------- shared helpers for all chapter pages ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// theme
+(function () {
+  const saved = store.get('sml-theme', null);
+  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  const b = $('#themeBtn');
+  if (!b) return;
+  const label = () => {
+    const t = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    b.textContent = t === 'dark' ? '☀ Light' : '☾ Dark';
+  };
+  label();
+  b.onclick = () => {
+    const cur = document.documentElement.getAttribute('data-theme') ||
+      (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nxt);
+    store.set('sml-theme', nxt); label();
+  };
+})();
+
+// TOC, scroll spy, progress, "mark as understood"
+(function () {
+  const toc = $('#tocList'); const secs = $$('section.chap');
+  const key = 'sml-done-' + (document.body.dataset.chapter || 'x');
+  const done = new Set(store.get(key, []));
+  secs.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#' + s.id; a.innerHTML = '<span class="dot"></span>' + esc(s.dataset.title || s.id);
+    if (done.has(s.id)) a.classList.add('done');
+    toc && toc.appendChild(a);
+    const head = s.querySelector('.sec-head');
+    if (head) {
+      const b = document.createElement('button'); b.className = 'donebtn';
+      const paint = () => { b.classList.toggle('on', done.has(s.id)); b.textContent = done.has(s.id) ? '✓ Understood' : 'Mark as understood'; a.classList.toggle('done', done.has(s.id)); updCount(); };
+      b.onclick = () => { done.has(s.id) ? done.delete(s.id) : done.add(s.id); store.set(key, [...done]); paint(); };
+      head.appendChild(b); setTimeout(paint);
+    }
+  });
+  function updCount() { const c = $('#doneCount'); if (c) c.textContent = done.size + ' / ' + secs.length + ' sections understood'; }
+  const links = toc ? $$('a', toc) : [];
+  const onScroll = () => {
+    const h = document.documentElement; const p = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    const bar = $('#progress'); if (bar) bar.style.width = (p * 100) + '%';
+    let cur = 0; secs.forEach((s, i) => { if (s.getBoundingClientRect().top < 140) cur = i; });
+    links.forEach((l, i) => l.classList.toggle('active', i === cur));
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+})();
+
+// tabs: <div class="tabs" data-group="x"><button data-tab="a">..</button></div> + <div class="tabpanel" data-group="x" data-tab="a">
+document.addEventListener('click', e => {
+  const b = e.target.closest('.tabs button'); if (!b) return;
+  const g = b.parentElement.dataset.group;
+  $$('.tabs[data-group="' + g + '"] button').forEach(x => x.classList.toggle('on', x === b));
+  $$('.tabpanel[data-group="' + g + '"]').forEach(p => p.classList.toggle('on', p.dataset.tab === b.dataset.tab));
+});
+
+// copy buttons on code
+function addCopy(root = document) {
+  $$('pre', root).forEach(p => {
+    if (p.querySelector('.copy')) return;
+    const b = document.createElement('button'); b.className = 'copy'; b.textContent = 'Copy';
+    b.onclick = () => { const t = p.querySelector('code') ? p.querySelector('code').innerText : p.innerText.replace(/Copy$/, ''); navigator.clipboard && navigator.clipboard.writeText(t); b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy', 1200); };
+    p.appendChild(b);
+  });
+}
+addCopy();
+
+// quiz engine: renderQuiz('#el', [{q, opts:[...], a: idx, why}])
+function renderQuiz(sel, items) {
+  const root = $(sel); if (!root) return; root.classList.add('quiz');
+  let right = 0, answered = 0;
+  const sc = document.createElement('p'); sc.className = 'score';
+  const upd = () => sc.textContent = `Score: ${right} / ${items.length}` + (answered === items.length ? (right === items.length ? ' — perfect! 🎉' : ' — review the explanations and try again.') : '');
+  items.forEach((it, qi) => {
+    const d = document.createElement('div'); d.className = 'q';
+    d.innerHTML = `<p>${qi + 1}. ${it.q}</p><div class="opts"></div><div class="why">💡 ${it.why}</div>`;
+    const o = d.querySelector('.opts');
+    it.opts.forEach((t, i) => {
+      const b = document.createElement('button'); b.innerHTML = t;
+      b.onclick = () => {
+        if (d.classList.contains('answered')) return;
+        d.classList.add('answered'); answered++;
+        if (i === it.a) { b.classList.add('right'); right++; } else { b.classList.add('wrong'); o.children[it.a].classList.add('right'); }
+        upd();
+      };
+      o.appendChild(b);
+    });
+    root.appendChild(d);
+  });
+  const r = document.createElement('button'); r.className = 'btn'; r.textContent = '↺ Reset quiz';
+  r.onclick = () => { root.innerHTML = ''; renderQuiz(sel, items); };
+  root.appendChild(sc); root.appendChild(r); upd();
+}
+
+// sorter engine (click a chip, then click a bucket — or drag): makeSorter('#el', cats:[{id,label}], items:[{t, c, why?}])
+function makeSorter(sel, cats, items) {
+  const root = $(sel); if (!root) return;
+  root.innerHTML = `<div class="pool small">Click an item, then click the box it belongs to (or drag it).</div><div class="sorter"></div><div class="btnrow"><button class="btn primary chk">Check answers</button><button class="btn rst">Reset</button></div><div class="feedback"></div>`;
+  const pool = $('.pool', root), sorter = $('.sorter', root), fb = $('.feedback', root);
+  let selected = null;
+  const shuffled = items.map((x, i) => ({ ...x, i })).sort(() => Math.random() - .5);
+  shuffled.forEach(it => {
+    const c = document.createElement('span'); c.className = 'chip'; c.textContent = it.t; c.draggable = true; c.dataset.c = it.c; c.dataset.i = it.i;
+    if (it.why) c.title = it.why;
+    c.onclick = e => { e.stopPropagation(); $$('.chip', root).forEach(x => x.classList.remove('sel')); selected = c; c.classList.add('sel'); };
+    c.ondragstart = ev => { selected = c; ev.dataTransfer.setData('text', it.i); };
+    pool.appendChild(c);
+  });
+  cats.forEach(cat => {
+    const b = document.createElement('div'); b.className = 'bucket'; b.dataset.id = cat.id; b.innerHTML = `<h5>${cat.label}</h5>`;
+    const drop = () => { if (selected) { b.appendChild(selected); selected.classList.remove('sel', 'right', 'wrong'); selected = null; } };
+    b.onclick = drop;
+    b.ondragover = e => { e.preventDefault(); b.classList.add('over'); };
+    b.ondragleave = () => b.classList.remove('over');
+    b.ondrop = e => { e.preventDefault(); b.classList.remove('over'); drop(); };
+    sorter.appendChild(b);
+  });
+  pool.onclick = () => { if (selected) { pool.appendChild(selected); selected.classList.remove('sel'); selected = null; } };
+  $('.chk', root).onclick = () => {
+    let ok = 0, placed = 0;
+    $$('.bucket .chip', root).forEach(c => { placed++; const good = c.parentElement.dataset.id === c.dataset.c; c.classList.toggle('right', good); c.classList.toggle('wrong', !good); if (good) ok++; });
+    fb.className = 'feedback show ' + (ok === items.length ? 'ok' : 'info');
+    fb.textContent = ok === items.length ? `All ${ok} correct — well done!` : `${ok} of ${items.length} correct (${items.length - placed} not placed yet). Red items are in the wrong box — hover them for a hint.`;
+  };
+  $('.rst', root).onclick = () => makeSorter(sel, cats, items);
+}
+
+// tiny syntax highlighter for python / sql / yaml snippets marked data-hl
+function hl(code, lang) {
+  let s = esc(code);
+  if (lang === 'py' || lang === 'sql') {
+    s = s.replace(/(#.*|--.*)$/gm, '<span class="c-c">$1</span>');
+    s = s.replace(/(&quot;.*?&quot;|'[^'\n]*')/g, '<span class="c-s">$1</span>');
+    const kw = lang === 'py' ? 'def|return|import|from|as|for|in|if|else|try|except|with|lambda|True|False|None|print' : 'SELECT|FROM|WHERE|GROUP BY|ORDER BY|JOIN|LEFT JOIN|ON|AS|WITH|SUM|COUNT|AND|OR|MATCH|RETURN|PREFIX';
+    s = s.replace(new RegExp('\\b(' + kw + ')\\b', 'g'), '<span class="c-k">$1</span>');
+  } else if (lang === 'yaml') {
+    s = s.replace(/(#.*)$/gm, '<span class="c-c">$1</span>').replace(/^(\s*-?\s*)([\w_]+):/gm, '$1<span class="c-k">$2</span>:');
+  }
+  return s;
+}
+$$('pre code[data-hl]').forEach(c => { c.innerHTML = hl(c.textContent, c.dataset.hl); });
+
+// ---------- maths + SVG plotting helpers (shared by the Statistics & ML chapter pages) ----------
+const fmt = (x, d = 2) => (x === null || x === undefined || !isFinite(x)) ? '—' : (+x).toFixed(d);
+const sum = a => a.reduce((s, x) => s + x, 0);
+const mean = a => a.length ? sum(a) / a.length : NaN;
+const variance = (a, ddof = 0) => { const m = mean(a); return a.reduce((s, x) => s + (x - m) ** 2, 0) / (a.length - ddof); };
+const sd = (a, ddof = 0) => Math.sqrt(variance(a, ddof));
+const median = a => { const s = [...a].sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; };
+const quantile = (a, q) => { const s = [...a].sort((x, y) => x - y); const p = (s.length - 1) * q, lo = Math.floor(p), hi = Math.ceil(p); return s[lo] + (s[hi] - s[lo]) * (p - lo); };
+const modes = a => { const c = new Map(); a.forEach(x => c.set(x, (c.get(x) || 0) + 1)); const m = Math.max(...c.values()); return m === 1 && a.length > 1 ? [] : [...c].filter(e => e[1] === m).map(e => e[0]); };
+const skewness = a => { const m = mean(a), s = sd(a); return s === 0 ? 0 : mean(a.map(x => ((x - m) / s) ** 3)); };
+const pearson = (x, y) => { const mx = mean(x), my = mean(y); let a = 0, b = 0, c = 0; for (let i = 0; i < x.length; i++) { a += (x[i] - mx) * (y[i] - my); b += (x[i] - mx) ** 2; c += (y[i] - my) ** 2; } return a / Math.sqrt(b * c); };
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const range = (a, b, step = 1) => { const r = []; for (let x = a; step > 0 ? x <= b + 1e-9 : x >= b - 1e-9; x += step) r.push(x); return r; };
+
+// seeded RNG so every student sees the same "random" example until they press re-sample
+function rng(seed = 42) { let t = seed >>> 0; return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ t >>> 15, 1 | t); r ^= r + Math.imul(r ^ r >>> 7, 61 | r); return ((r ^ r >>> 14) >>> 0) / 4294967296; }; }
+function gauss(R) { let u = 0, v = 0; while (u === 0) u = R(); v = R(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+
+// special functions
+function lgamma(x) { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5]; let y = x, t = x + 5.5; t -= (x + .5) * Math.log(t); let s = 1.000000000190015; for (const k of c) s += k / ++y; return -t + Math.log(2.5066282746310005 * s / x); }
+function betacf(a, b, x) { let qab = a + b, qap = a + 1, qam = a - 1, c = 1, d = 1 - qab * x / qap; if (Math.abs(d) < 1e-30) d = 1e-30; d = 1 / d; let h = d; for (let m = 1; m <= 200; m++) { const m2 = 2 * m; let aa = m * (b - m) * x / ((qam + m2) * (a + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; h *= d * c; aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2)); d = 1 + aa * d; if (Math.abs(d) < 1e-30) d = 1e-30; c = 1 + aa / c; if (Math.abs(c) < 1e-30) c = 1e-30; d = 1 / d; const del = d * c; h *= del; if (Math.abs(del - 1) < 3e-12) break; } return h; }
+function ibeta(x, a, b) { if (x <= 0) return 0; if (x >= 1) return 1; const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a : 1 - bt * betacf(b, a, 1 - x) / b; }
+const tCDF = (t, df) => { const x = df / (df + t * t); const p = 0.5 * ibeta(x, df / 2, 0.5); return t > 0 ? 1 - p : p; };
+const tTwoSided = (t, df) => ibeta(df / (df + t * t), df / 2, 0.5);
+const fSurvival = (f, d1, d2) => f <= 0 ? 1 : ibeta(d2 / (d2 + d1 * f), d2 / 2, d1 / 2);
+function tCrit(conf, df) { let lo = 0, hi = 100; for (let i = 0; i < 80; i++) { const m = (lo + hi) / 2; (tCDF(m, df) < 1 - (1 - conf) / 2) ? lo = m : hi = m; } return (lo + hi) / 2; }
+function erf(x) { const s = Math.sign(x); x = Math.abs(x); const t = 1 / (1 + 0.3275911 * x); const y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return s * y; }
+const normCDF = (x, m = 0, s = 1) => 0.5 * (1 + erf((x - m) / (s * Math.SQRT2)));
+const normPDF = (x, m = 0, s = 1) => Math.exp(-0.5 * ((x - m) / s) ** 2) / (s * Math.sqrt(2 * Math.PI));
+const lchoose = (n, k) => lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+const binomPMF = (k, n, p) => p === 0 ? +(k === 0) : p === 1 ? +(k === n) : Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log(1 - p));
+const poisPMF = (k, l) => Math.exp(k * Math.log(l) - l - lgamma(k + 1));
+
+// nice tick values
+function ticks(a, b, n = 5) { const span = b - a || 1; const step0 = span / n; const mag = 10 ** Math.floor(Math.log10(step0)); const err = step0 / mag; const step = (err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1) * mag; const out = []; for (let x = Math.ceil(a / step) * step; x <= b + step * 1e-6; x += step) out.push(+x.toFixed(10)); return out; }
+const tickFmt = v => Math.abs(v) >= 10000 ? (v / 1000).toFixed(0) + 'k' : Math.abs(v) < 1e-9 ? '0' : (Math.abs(v) < 1 ? +v.toPrecision(2) : +v.toFixed(2)).toString();
+
+// Plot: lightweight SVG chart.  const p = new Plot('#el', {w, h, x:[a,b], y:[a,b], xlabel, ylabel});
+const PAL = ['var(--blue)', 'var(--accent)', 'var(--green)', 'var(--purple)', 'var(--amber)', 'var(--red)', 'var(--muted)'];
+class Plot {
+  constructor(sel, o = {}) {
+    this.el = typeof sel === 'string' ? $(sel) : sel;
+    this.o = Object.assign({ w: 640, h: 300, x: [0, 1], y: [0, 1], m: { l: 48, r: 14, t: 14, b: 40 }, grid: true, xticks: null, yticks: null }, o);
+    this.el.classList.add('plot');
+    this.svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    this.svg.setAttribute('viewBox', `0 0 ${this.o.w} ${this.o.h}`);
+    this.svg.setAttribute('role', 'img');
+    if (o.label) this.svg.setAttribute('aria-label', o.label);
+    this.el.innerHTML = ''; this.el.appendChild(this.svg);
+    this.clear();
+  }
+  get iw() { return this.o.w - this.o.m.l - this.o.m.r; }
+  get ih() { return this.o.h - this.o.m.t - this.o.m.b; }
+  sx(x) { const [a, b] = this.o.x; return this.o.m.l + (x - a) / (b - a) * this.iw; }
+  sy(y) { const [a, b] = this.o.y; return this.o.m.t + this.ih - (y - a) / (b - a) * this.ih; }
+  ix(px) { const [a, b] = this.o.x; return a + (px - this.o.m.l) / this.iw * (b - a); }
+  iy(py) { const [a, b] = this.o.y; return a + (this.o.m.t + this.ih - py) / this.ih * (b - a); }
+  add(tag, attrs, parent) { const e = document.createElementNS('http://www.w3.org/2000/svg', tag); for (const k in attrs) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); } (parent || this.svg).appendChild(e); return e; }
+  clear(x, y) { if (x) this.o.x = x; if (y) this.o.y = y; this.svg.innerHTML = ''; this.axes(); return this; }
+  axes() {
+    const { m, w, h } = this.o; const g = this.add('g', { class: 'ax' });
+    const xt = this.o.xticks || ticks(...this.o.x, Math.max(3, Math.round(this.iw / 80)));
+    const yt = this.o.yticks || ticks(...this.o.y, Math.max(3, Math.round(this.ih / 50)));
+    yt.forEach(v => { const y = this.sy(v); if (this.o.grid) this.add('line', { x1: m.l, x2: w - m.r, y1: y, y2: y, class: 'gl' }, g); this.add('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end', text: this.o.yfmt ? this.o.yfmt(v) : tickFmt(v) }, g); });
+    xt.forEach(v => { const x = this.sx(v); if (this.o.grid) this.add('line', { x1: x, x2: x, y1: m.t, y2: h - m.b, class: 'gl' }, g); this.add('text', { x, y: h - m.b + 16, 'text-anchor': 'middle', text: this.o.xfmt ? this.o.xfmt(v) : tickFmt(v) }, g); });
+    this.add('line', { x1: m.l, x2: w - m.r, y1: h - m.b, y2: h - m.b, class: 'axl' }, g);
+    this.add('line', { x1: m.l, x2: m.l, y1: m.t, y2: h - m.b, class: 'axl' }, g);
+    if (this.o.xlabel) this.add('text', { x: m.l + this.iw / 2, y: h - 4, 'text-anchor': 'middle', class: 'lab', text: this.o.xlabel }, g);
+    if (this.o.ylabel) this.add('text', { x: 12, y: m.t + this.ih / 2, 'text-anchor': 'middle', class: 'lab', transform: `rotate(-90 12 ${m.t + this.ih / 2})`, text: this.o.ylabel }, g);
+    const id = 'clip' + (Plot.n = (Plot.n || 0) + 1);
+    const cp = this.add('clipPath', { id }); this.add('rect', { x: m.l - 1, y: m.t - 1, width: this.iw + 2, height: this.ih + 2 }, cp);
+    this.layer = this.add('g', { 'clip-path': `url(#${id})` });
+  }
+  path(xs, ys, s = {}) { let d = ''; let pen = false; for (let i = 0; i < xs.length; i++) { if (ys[i] === null || !isFinite(ys[i])) { pen = false; continue; } d += (pen ? 'L' : 'M') + this.sx(xs[i]).toFixed(1) + ',' + this.sy(ys[i]).toFixed(1); pen = true; } return this.add('path', { d, style: `fill:none;stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  area(xs, ys, s = {}) { const y0 = this.sy(Math.max(this.o.y[0], 0)); let d = `M${this.sx(xs[0])},${y0}`; xs.forEach((x, i) => d += `L${this.sx(x).toFixed(1)},${this.sy(ys[i]).toFixed(1)}`); d += `L${this.sx(xs[xs.length - 1])},${y0}Z`; return this.add('path', { d, style: `fill:${s.color || 'var(--accent)'};opacity:${s.opacity || .18};stroke:none` }, this.layer); }
+  dot(x, y, s = {}) { return this.add('circle', { cx: this.sx(x), cy: this.sy(y), r: s.r || 4, style: `fill:${s.color || 'var(--accent)'};stroke:${s.stroke || 'var(--surface)'};stroke-width:${s.sw ?? 1};${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  bar(x0, x1, y, s = {}) { const yb = this.sy(Math.max(this.o.y[0], 0)), yt = this.sy(y); return this.add('rect', { x: this.sx(x0) + (s.gap ?? 1), y: Math.min(yt, yb), width: Math.max(0, this.sx(x1) - this.sx(x0) - 2 * (s.gap ?? 1)), height: Math.abs(yb - yt), rx: 2, style: `fill:${s.color || 'var(--blue)'};opacity:${s.opacity ?? .85}` }, this.layer); }
+  vline(x, s = {}) { const l = this.add('line', { x1: this.sx(x), x2: this.sx(x), y1: this.o.m.t, y2: this.o.h - this.o.m.b, style: `stroke:${s.color || 'var(--accent)'};stroke-width:${s.width || 2};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); if (s.label) this.text(x, this.o.y[1], s.label, { color: s.color, dy: s.dy ?? 12, anchor: s.anchor || 'start', dx: s.dx ?? 4 }); return l; }
+  hline(y, s = {}) { return this.add('line', { x1: this.o.m.l, x2: this.o.w - this.o.m.r, y1: this.sy(y), y2: this.sy(y), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash : ''}` }, this.layer); }
+  seg(x1, y1, x2, y2, s = {}) { return this.add('line', { x1: this.sx(x1), y1: this.sy(y1), x2: this.sx(x2), y2: this.sy(y2), style: `stroke:${s.color || 'var(--muted)'};stroke-width:${s.width || 1.5};${s.dash ? 'stroke-dasharray:' + s.dash + ';' : ''}${s.opacity ? 'opacity:' + s.opacity : ''}` }, this.layer); }
+  text(x, y, t, s = {}) { return this.add('text', { x: this.sx(x) + (s.dx || 0), y: this.sy(y) + (s.dy || 0), 'text-anchor': s.anchor || 'middle', class: 'pt', style: `fill:${s.color || 'var(--ink)'};font-size:${s.size || 12}px;font-weight:${s.weight || 600}`, text: t }, s.noclip ? this.svg : this.layer); }
+  hist(data, bins, s = {}) { const [a, b] = s.range || [Math.min(...data), Math.max(...data)]; const w = (b - a) / bins || 1; const c = new Array(bins).fill(0); data.forEach(v => { const i = Math.min(bins - 1, Math.max(0, Math.floor((v - a) / w))); c[i]++; }); return { edges: c.map((_, i) => a + i * w), w, counts: c }; }
+  onClick(fn) { this.svg.style.cursor = 'crosshair'; this.svg.addEventListener('click', e => { const pt = this.svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(this.svg.getScreenCTM().inverse()); fn(this.ix(q.x), this.iy(q.y), e); }); }
+}
+function legend(sel, items) { $(sel).innerHTML = items.map(([c, t, dash]) => `<span class="lg"><i style="background:${c};${dash ? 'height:0;border-top:2px dashed ' + c + ';background:none' : ''}"></i>${t}</span>`).join(''); }
+const kpi = (l, v, d = '') => `<div class="kpi"><div class="l">${l}</div><div class="v">${v}</div>${d ? `<div class="small">${d}</div>` : ''}</div>`;
+// bind a range input to a label: slide('#id', fn) -> calls fn on input, shows value in [data-for=id]
+function slide(id, fn, f = v => v) { const el = $('#' + id); const out = $$(`[data-for="${id}"]`); const run = () => { out.forEach(o => o.textContent = f(+el.value)); fn(+el.value); }; el.addEventListener('input', run); return run; }
+
+// ---------- small linear algebra ----------
+function solve(A, b) { const n = b.length; const M = A.map((r, i) => [...r, b[i]]); for (let c = 0; c < n; c++) { let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r; [M[c], M[p]] = [M[p], M[c]]; const d = M[c][c] || 1e-12; for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / d; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; } } return M.map((r, i) => r[n] / (r[i] || 1e-12)); }
+// least squares with optional ridge penalty (lam applied to all but column 0 when intercept=true)
+function lstsq(X, y, lam = 0, intercept = true) { const p = X[0].length; const A = Array.from({ length: p }, () => new Array(p).fill(0)), b = new Array(p).fill(0); X.forEach((r, i) => { for (let j = 0; j < p; j++) { b[j] += r[j] * y[i]; for (let k = 0; k < p; k++) A[j][k] += r[j] * r[k]; } }); for (let j = intercept ? 1 : 0; j < p; j++) A[j][j] += lam; for (let j = 0; j < p; j++) A[j][j] += 1e-10; return solve(A, b); }
+const dot = (a, b) => a.reduce((s, x, i) => s + x * b[i], 0);
+const col = (M, j) => M.map(r => r[j]);
+function standardize(M) { const p = M[0].length; const mu = [], s = []; for (let j = 0; j < p; j++) { const c = col(M, j); mu.push(mean(c)); s.push(sd(c) || 1); } return { Z: M.map(r => r.map((v, j) => (v - mu[j]) / s[j])), mu, s }; }
+const r2 = (y, p) => { const m = mean(y); return 1 - sum(y.map((v, i) => (v - p[i]) ** 2)) / sum(y.map(v => (v - m) ** 2)); };
+const rmse = (y, p) => Math.sqrt(mean(y.map((v, i) => (v - p[i]) ** 2)));
+</script>
+<script>
+const AIR = [112, 118, 132, 129, 121, 135, 148, 148, 136, 119, 104, 118, 115, 126, 141, 135, 125, 149, 170, 170, 158, 133, 114, 140, 145, 150, 178, 163, 172, 178, 199, 199, 184, 162, 146, 166, 171, 180, 193, 181, 183, 218, 230, 242, 209, 191, 172, 194, 196, 196, 236, 235, 229, 243, 264, 272, 237, 211, 180, 201, 204, 188, 235, 227, 234, 264, 302, 293, 259, 229, 203, 229, 242, 233, 267, 269, 270, 315, 364, 347, 312, 274, 237, 278, 284, 277, 317, 313, 318, 374, 413, 405, 355, 306, 271, 306, 315, 301, 356, 348, 355, 422, 465, 467, 404, 347, 305, 336, 340, 318, 362, 348, 363, 435, 491, 505, 404, 359, 310, 337, 360, 342, 406, 396, 420, 472, 548, 559, 463, 407, 362, 405, 417, 391, 419, 461, 472, 535, 622, 606, 508, 461, 390, 432];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const mlabel = i => MON[i % 12] + ' ' + (1949 + Math.floor(i / 12));
+const yearTicks = (a, b) => range(a, b).filter(i => i % 24 === 0);
+const yfmt = i => String(1949 + Math.round(i / 12));
+const d2 = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2;
+
+// ---------- K-Means helpers ----------
+function kmeansRun(P, K, R, maxIt = 50) { let C = []; const idx = range(0, P.length - 1); for (let i = 0; i < K; i++) C.push([...P[idx.splice(Math.floor(R() * idx.length), 1)[0]]]); let A = []; for (let it = 0; it < maxIt; it++) { const nA = P.map(p => { let b = 0; C.forEach((c, j) => { if (d2(p, c) < d2(p, C[b])) b = j; }); return b; }); const same = A.length && nA.every((v, i) => v === A[i]); A = nA; C = C.map((c, j) => { const m = P.filter((_, i) => A[i] === j); return m.length ? [mean(m.map(p => p[0])), mean(m.map(p => p[1]))] : c; }); if (same) break; } return { C, A, sse: sum(P.map((p, i) => d2(p, C[A[i]]))) }; }
+function silhouette(P, A) { const K = Math.max(...A) + 1; if (K < 2) return NaN; return mean(P.map((p, i) => { const dist = new Array(K).fill(0), cnt = new Array(K).fill(0); P.forEach((q, j) => { if (i !== j) { dist[A[j]] += Math.sqrt(d2(p, q)); cnt[A[j]]++; } }); const a = cnt[A[i]] ? dist[A[i]] / cnt[A[i]] : 0; let b = Infinity; for (let k = 0; k < K; k++) if (k !== A[i] && cnt[k]) b = Math.min(b, dist[k] / cnt[k]); return cnt[A[i]] ? (b - a) / Math.max(a, b) : 0; })); }
+const blobs = seed => { const R = rng(seed), C = [[-2, 1.6], [1.8, 2], [-1.2, -1.8], [2.2, -1.2]]; return C.flatMap(c => Array.from({ length: 55 }, () => [c[0] + .65 * gauss(R), c[1] + .65 * gauss(R)])); };
+
+// ===== Section 2 & 3: K-Means + elbow =====
+(function () {
+  let P, C = [], A = null, it = 0, seed = 12, R = rng(99);
+  const sse = () => A ? sum(P.map((p, i) => d2(p, C[A[i]]))) : NaN;
+  function draw(msg) {
+    const p = new Plot('#kmPlot', { h: 340, x: [-4.5, 4.5], y: [-4, 4], xlabel: 'feature 1 (scaled)', ylabel: 'feature 2 (scaled)' });
+    P.forEach((q, i) => p.dot(q[0], q[1], { r: 4.5, color: A ? PAL[A[i] % PAL.length] : 'var(--muted)', opacity: A ? .85 : .6 }));
+    C.forEach((c, j) => { p.add('path', { d: `M${p.sx(c[0]) - 9},${p.sy(c[1]) - 9}l18,18M${p.sx(c[0]) + 9},${p.sy(c[1]) - 9}l-18,18`, style: `stroke:var(--surface);stroke-width:7;stroke-linecap:round` }, p.layer); p.add('path', { d: `M${p.sx(c[0]) - 9},${p.sy(c[1]) - 9}l18,18M${p.sx(c[0]) + 9},${p.sy(c[1]) - 9}l-18,18`, style: `stroke:${PAL[j % PAL.length]};stroke-width:4;stroke-linecap:round` }, p.layer); });
+    $('#kmKpi').innerHTML = kpi('K', C.length || +$('#kmK').value) + kpi('Iteration', it) + kpi('SSE (inertia)', A ? fmt(sse(), 1) : '—') + kpi('Silhouette', A && C.length > 1 ? fmt(silhouette(P, A), 3) : '—');
+    if (msg) $('#kmOut').innerHTML = msg;
+  }
+  function init() { const K = +$('#kmK').value, idx = range(0, P.length - 1); C = []; for (let i = 0; i < K; i++) C.push([...P[idx.splice(Math.floor(R() * idx.length), 1)[0]]]); A = null; it = 0; draw(`① ${K} centroids placed on random data points (✕). Now press <b>Assign</b>.`); }
+  function assign() { if (!C.length) init(); const old = A; A = P.map(p => { let b = 0; C.forEach((c, j) => { if (d2(p, c) < d2(p, C[b])) b = j; }); return b; }); const moved = old ? A.filter((v, i) => v !== old[i]).length : P.length; draw(`② Each point joins its nearest centroid. ${old ? moved + ' point(s) changed cluster.' : ''} ${old && moved === 0 ? '<b>Converged ✓</b>: no point changed, so we stop.' : 'Now press <b>Update</b>.'}`); return moved; }
+  function update() { if (!A) return assign(); C = C.map((c, j) => { const m = P.filter((_, i) => A[i] === j); return m.length ? [mean(m.map(p => p[0])), mean(m.map(p => p[1]))] : c; }); it++; draw('③ Each centroid moves to the mean of its points, which lowers the SSE. Assign again…'); }
+  $('#kmInit').onclick = init; $('#kmAssign').onclick = assign; $('#kmUpdate').onclick = update;
+  $('#kmRun').onclick = () => { if (!C.length) init(); for (let k = 0; k < 100; k++) { const m = assign(); if (it && m === 0) break; update(); } assign(); draw(`<b>Converged</b> after ${it} iterations, SSE = ${fmt(sse(), 1)}. Press ① again: a different random start can end in a different (worse) solution, which is why libraries run it several times (<code>n_init=10</code>) and use k-means++.`); };
+  $('#kmData').onclick = () => { seed += 3; P = blobs(seed); init(); elbow(); };
+  slide('kmK', init);
+  function elbow() {
+    const Ks = range(1, 8), res = Ks.map(K => { let best = null; for (let s = 0; s < 6; s++) { const r = kmeansRun(P, K, rng(K * 31 + s)); if (!best || r.sse < best.sse) best = r; } return best; });
+    const sil = res.map((r, i) => i ? silhouette(P, r.A) : NaN);
+    const e = new Plot('#elPlot', { w: 420, h: 250, x: [1, 8], y: [0, Math.max(...res.map(r => r.sse)) * 1.05], xlabel: 'K', ylabel: 'SSE', xticks: Ks });
+    e.path(Ks, res.map(r => r.sse), { color: 'var(--blue)', width: 2.5 }); Ks.forEach((k, i) => e.dot(k, res[i].sse, { r: 4.5, color: k === 4 ? 'var(--accent)' : 'var(--blue)' })); e.text(4, res[3].sse, 'elbow', { dy: -10, dx: 20, color: 'var(--accent)' });
+    const s = new Plot('#siPlot', { w: 420, h: 250, x: [1, 8], y: [0, 1], xlabel: 'K', ylabel: 'silhouette', xticks: Ks });
+    const bk = sil.indexOf(Math.max(...sil.slice(1)));
+    s.path(Ks.slice(1), sil.slice(1), { color: 'var(--green)', width: 2.5 }); Ks.slice(1).forEach((k, i) => s.dot(k, sil[i + 1], { r: 4.5, color: i + 1 === bk ? 'var(--accent)' : 'var(--green)' }));
+    $('#elOut').innerHTML = `The SSE curve bends at <b>K = 4</b>: after that, extra clusters barely reduce it. The silhouette score peaks at <b>K = ${Ks[bk]}</b> (${fmt(sil[bk], 2)}). Both point to the 4 groups we generated.`;
+  }
+  P = blobs(seed); init(); elbow();
+})();
+
+// ===== Section 4: document clustering =====
+(function () {
+  const D = [[0, 3, 3, 0, 2], [4, 1, 0, 1, 2], [0, 4, 0, 0, 2], [0, 3, 0, 3, 3], [0, 1, 3, 0, 1], [2, 2, 0, 0, 4], [1, 0, 3, 2, 0], [3, 1, 0, 0, 2]];
+  let A, phase, iter, means, sims, lastMeans;
+  const show = () => { const g = [0, 1, 2].map(c => 'C' + (c + 1) + ' = {' + A.map((a, i) => a === c ? 'D' + (i + 1) : null).filter(Boolean).join(', ') + '}'); return g.join('   ') + (A.includes(-1) ? '   (unassigned: ' + A.map((a, i) => a === -1 ? 'D' + (i + 1) : null).filter(Boolean).join(', ') + ')' : ''); };
+  function render(msg) {
+    let s = `Iteration ${iter} · ${show()}`;
+    if (means) s += '\n\nCluster means (T1…T5):\n' + means.map((m, c) => `  C${c + 1} = [${m.map(v => fmt(v, 2)).join(', ')}]`).join('\n');
+    $('#dcState').textContent = s;
+    $('#dcTbl').innerHTML = !sims ? '<tr><th>Doc</th><th>T1</th><th>T2</th><th>T3</th><th>T4</th><th>T5</th></tr>' + D.map((r, i) => `<tr><td>D${i + 1}</td>${r.map(v => `<td class="num">${v}</td>`).join('')}</tr>`).join('') : '<tr><th>Similarity (dot product)</th>' + D.map((_, i) => `<th class="num">D${i + 1}</th>`).join('') + '</tr>' + [0, 1, 2].map(c => `<tr><td>C${c + 1}</td>${D.map((_, i) => { const best = pick(i); return `<td class="num ${best === c ? 'bad' : ''}" style="${best === c ? 'font-weight:700' : ''}">${fmt(sims[c][i], 2)}</td>`; }).join('')}</tr>`).join('');
+    $('#dcOut').innerHTML = msg;
+  }
+  // highest similarity wins; on a tie the document stays in its current cluster (as on the slide: D5 ties C1/C3 = 8.5)
+  const pick = i => { const s = sims.map(r => r[i]), mx = Math.max(...s); return A[i] >= 0 && Math.abs(s[A[i]] - mx) < 1e-9 ? A[i] : s.indexOf(mx); };
+  function reset() { lastMeans = null; A = [0, 0, 1, 1, 2, 2, -1, -1]; phase = 0; iter = 0; means = null; sims = null; render('The starting groups are given; D7 and D8 are not assigned yet. Press <b>Next step</b> to compute the cluster means.'); }
+  $('#dcStep').onclick = () => {
+    if (phase === 0) { const prev = lastMeans; means = [0, 1, 2].map(c => { const m = D.filter((_, i) => A[i] === c); return m.length ? range(0, 4).map(t => mean(m.map(r => r[t]))) : prev[c]; }); lastMeans = means; sims = null; phase = 1; render('Each cluster mean = the average term vector of its documents (e.g. C1 = (D1 + D2) / 2). Next: compare every document with every mean.'); }
+    else if (phase === 1) { sims = means.map(m => D.map(d => dot(m, d))); phase = 2; render('Similarity = dot product of the document and the cluster mean. The <b>highest value in each column</b> (red) decides where the document goes. E.g. D1: C1 = 14.5, C2 = 15.5, C3 = 14 → C2. On a tie (D5: C1 = C3 = 8.5) the document stays where it is.'); }
+    else { const nA = D.map((_, i) => pick(i)); const changed = nA.filter((v, i) => v !== A[i]).length; A = nA; iter++; phase = 0; means = null; sims = null; render(changed ? `Reassigned (${changed} document(s) moved). After iteration 1 the slide gets C1 = {D2, D7, D8}, C2 = {D1, D3, D4, D6}, C3 = {D5}. Continue until nothing moves.` : '<b>Converged ✓</b>: no document changed cluster, so these are the final topic groups.'); }
+  };
+  $('#dcReset').onclick = reset; reset();
+})();
+
+// ===== Section 5: DBSCAN =====
+(function () {
+  const R = rng(8), P = [];
+  for (let i = 0; i < 110; i++) { const t = Math.PI * R(); P.push([Math.cos(t) + .08 * gauss(R), Math.sin(t) + .08 * gauss(R)]); }
+  for (let i = 0; i < 110; i++) { const t = Math.PI * R(); P.push([1 - Math.cos(t) + .08 * gauss(R), .45 - Math.sin(t) + .08 * gauss(R)]); }
+  for (let i = 0; i < 18; i++) P.push([-1.4 + 3.8 * R(), -.9 + 2.3 * R()]);
+  legend('#dbLeg', [['var(--blue)', 'Cluster colours'], ['var(--muted)', 'Noise (−1)'], ['var(--ink)', 'Ring = core point']]);
+  function dbscan(eps, ms) {
+    const n = P.length, lab = new Array(n).fill(undefined), nb = P.map(p => P.map((q, j) => d2(p, q) <= eps * eps ? j : -1).filter(j => j >= 0)), core = nb.map(x => x.length >= ms);
+    let c = 0; for (let i = 0; i < n; i++) { if (lab[i] !== undefined || !core[i]) continue; lab[i] = c; const st = [...nb[i]]; while (st.length) { const j = st.pop(); if (lab[j] === -1) lab[j] = c; if (lab[j] !== undefined) continue; lab[j] = c; if (core[j]) st.push(...nb[j]); } c++; }
+    return { lab: lab.map(v => v === undefined ? -1 : v), core, k: c };
+  }
+  function draw() {
+    const eps = +$('#dbE').value, ms = +$('#dbM').value, alg = $('#dbAlg').value;
+    const p = new Plot('#dbPlot', { h: 320, x: [-1.6, 2.6], y: [-1.1, 1.5], xlabel: 'longitude (scaled)', ylabel: 'latitude (scaled)' });
+    if (alg === 'km') { const r = kmeansRun(P, 2, rng(3)); P.forEach((q, i) => p.dot(q[0], q[1], { r: 4.5, color: PAL[r.A[i]] })); $('#dbKpi').innerHTML = kpi('Clusters', 2, 'fixed K') + kpi('Noise points', 0, 'outliers forced into clusters'); $('#dbOut').innerHTML = 'K-Means cuts the two moons with a straight boundary because it assumes round clusters around a centroid. Every isolated outlier is forced into a cluster.'; return; }
+    const r = dbscan(eps, ms);
+    P.forEach((q, i) => { if (r.lab[i] === -1) p.dot(q[0], q[1], { r: 3.5, color: 'var(--muted)', opacity: .7 }); else p.dot(q[0], q[1], { r: r.core[i] ? 5 : 4, color: PAL[r.lab[i] % PAL.length], stroke: r.core[i] ? 'var(--ink)' : 'var(--surface)', sw: r.core[i] ? 1 : 1 }); });
+    p.add('circle', { cx: p.sx(-1.25), cy: p.sy(1.25), r: p.sx(-1.25 + eps) - p.sx(-1.25), style: 'fill:none;stroke:var(--accent);stroke-dasharray:4 3;stroke-width:1.5' }, p.layer); p.text(-1.25, 1.25, 'eps', { dy: 4, size: 10, color: 'var(--accent)' });
+    const noise = r.lab.filter(v => v === -1).length;
+    $('#dbKpi').innerHTML = kpi('Clusters found', r.k) + kpi('Noise points', noise) + kpi('Core points', r.core.filter(Boolean).length);
+    $('#dbOut').innerHTML = r.k === 2 && noise < 40 ? '✓ Two moon-shaped clusters found and the scattered points marked as noise, without ever choosing K.' : r.k > 2 ? `${r.k} clusters: eps is a little small (or min_samples large) for this density, so a moon splits into pieces or a few scattered points form their own tiny cluster.` : r.k === 1 ? 'eps is too large: the dense regions connect and everything merges into one cluster.' : 'No dense region found. Increase eps or lower min_samples.';
+  }
+  slide('dbE', draw, v => v.toFixed(2)); slide('dbM', draw); $('#dbAlg').onchange = draw; draw();
+})();
+
+// ===== Section 6: PCA =====
+(function () {
+  const R = rng(4), raw = Array.from({ length: 150 }, () => { const z = gauss(R); return [40 + 12 * z, 52000 + 14000 * (.8 * z + .6 * gauss(R))]; });
+  const { Z } = standardize(raw);
+  const cov = M => { const a = mean(M.map(r => r[0] * r[0])), b = mean(M.map(r => r[0] * r[1])), c = mean(M.map(r => r[1] * r[1])); return [a, b, c]; };
+  const eig = ([a, b, c]) => { const tr = a + c, det = a * c - b * b, l1 = tr / 2 + Math.sqrt(tr * tr / 4 - det), l2 = tr - l1; const v = Math.abs(b) > 1e-12 ? [l1 - c, b] : (a >= c ? [1, 0] : [0, 1]); const n = Math.hypot(...v); return { l1, l2, v: [v[0] / n, v[1] / n] }; };
+  const cen = M => { const m0 = mean(M.map(r => r[0])), m1 = mean(M.map(r => r[1])); return M.map(r => [r[0] - m0, r[1] - m1]); };
+  const Es = eig(cov(Z)), Er = eig(cov(cen(raw)));
+  const pc1deg = ((Math.atan2(Es.v[1], Es.v[0]) * 180 / Math.PI) + 180) % 180;
+  function draw() {
+    const th = +$('#pcA').value * Math.PI / 180, u = [Math.cos(th), Math.sin(th)], sc = $('#pcS').value === '1';
+    const p = new Plot('#pcPlot', { w: 380, h: 340, x: [-3.6, 3.6], y: [-3.2, 3.2], xlabel: 'age (standardised)', ylabel: 'income (standardised)' });
+    Z.forEach(q => { const t = dot(q, u); p.seg(q[0], q[1], t * u[0], t * u[1], { color: 'var(--muted)', opacity: .25, width: 1 }); });
+    Z.forEach(q => p.dot(q[0], q[1], { r: 3.5, color: 'var(--blue)', opacity: .75 }));
+    p.seg(-4 * u[0], -4 * u[1], 4 * u[0], 4 * u[1], { color: 'var(--accent)', width: 2.5 });
+    Z.forEach(q => { const t = dot(q, u); p.dot(t * u[0], t * u[1], { r: 2.5, color: 'var(--accent)', sw: 0 }); });
+    if (sc) { p.seg(0, 0, 2.6 * Es.v[0], 2.6 * Es.v[1], { color: 'var(--green)', width: 3, dash: '6 3' }); p.text(2.8 * Es.v[0], 2.8 * Es.v[1], 'PC1', { color: 'var(--green)' }); }
+    else { const d = [Er.v[0] * 12, Er.v[1] * 14000 / 14000 * 1]; const dv = [Er.v[0] / sd(raw.map(r => r[0])), Er.v[1] / sd(raw.map(r => r[1]))]; const n = Math.hypot(...dv); p.seg(0, 0, 2.6 * dv[0] / n, 2.6 * dv[1] / n, { color: 'var(--red)', width: 3, dash: '6 3' }); p.text(2.8 * dv[0] / n, 2.9 * dv[1] / n, 'raw PC1', { color: 'var(--red)' }); }
+    const vs = range(0, 179).map(a => { const w = [Math.cos(a * Math.PI / 180), Math.sin(a * Math.PI / 180)]; return variance(Z.map(q => dot(q, w))); });
+    const q = new Plot('#pcProj', { w: 380, h: 340, x: [0, 180], y: [0, Math.max(...vs) * 1.1], xlabel: 'axis angle (°)', ylabel: 'variance of projection', xticks: [0, 45, 90, 135, 180] });
+    q.path(range(0, 179), vs, { color: 'var(--purple)', width: 2.5 }); q.vline(pc1deg, { color: 'var(--green)', dash: '5 4', label: 'PC1' }); q.dot(+$('#pcA').value, vs[+$('#pcA').value], { r: 7, color: 'var(--accent)' });
+    const cur = vs[+$('#pcA').value], tot = Es.l1 + Es.l2;
+    $('#pcKpi').innerHTML = kpi('Variance on your axis', fmt(cur, 3), `${fmt(cur / tot * 100, 1)} % of total`) + kpi('PC1 explains', fmt(Es.l1 / tot * 100, 1) + ' %', `angle ${fmt(pc1deg, 0)}°`) + kpi('PC2 explains', fmt(Es.l2 / tot * 100, 1) + ' %') + kpi('Raw-data PC1', (Er.l1 / (Er.l1 + Er.l2) > .999 ? '> 99.9' : fmt(Er.l1 / (Er.l1 + Er.l2) * 100, 1)) + ' %', 'dominated by income in €');
+    $('#pcOut').innerHTML = sc ? `The orange points are the data projected onto your axis. PC1 is the angle where they are most spread out (variance is largest): here about ${fmt(pc1deg, 0)}°, along the diagonal, because age and income are correlated. One number (the PC1 score) keeps ${fmt(Es.l1 / tot * 100, 0)} % of the information.` : '⚠️ <b>Without scaling</b>, income in € has a variance about a million times larger than age in years, so “PC1” simply points along income (red arrow) and claims 99.9 % of the variance. PCA is sensitive to feature size, so <b>always standardise first</b>.';
+  }
+  slide('pcA', draw); $('#pcS').onchange = draw; $('#pcSnap').onclick = () => { $('#pcA').value = Math.round(pc1deg); $('#pcA').dispatchEvent(new Event('input')); }; draw();
+})();
+
+// ===== Section 7: decomposition =====
+function decompose(y, mode) {
+  const n = y.length, T = y.map((_, i) => i < 6 || i > n - 7 ? null : (y[i - 6] / 2 + y[i + 6] / 2 + sum(y.slice(i - 5, i + 6))) / 12);
+  const det = y.map((v, i) => T[i] === null ? null : mode === 'add' ? v - T[i] : v / T[i]);
+  let S = range(0, 11).map(m => mean(det.filter((v, i) => v !== null && i % 12 === m)));
+  const adj = mean(S); S = S.map(v => mode === 'add' ? v - adj : v / adj);
+  const Sf = y.map((_, i) => S[i % 12]), Rr = y.map((v, i) => T[i] === null ? null : mode === 'add' ? v - T[i] - Sf[i] : v / (T[i] * Sf[i]));
+  return { T, S: Sf, R: Rr };
+}
+(function () {
+  let mode = 'mult'; const X = range(0, 143);
+  function draw() {
+    const { T, S, R } = decompose(AIR, mode);
+    const mk = (sel, ys, lab, c, yl, base) => { const v = ys.filter(x => x !== null), lo = Math.min(...v), hi = Math.max(...v), pad = (hi - lo) * .1 || 1; const p = new Plot(sel, { h: 130, x: [0, 143], y: [lo - pad, hi + pad], xticks: yearTicks(0, 143), xfmt: yfmt, ylabel: lab, m: { l: 56, r: 10, t: 8, b: 24 } }); if (base !== undefined) p.hline(base, { color: 'var(--muted)', dash: '3 3', width: 1 }); p.path(X, ys, { color: c, width: 2 }); return p; };
+    mk('#decObs', AIR, 'observed', 'var(--ink)'); mk('#decTr', T, 'trend', 'var(--blue)'); mk('#decSe', S, 'seasonal', 'var(--green)', null, mode === 'add' ? 0 : 1); const rp = mk('#decRe', R, 'residual', 'var(--accent)', null, mode === 'add' ? 0 : 1);
+    const sv = S.slice(0, 12), hi = sv.indexOf(Math.max(...sv)), lo = sv.indexOf(Math.min(...sv));
+    const Rv = R.filter(v => v !== null); const half = Math.floor(Rv.length / 2);
+    $('#decOut').innerHTML = mode === 'mult' ? `<b>Multiplicative:</b> the seasonal swing grows with the level (look at the observed series), so season is a <i>factor</i>: ${MON[hi]} ≈ ×${fmt(sv[hi], 2)} and ${MON[lo]} ≈ ×${fmt(sv[lo], 2)} of the trend. The residuals are fairly even across the years. This is the right model here.` : `<b>Additive:</b> season is a fixed number of passengers (${MON[hi]} ≈ +${fmt(sv[hi], 0)}, ${MON[lo]} ≈ ${fmt(sv[lo], 0)}). The residuals start small and fan out in later years (SD ${fmt(sd(Rv.slice(0, half)), 1)} → ${fmt(sd(Rv.slice(half)), 1)}). That growing pattern is a sign that additive is the wrong choice for this series.`;
+  }
+  $$('#decBtns [data-m]').forEach(b => b.onclick = () => { $$('#decBtns [data-m]').forEach(x => x.classList.toggle('sel', x === b)); mode = b.dataset.m; draw(); }); draw();
+})();
+
+// ===== Section 8: stationarity =====
+(function () {
+  let t = 'raw';
+  legend('#stLeg', [['var(--ink)', 'Series'], ['var(--accent)', 'Rolling mean (12)'], ['var(--blue)', 'Rolling SD (12), shifted to the mean line', true]]);
+  function series() { let y = [...AIR]; let off = 0; if (t.startsWith('log')) y = y.map(Math.log); if (t === 'd1' || t === 'logd1' || t === 'logd1s') { y = y.slice(1).map((v, i) => v - y[i]); off = 1; } if (t === 'logd1s') { y = y.slice(12).map((v, i) => v - y[i]); off = 13; } return { y, off }; }
+  function draw() {
+    const { y, off } = series(), X = y.map((_, i) => i + off), w = 12;
+    const rm = y.map((_, i) => i < w - 1 ? null : mean(y.slice(i - w + 1, i + 1))), rs = y.map((_, i) => i < w - 1 ? null : sd(y.slice(i - w + 1, i + 1)));
+    const lo = Math.min(...y), hi = Math.max(...y), pad = (hi - lo) * .1;
+    const p = new Plot('#stPlot', { h: 250, x: [0, 143], y: [lo - pad, hi + pad], xticks: yearTicks(0, 143), xfmt: yfmt });
+    p.path(X, y, { color: 'var(--ink)', width: 1.5 }); p.path(X, rm, { color: 'var(--accent)', width: 2.5 }); p.path(X, rs.map((s, i) => s === null ? null : rm[i] + s), { color: 'var(--blue)', width: 1.5, dash: '5 3' });
+    const h = Math.floor(y.length / 2), a = y.slice(0, h), b = y.slice(h), s = sd(y);
+    const dm = Math.abs(mean(b) - mean(a)) / s, vr = sd(b) / sd(a), ok = dm < .3 && vr > .67 && vr < 1.5;
+    $('#stKpi').innerHTML = kpi('Mean 1st half', fmt(mean(a), 3)) + kpi('Mean 2nd half', fmt(mean(b), 3)) + kpi('SD ratio (2nd/1st)', fmt(vr, 2)) + kpi('Verdict', ok ? 'looks stationary' : 'not stationary');
+    const o = $('#stOut'); o.className = 'feedback show ' + (ok ? 'ok' : 'no');
+    o.innerHTML = { raw: 'Strong upward <b>trend</b> (the mean rises) and a <b>growing seasonal swing</b> (the variance rises). Clearly non-stationary.', log: 'The log makes the seasonal swings roughly equal in size (variance stabilised), but the trend is still there.', d1: 'Differencing removed the trend, but the swings still grow over time and the yearly pattern remains.', logd1: 'log + differencing: the mean is stable and the variance is roughly constant. Strong monthly seasonality is still visible, so a seasonal difference is still needed.', logd1s: 'log, plus a first difference, plus a seasonal difference (lag 12): the mean is stable, the variance is stable and the seasonal pattern is gone. This is the SARIMA(·, 1, ·)(·, 1, ·)₁₂ recipe for AirPassengers.' }[t] + (ok ? '' : ' <span class="small">(Formal check: the ADF test, <code>statsmodels.tsa.stattools.adfuller</code>.)</span>');
+  }
+  $$('#stBtns [data-t]').forEach(b => b.onclick = () => { $$('#stBtns [data-t]').forEach(x => x.classList.toggle('sel', x === b)); t = b.dataset.t; draw(); }); draw();
+})();
+
+// ===== Section 9: baselines + Holt-Winters =====
+(function () {
+  const COL = { naive: 'var(--muted)', snaive: 'var(--green)', ma: 'var(--blue)', hw: 'var(--accent)' }, NAME = { naive: 'Naive', snaive: 'Seasonal naive', ma: 'Moving average', hw: 'Holt-Winters' };
+  legend('#fcLeg', [['var(--ink)', 'Actual'], ...Object.keys(COL).map(k => [COL[k], NAME[k]])]);
+  function hw(train, h, a, b, g) {
+    const y = train.map(Math.log), m = 12; let L = mean(y.slice(0, 12)), T = (mean(y.slice(12, 24)) - L) / 12; const S = y.slice(0, 12).map(v => v - L);
+    for (let t = 12; t < y.length; t++) { const sOld = S[t - m], Lp = L; L = a * (y[t] - sOld) + (1 - a) * (L + T); T = b * (L - Lp) + (1 - b) * T; S.push(g * (y[t] - L) + (1 - g) * sOld); }
+    return range(1, h).map(k => Math.exp(L + k * T + S[S.length - m + ((k - 1) % m)]));
+  }
+  function draw() {
+    const cut = +$('#fcCut').value, w = +$('#fcW').value, h = Math.min(24, 144 - cut), tr = AIR.slice(0, cut), te = AIR.slice(cut, cut + h);
+    const F = { naive: te.map(() => tr[cut - 1]), snaive: te.map((_, k) => tr[cut - 12 + (k % 12)]), ma: te.map(() => mean(tr.slice(-w))), hw: hw(tr, h, +$('#hwA').value, +$('#hwB').value, +$('#hwG').value) };
+    const on = $$('#fcShow input').filter(i => i.checked).map(i => i.dataset.s);
+    const p = new Plot('#fcPlot', { h: 300, x: [cut - 48, cut + h - 1], y: [100, 700], xticks: range(cut - 48, cut + h).filter(i => i % 12 === 0), xfmt: i => MON[i % 12] + ' ' + String(1949 + Math.floor(i / 12)).slice(2), ylabel: 'passengers (1000s)' });
+    p.add('rect', { x: p.sx(cut - .5), y: p.sy(700), width: p.sx(cut + h - 1) - p.sx(cut - .5), height: p.sy(100) - p.sy(700), style: 'fill:var(--accent-soft);opacity:.5' }, p.layer);
+    p.text(cut + 1, 690, 'TEST (future)', { anchor: 'start', size: 11, color: 'var(--accent)', dy: 4 }); p.text(cut - 2, 690, 'TRAIN (past)', { anchor: 'end', size: 11, color: 'var(--muted)', dy: 4 });
+    const XI = range(cut - 48, cut + h - 1); p.path(XI, XI.map(i => AIR[i]), { color: 'var(--ink)', width: 2 });
+    const tx = range(cut, cut + h - 1); on.forEach(k => p.path(tx, F[k], { color: COL[k], width: 2.5, dash: k === 'hw' ? '' : '6 3' }));
+    const met = k => { const e = te.map((v, i) => v - F[k][i]); return [mean(e.map(Math.abs)), Math.sqrt(mean(e.map(v => v * v))), mean(e.map((v, i) => Math.abs(v) / te[i])) * 100]; };
+    const rows = Object.keys(F).map(k => [k, ...met(k)]).sort((a, b) => a[3] - b[3]);
+    $('#fcTbl').innerHTML = `<tr><th>Model (test = ${mlabel(cut)} – ${mlabel(cut + h - 1)})</th><th class="num">MAE</th><th class="num">RMSE</th><th class="num">MAPE</th></tr>` + rows.map((r, i) => `<tr class="${i === 0 ? 'hl' : ''}"><td><span class="lg"><i style="background:${COL[r[0]]}"></i>${NAME[r[0]]}${i === 0 ? ' 🏆' : ''}</span></td><td class="num">${fmt(r[1], 1)}</td><td class="num">${fmt(r[2], 1)}</td><td class="num">${fmt(r[3], 1)} %</td></tr>`).join('');
+  }
+  slide('fcCut', draw, v => mlabel(v - 1)); slide('fcW', draw); ['hwA', 'hwB', 'hwG'].forEach(id => slide(id, draw, v => v.toFixed(2)));
+  $$('#fcShow input').forEach(i => i.onchange = draw); draw();
+})();
+
+// ===== Section 10: AR / MA simulator, lag features, sorter =====
+(function () {
+  const R = rng(77), N = 220, e = Array.from({ length: N }, () => gauss(R));
+  function draw() {
+    const typ = $('#armT').value, ph = +$('#armP').value, y = new Array(N).fill(0);
+    for (let t = 1; t < N; t++) y[t] = typ === 'ar' ? ph * y[t - 1] + e[t] : e[t] + ph * e[t - 1];
+    const s = y.slice(20), lo = Math.min(...s), hi = Math.max(...s);
+    const p = new Plot('#armSer', { w: 420, h: 240, x: [0, s.length - 1], y: [lo - .5, hi + .5], xlabel: 't', ylabel: 'Y' }); p.hline(0, { color: 'var(--muted)', dash: '3 3', width: 1 }); p.path(range(0, s.length - 1), s, { color: 'var(--purple)', width: 1.5 });
+    const m = mean(s), v = sum(s.map(x => (x - m) ** 2)), acf = range(1, 15).map(k => sum(s.slice(k).map((x, i) => (x - m) * (s[i] - m))) / v), band = 1.96 / Math.sqrt(s.length);
+    const q = new Plot('#armAcf', { w: 420, h: 240, x: [.3, 15.7], y: [-1, 1], xlabel: 'lag k', ylabel: 'autocorrelation', xticks: range(1, 15) });
+    q.add('rect', { x: q.sx(.3), y: q.sy(band), width: q.sx(15.7) - q.sx(.3), height: q.sy(-band) - q.sy(band), style: 'fill:var(--blue-soft)' }, q.layer); q.hline(0, { color: 'var(--muted)', width: 1 });
+    acf.forEach((a, i) => { const k = i + 1; q.add('rect', { x: q.sx(k - .25), y: q.sy(Math.max(0, a)), width: q.sx(k + .25) - q.sx(k - .25), height: Math.abs(q.sy(a) - q.sy(0)), style: `fill:${Math.abs(a) > band ? 'var(--accent)' : 'var(--muted)'}` }, q.layer); });
+    $('#armOut').innerHTML = typ === 'ar' ? `<b>AR(1), φ = ${ph.toFixed(2)}:</b> the ACF ${Math.abs(ph) > .3 ? 'decays gradually' : 'is small'}${ph < -.3 ? ', alternating in sign, so the series zig-zags' : ''}. ${ph > .9 ? 'φ close to 1 makes the series wander like a random walk (nearly non-stationary).' : 'Each value “remembers” the previous one.'} A gradually decaying ACF points to an AR model.` : `<b>MA(1), θ = ${ph.toFixed(2)}:</b> the ACF has a spike at <b>lag 1 only</b>, then cuts off. A shock affects just the next step and is then forgotten. A sharp cut-off after q lags points to an MA(q) model.`;
+  }
+  slide('armP', draw, v => v.toFixed(2)); $('#armT').onchange = draw; draw();
+
+  function lags() {
+    const on = $$('#lagBtns input').filter(i => i.checked).map(i => i.dataset.l), H = { lag1: 'lag_1', lag12: 'lag_12', roll3: 'rolling_mean_3', month: 'month', summer: 'is_summer' };
+    const rows = range(0, 15).map(i => { const r = [mlabel(i), AIR[i]]; on.forEach(k => r.push(k === 'lag1' ? (i >= 1 ? AIR[i - 1] : '') : k === 'lag12' ? (i >= 12 ? AIR[i - 12] : '') : k === 'roll3' ? (i >= 3 ? fmt(mean(AIR.slice(i - 3, i)), 1) : '') : k === 'month' ? (i % 12) + 1 : +[5, 6, 7].includes(i % 12))); return r; });
+    $('#lagTbl').innerHTML = '<tr><th>date</th><th>y (target)</th>' + on.map(k => `<th>${H[k]}</th>`).join('') + '</tr>' + rows.map(r => '<tr>' + r.map((c, j) => `<td class="${c === '' ? 'warn' : ''}">${c === '' ? 'NaN' : c}</td>`).join('') + '</tr>').join('');
+  }
+  $$('#lagBtns input').forEach(i => i.onchange = lags); lags();
+
+  makeSorter('#sortModels', [{ id: 'arima', label: 'ARIMA' }, { id: 'sarima', label: 'SARIMA' }, { id: 'prophet', label: 'Prophet' }, { id: 'xgb', label: 'XGBoost + lag features' }, { id: 'dl', label: 'LSTM / Transformer' }], [
+    { t: 'Monthly sales with a clear yearly cycle and a trend', c: 'sarima' }, { t: 'Yearly GDP with a trend, no seasonality', c: 'arima' },
+    { t: 'Daily web traffic with weekly pattern + holidays + missing days', c: 'prophet' }, { t: 'Store demand driven by weather, promotions and prices', c: 'xgb' },
+    { t: 'Millions of sensor readings with long, complex dependencies', c: 'dl' }, { t: 'Monthly energy demand with stable yearly cycle', c: 'sarima' },
+    { t: 'Short series with trend, quick interpretable baseline', c: 'arima' }, { t: 'Retail demand where Black Friday & Easter matter', c: 'prophet' }
+  ]);
+})();
+
+// ===== Section 11: PSI + checklist =====
+(function () {
+  legend('#psLeg', [['var(--blue)', 'Training (reference) distribution'], ['var(--accent)', 'This month (production)']]);
+  const edges = [-Infinity, ...range(1, 9).map(k => { let lo = -5, hi = 5; for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; normCDF(m) < k / 10 ? lo = m : hi = m; } return lo; }), Infinity];
+  function draw() {
+    const m = +$('#psM').value, s = +$('#psS').value, xs = range(-5, 5, .05);
+    const p = new Plot('#psPlot', { h: 220, x: [-5, 5], y: [0, .45 / Math.min(1, s) * 1.02], xlabel: 'feature value (e.g. applicant income, standardised)', yticks: [] });
+    p.area(xs, xs.map(x => normPDF(x)), { color: 'var(--blue)', opacity: .2 }); p.path(xs, xs.map(x => normPDF(x)), { color: 'var(--blue)', width: 2 });
+    p.area(xs, xs.map(x => normPDF(x, m, s)), { color: 'var(--accent)', opacity: .2 }); p.path(xs, xs.map(x => normPDF(x, m, s)), { color: 'var(--accent)', width: 2 });
+    let psi = 0; for (let k = 0; k < 10; k++) { const a = Math.max(1e-6, normCDF(edges[k + 1], m, s) - normCDF(edges[k], m, s)), e = .1; psi += (a - e) * Math.log(a / e); }
+    const o = $('#psOut'); o.className = 'feedback show ' + (psi < .1 ? 'ok' : psi < .25 ? 'info' : 'no');
+    o.innerHTML = `PSI = <b>${fmt(psi, 3)}</b> → ${psi < .1 ? 'stable: no action needed.' : psi < .25 ? 'moderate shift: investigate the cause and watch the performance metrics.' : 'major shift: the model is seeing data unlike its training data. Retrain or recalibrate.'}`;
+  }
+  slide('psM', draw, v => v.toFixed(2)); slide('psS', draw, v => v.toFixed(2)); draw();
+
+  const items = ['Clear business / research question', 'Data description: source, size, variables, licence', 'EDA with key figures (distributions, correlations)', 'Preprocessing steps documented (missing values, scaling, encoding)', 'Model choice justified (why this method?)', 'Baseline model for comparison', 'Metric table (e.g. MAE / RMSE / MAPE, F1, silhouette)', 'Interpretation paragraph for each result (clusters, forecasts)', 'Supervised + unsupervised parts connected (e.g. cluster label as feature)', 'Limitations, risks and ethical considerations', 'requirements.txt + fixed random seeds + README “how to run”', 'Model saved with joblib and reload tested', 'Monitoring plan: what drift / metric would trigger retraining?'];
+  const key = 'sml-checklist'; let st = store.get(key, []);
+  function paint() {
+    $('#chkBox').innerHTML = items.map((t, i) => `<label class="check"><input type="checkbox" data-i="${i}" ${st.includes(i) ? 'checked' : ''}> <span>${t}</span></label>`).join('');
+    $$('#chkBox input').forEach(c => c.onchange = () => { const i = +c.dataset.i; st = c.checked ? [...st, i] : st.filter(x => x !== i); store.set(key, st); bar(); });
+    bar();
+  }
+  const bar = () => { $('#chkBar').style.width = (st.length / items.length * 100) + '%'; $('#chkTxt').textContent = `${st.length} / ${items.length} done${st.length === items.length ? ' — ready to submit! 🎉' : ''} (saved in this browser)`; };
+  paint();
+})();
+
+// ===== Quiz =====
+renderQuiz('#quizBox', [
+  { q: 'What is the main goal of clustering?', opts: ['Predict a known label', 'Discover natural groups in unlabelled data', 'Forecast future values', 'Reduce training time'], a: 1, why: 'Clustering is unsupervised: no labels, find similar groups.' },
+  { q: 'After assigning points to the nearest centroid, what does K-Means do next?', opts: ['Stops', 'Moves each centroid to the mean of its assigned points', 'Deletes outliers', 'Increases K'], a: 1, why: 'Assign → update → repeat until stable.' },
+  { q: 'Which dataset is most suitable for K-Means?', opts: ['Two interleaved moon shapes', 'Compact, roughly round, well-separated groups', 'Data with many outliers', 'A time series'], a: 1, why: 'K-Means assumes spherical clusters around centroids.' },
+  { q: 'In DBSCAN, what does eps control?', opts: ['The number of clusters', 'The maximum distance for two points to be neighbours', 'The learning rate', 'The number of iterations'], a: 1, why: 'eps is the neighbourhood radius.' },
+  { q: 'Which point is a core point in DBSCAN?', opts: ['Any point in a cluster', 'A point with at least min_samples neighbours within eps', 'The centroid', 'A noise point'], a: 1, why: 'Core points define dense regions; border points are reachable but not dense themselves.' },
+  { q: 'A city wants accident hotspots from GPS data; hotspots have irregular shapes and some accidents are isolated. Method?', opts: ['K-Means', 'DBSCAN', 'Linear regression', 'PCA only'], a: 1, why: 'Irregular shapes + noise detection + no K → DBSCAN.' },
+  { q: 'What is the main purpose of PCA in this chapter\'s clustering workflow?', opts: ['To create the clusters', 'To visualise and explain clusters in 2-D', 'To impute missing values', 'To forecast'], a: 1, why: 'Clustering finds groups; PCA helps us see them.' },
+  { q: 'After PCA, two cluster colours strongly overlap. Best interpretation?', opts: ['PCA is broken', 'Those clusters may not be truly distinct, or PC1/PC2 miss what separates them', 'K is definitely too small', 'The data has no variance'], a: 1, why: 'Overlap in 2-D is a warning sign; check other components and the cluster profiles.' },
+  { q: 'Why should we usually avoid randomly shuffling time-series data?', opts: ['It is slow', 'Future information leaks into training, so scores are too optimistic', 'It removes seasonality', 'Shuffling is required'], a: 1, why: 'Train on the past, test on the future.' },
+  { q: 'Which example best represents seasonality?', opts: ['Smartphone users rising for 10 years', 'Retail sales peaking every December', 'A one-off market crash', 'Random sensor noise'], a: 1, why: 'A pattern repeating at fixed intervals.' },
+  { q: 'Website traffic gradually decreases for months after a campaign ends. Which component?', opts: ['Seasonality', 'Trend', 'Residual', 'Stationarity'], a: 1, why: 'A long-term direction is a trend.' },
+  { q: 'After removing trend and season, residuals are random around 0 except one huge negative value. Interpretation?', opts: ['Strong seasonality', 'An anomaly / unusual event at that time', 'Upward trend', 'The decomposition failed'], a: 1, why: 'A large isolated residual is a candidate anomaly (e.g. an outage).' },
+  { q: 'Which statement best describes a stationary time series?', opts: ['It always increases', 'Its mean and variance stay stable over time', 'It has strong seasonality', 'It has no noise'], a: 1, why: 'Stable mean and variance, with no trend or changing seasonality.' },
+  { q: 'A strong seasonal pattern repeats every year. Which classical model is most suitable?', opts: ['AR', 'ARIMA', 'SARIMA', 'MA'], a: 2, why: 'SARIMA adds seasonal terms (s = 12 for monthly data).' },
+  { q: 'An advanced model performs almost the same as the seasonal-naive baseline. Best conclusion?', opts: ['Deploy the advanced model anyway', 'The extra complexity is not justified; prefer the simple model or improve features', 'The baseline is wrong', 'Use more epochs'], a: 1, why: 'Baselines guard against unnecessary complexity.' },
+  { q: 'Why fix random seeds and record package versions in the final project?', opts: ['To make code faster', 'So others (and you) get the same results when rerunning: reproducibility', 'It is required by Python', 'To prevent drift'], a: 1, why: 'Reproducibility is part of trustworthy reporting.' }
+]);
+</script>
+</body></html>

@@ -2,23 +2,40 @@
 
 A clean academic repository for the **Statistics and Machine Learning** course.
 
+## Interactive study guides
+
+Open these in your browser. Each page explains the chapter's concepts with worked examples, simulations you can play with, links to the course notebooks and a self-check quiz.
+
+| Chapter | Topic | Open |
+|---|---|---|
+| 1 | Statistical Foundations & Inference | [Open page](https://mehrdadjalali-ai.github.io/stat-ml-teaching-materials/interactive/Chapter1_Statistical_Foundations_Inference.html) |
+| 2 | Machine Learning Foundations & Regression | [Open page](https://mehrdadjalali-ai.github.io/stat-ml-teaching-materials/interactive/Chapter2_ML_Foundations_Regression.html) |
+| 3 | Classification, Evaluation & Regularization | [Open page](https://mehrdadjalali-ai.github.io/stat-ml-teaching-materials/interactive/Chapter3_Classification_Evaluation.html) |
+| 4 | Unsupervised Learning, Time Series & Reporting | [Open page](https://mehrdadjalali-ai.github.io/stat-ml-teaching-materials/interactive/Chapter4_Unsupervised_TimeSeries_Reporting.html) |
+
+All four: <https://mehrdadjalali-ai.github.io/stat-ml-teaching-materials/interactive/>
+
+Offline: download the `.html` files from the [`interactive/`](interactive/) folder and open them in any browser.
+
 ## Repository Goals
 
-- Organize the course material week by week.
-- Provide complete and beginner-friendly (master's level) Week 1 learning resources.
+- Organize the course material chapter by chapter.
+- Provide complete and beginner-friendly (master's level) learning resources for every chapter.
 - Separate lecture-support materials from practical lab activities.
 
-## Weekly Structure
+## Course Structure
 
-- `Week_01_Statistical_Foundations_and_Inference/` (fully developed)
-  - `Lecture_Support/`: concept reinforcement, worked examples, take-home style exercises.
-  - `Practical_Lab/`: guided in-class tasks and detailed solutions.
-  - `data/`: notes for datasets used in Week 1.
-- `Week_02_Machine_Learning_Foundations_and_Regression/` (placeholder)
-- `Week_03_Classification_Evaluation_and_Regularization/` (placeholder)
-- `Week_04_Unsupervised_Learning_Time_Series_and_Reporting/` (placeholder)
+| Chapter | Folder |
+|---|---|
+| 1 · Statistical Foundations & Inference | `Week_01_Statistical_Foundations_and_Inference/` (`Lecture_Support/`, `Practical_Lab/`) |
+| 2 · Machine Learning Foundations & Regression | `Week_02_Machine_Learning_Foundations_and_Regression/Lecture_Support/` |
+| 3 · Classification, Evaluation & Regularization | `Week_03_Classification_Evaluation_and_Regularization/Lecture_Support/` |
+| 4 · Unsupervised Learning, Time Series & Reporting | `Week_04_Unsupervised_Learning_Time_Series_and_Reporting/Lecture_Support/` |
+| Interactive study guides | `interactive/` |
 
-## Week 1 Learning Outcomes
+Datasets used by the notebooks are in `data/`.
+
+## Chapter 1 Learning Outcomes
 
 1. Distinguish variable types and perform dataset inspection.
 2. Compute and interpret descriptive statistics.
